@@ -802,53 +802,77 @@ header .btn {
 }
 
 
-/* === PRELOADER === */
-#preloader {
+
+/* === PRELOADER (full-screen overlay) === */
+#preloader{
   position: fixed;
-  top: 0;
-  left: 0;
+  inset: 0;                 /* top:0; right:0; bottom:0; left:0; */
   width: 100%;
   height: 100%;
-  background: #f9f9f9;
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 20000; /* stays on top of everything */
-  transition: opacity 0.6s ease, visibility 0.6s ease;
+  justify-content: center;
+  background: #ffffff;      /* matches page bg; change if you want */
+  z-index: 99999;           /* MUST be above your nav (nav used 10000) */
+  transition: opacity .6s ease, visibility .6s ease;
+  pointer-events: auto;
 }
 
-.preloader {
-  display: flex;
-  gap: 5px;
-  font-size: clamp(2rem, 8vw, 4rem); /* responsive font size */
-  font-weight: bold;
-  color: purple;
-  letter-spacing: 4px;
-}
-
-.preloader span {
+/* hide class applied when finished */
+#preloader.preloader-hidden{
   opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 0.8s forwards;
+  visibility: hidden;
+  pointer-events: none;
 }
 
-.preloader span:nth-child(1) { animation-delay: 0s; }
-.preloader span:nth-child(2) { animation-delay: 0.1s; }
-.preloader span:nth-child(3) { animation-delay: 0.2s; }
-.preloader span:nth-child(4) { animation-delay: 0.3s; }
-.preloader span:nth-child(5) { animation-delay: 0.4s; }
-.preloader span:nth-child(6) { animation-delay: 0.5s; }
-.preloader span:nth-child(7) { animation-delay: 0.6s; }
-.preloader span:nth-child(8) { animation-delay: 0.7s; }
-.preloader span:nth-child(9) { animation-delay: 0.8s; }
-.preloader span:nth-child(10) { animation-delay: 0.9s; }
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* letters container */
+.preloader-letters{
+  display:flex;
+  gap: 6px;
+  font-family: 'Montserrat', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-weight: 800;
+  color: #6a0dad;           /* purple */
+  letter-spacing: 6px;
+  font-size: clamp(28px, 8vw, 64px); /* responsive */
+  text-transform: uppercase;
+  user-select: none;
 }
+
+/* letter animation */
+.preloader-letters span{
+  display:inline-block;
+  opacity: 0;
+  transform: translateY(18px);
+  animation: pm-fadeUp .65s forwards cubic-bezier(.22,.9,.32,1);
+}
+
+/* small incremental delay for each letter */
+.preloader-letters span:nth-child(1){ animation-delay: 0s;   }
+.preloader-letters span:nth-child(2){ animation-delay: 0.08s; }
+.preloader-letters span:nth-child(3){ animation-delay: 0.16s; }
+.preloader-letters span:nth-child(4){ animation-delay: 0.24s; }
+.preloader-letters span:nth-child(5){ animation-delay: 0.32s; }
+.preloader-letters span:nth-child(6){ animation-delay: 0.40s; }
+.preloader-letters span:nth-child(7){ animation-delay: 0.48s; }
+.preloader-letters span:nth-child(8){ animation-delay: 0.56s; }
+.preloader-letters span:nth-child(9){ animation-delay: 0.64s; }
+.preloader-letters span:nth-child(10){ animation-delay: 0.72s; }
+
+@keyframes pm-fadeUp{
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* small bounce loop while waiting (optional) */
+.preloader-letters.bounce span{
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+/* mobile tweak */
+@media (max-width:420px){
+  .preloader-letters{ letter-spacing: 3px; font-size: clamp(22px, 11vw, 46px); }
+}
+
 
 
 
