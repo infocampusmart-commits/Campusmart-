@@ -14,6 +14,53 @@
     />
     <link rel="stylesheet" href="food.css" />
     <title>Campusmart</title>
+    <style>
+      /* Preloader container */
+    .preloader {
+      display: flex;
+      gap: 5px;
+      font-size: clamp(2rem, 8vw, 4rem); /* responsive font size */
+      font-weight: bold;
+      color: purple;
+      letter-spacing: 4px;
+    }
+
+    .preloader span {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeInUp 1s forwards;
+    }
+
+    /* Animate each letter with a delay */
+    .preloader span:nth-child(1) { animation-delay: 0s; }
+    .preloader span:nth-child(2) { animation-delay: 0.1s; }
+    .preloader span:nth-child(3) { animation-delay: 0.2s; }
+    .preloader span:nth-child(4) { animation-delay: 0.3s; }
+    .preloader span:nth-child(5) { animation-delay: 0.4s; }
+    .preloader span:nth-child(6) { animation-delay: 0.5s; }
+    .preloader span:nth-child(7) { animation-delay: 0.6s; }
+    .preloader span:nth-child(8) { animation-delay: 0.7s; }
+    .preloader span:nth-child(9) { animation-delay: 0.8s; }
+    .preloader span:nth-child(10) { animation-delay: 0.9s; }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Optional: fade out preloader after 2.5s */
+    .fade-out {
+      animation: fadeOut 1s forwards;
+      animation-delay: 2.5s;
+    }
+
+    @keyframes fadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+
+    </style>
   </head>
   <body>
     <nav>
@@ -205,6 +252,7 @@
 
   </body>
 </html>
+
 
 
 
