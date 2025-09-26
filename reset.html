@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="Blue 1.png">
+  <title>Reset Password - CampusMart</title>
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      color: purple;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 0.5rem;
+      text-align: left;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      background: purple;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: bold;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #6a0dad;
+    }
+
+    .message {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .success { color: green; font-weight: 600; }
+    .error { color: red; font-weight: 600; }
+
+    .back-link {
+      display: block;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: purple;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .back-link:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>Reset Password</h2>
+    <form id="resetForm">
+      <label for="newPassword">Enter your new password</label>
+      <input type="password" id="newPassword" required>
+      <button type="submit">Reset Password</button>
+    </form>
+    <div class="message" id="message"></div>
+    <a href="signin.html" class="back-link">⬅ Back to Sign In</a>
+  </div>
+
+  <script>
+    const form = document.getElementById("resetForm");
+    const message = document.getElementById("message");
+
+    // Extract token from URL
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("token");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const newPassword = document.getElementById("newPassword").value;
+      message.textContent = "⏳ Processing...";
+
+      try {
+        const response = await fetch("https://campus-mart-backend.onrender.com/api/auth/password/reset", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, newPassword })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          message.textContent = "✅ Password has been reset successfully!";
+          message.className = "message success";
+          setTimeout(() => window.location.href = "signin.html", 2000);
+        } else {
+          message.textContent = "❌ " + (data.message || "Password reset failed");
+          message.className = "message error";
+        }
+      } catch (err) {
+        message.textContent = "❌ Network error. Try again.";
+        message.className = "message error";
+      }
+    });
+  </script>
+
+</body>
+</html>

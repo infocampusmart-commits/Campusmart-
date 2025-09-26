@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="Blue 1.png">
+  <title>Order Confirmation - CampusMart</title>
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h2 {
+      color: purple;
+      margin-bottom: 1rem;
+    }
+
+    .order-details {
+      text-align: left;
+      margin-top: 1rem;
+    }
+
+    .order-details p {
+      margin: 8px 0;
+      font-size: 15px;
+    }
+
+    .highlight {
+      font-weight: bold;
+      color: #1a73e8;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 1.5rem;
+      padding: 12px 20px;
+      background: purple;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    .back-btn:hover {
+      background: #6a0dad;
+    }
+
+    .error {
+      color: red;
+      font-weight: bold;
+      margin-top: 1rem;
+    }
+
+    .loading {
+      color: #555;
+      font-style: italic;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🎉 Order Confirmed!</h2>
+    <p>Thank you for your purchase. Here are your order details:</p>
+    <div id="orderDetails" class="order-details loading">
+      Fetching order details...
+    </div>
+    <a href="index.html" class="back-btn">⬅ Back to Home</a>
+  </div>
+
+  <script>
+    const orderDetails = document.getElementById("orderDetails");
+
+    // Get orderId from URL
+    const params = new URLSearchParams(window.location.search);
+    const orderId = params.get("orderId");
+
+    async function fetchOrder() {
+      if (!orderId) {
+        orderDetails.textContent = "❌ No order ID provided.";
+        orderDetails.className = "order-details error";
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem("token"); // user must be logged in
+        const res = await fetch(`https://campus-mart-backend.onrender.com/api/order/${orderId}`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          orderDetails.className = "order-details";
+          orderDetails.innerHTML = `
+            <p><span class="highlight">Order ID:</span> ${data.id}</p>
+            <p><span class="highlight">Product:</span> ${data.productName}</p>
+            <p><span class="highlight">Price:</span> ₦${data.price}</p>
+            <p><span class="highlight">Status:</span> ${data.status}</p>
+            <p><span class="highlight">Date:</span> ${new Date(data.createdAt).toLocaleString()}</p>
+          `;
+        } else {
+          orderDetails.textContent = "❌ " + (data.message || "Failed to fetch order details.");
+          orderDetails.className = "order-details error";
+        }
+      } catch (err) {
+        orderDetails.textContent = "❌ Network error. Please try again.";
+        orderDetails.className = "order-details error";
+      }
+    }
+
+    fetchOrder();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/x-icon" href="Blue 1.png">
+  <link rel="icon" type="image/x-icon" href="Blue 1.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Become a Seller - CampusMart</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+      background: #f9f9f9;
+      color: #333;
+    }
+
+    /* Header */
+    header {
+      background: purple;
+      padding: 1rem;
+      text-align: center;
+      color: white;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      color: white;
+      font-size: 2rem;
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      animation: shake 1.5s infinite;
+      flex-shrink: 0;
+    }
+
+    /* Shake Animation */
+    @keyframes shake {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(3deg); }
+      50% { transform: rotate(-3deg); }
+      75% { transform: rotate(3deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    /* Seller Section */
+    .seller-section {
+      background: white;
+      padding: 2rem;
+      margin: 2rem auto;
+      max-width: 800px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .seller-section h2 {
+      color: purple;
+      margin-bottom: 1rem;
+      font-size: 1.6rem;
+    }
+
+    .seller-section p {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: #444;
+    }
+
+    .btn-seller {
+      display: inline-block;
+      background: purple;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .btn-seller:hover {
+      background: #6a0dad;
+      transform: scale(1.05);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: purple;
+      color: white;
+      font-size: 0.9rem;
+      margin-top: 2rem;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .logo {
+        width: 35px;
+        height: 35px;
+      }
+
+      .seller-section {
+        padding: 1.5rem 1rem;
+        margin: 1rem;
+      }
+
+      .seller-section p {
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <img src="Blue 1.png" alt="CampusMart Logo" class="logo" />
+      <h1>CampusMart Sellers</h1>
+    </div>
+  </header>
+
+  <!-- Seller Section -->
+  <main>
+    <section class="seller-section">
+      <h2>Become a Seller on CampusMart</h2>
+      <p>Are you interested in selling your products to thousands of students on CampusMart? Join our community of trusted sellers today and grow your business!</p>
+      <p>Simply fill out our registration form to get started.</p>
+      <a href="https://docs.google.com/forms/d/1D_zM_JT24EV58-MCfi4YZeCu0mBdBD9uUYs9ngl9quM/edit?usp=forms_home&ths=true" target="_blank" class="btn-seller">Register as a Seller</a>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 CampusMart. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

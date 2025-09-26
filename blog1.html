@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="Blue 1.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusMart Blog</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+      background: #f9f9f9;
+      color: #333;
+    }
+
+    /* Header */
+    header {
+      background: purple;
+      padding: 1rem;
+      text-align: center;
+      color: white;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      color: white;
+      font-size: 2rem;
+      margin: 0;
+    }
+
+    /* Logo Styling */
+    .logo {
+      width: 40px;
+      height: 40px;
+      animation: shake 1.5s infinite;
+    }
+
+    /* Shake Animation */
+    @keyframes shake {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(3deg); }
+      50% { transform: rotate(-3deg); }
+      75% { transform: rotate(3deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    /* Blog Cards */
+    .blog-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      padding: 2rem;
+    }
+
+    .blog-card {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .blog-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .blog-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .blog-content {
+      padding: 1rem;
+    }
+
+    .blog-content h3 {
+      margin-top: 0;
+      color: purple;
+      font-size: 1.2rem;
+    }
+
+    .blog-content p {
+      margin: 0.5rem 0;
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    .read-more {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.5rem 1rem;
+      background: purple;
+      color: white;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: background 0.3s;
+    }
+
+    .read-more:hover {
+      background: #6a0dad;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1rem;
+      background: purple;
+      color: white;
+      font-size: 0.9rem;
+    }
+
+    /* Responsive Adjustments */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .blog-card img {
+        height: 160px;
+      }
+
+      .blog-content p {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <header>
+    <div class="header-content">
+      <img src="Blue 1.png" alt="Campus Mart Logo" class="logo">
+      <h1>CampusMart Blog</h1>
+    </div>
+  </header>
+
+  <!-- Blog Section -->
+  <main>
+    <section class="blog-container" id="blogContainer">
+      <!-- Blog posts will be loaded here via JavaScript -->
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 CampusMart. All rights reserved.</p>
+  </footer>
+
+  <script>
+    const blogPosts = [
+      {
+        title: "Welcome to Campus Mart",
+        image: "images/post1.jpg",
+        description: "Discover the latest updates, products, and stories from Campus Mart.",
+        link: "#"
+      },
+      {
+        title: "Top 5 Student Deals",
+        image: "images/post2.jpg",
+        description: "Save more with these amazing student discounts available now.",
+        link: "#"
+      },
+      {
+        title: "Campus Events You Can’t Miss",
+        image: "images/post3.jpg",
+        description: "Here’s a list of upcoming events happening on campus this semester.",
+        link: "#"
+      }
+    ];
+
+    // Load posts into the HTML
+    const blogContainer = document.getElementById("blogContainer");
+
+    blogPosts.forEach(post => {
+      blogContainer.innerHTML += `
+        <div class="blog-card">
+          <img src="${post.image}" alt="${post.title}">
+          <div class="blog-content">
+            <h3>${post.title}</h3>
+            <p>${post.description}</p>
+            <a href="${post.link}" class="read-more">Read More</a>
+          </div>
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>

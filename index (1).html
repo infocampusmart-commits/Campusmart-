@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="Blue 1.png">
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+    />
+    <link rel="stylesheet" href="food.css" />
+    <title>Campusmart</title>
+  </head>
+  <body>
+    <nav>
+      <div class="nav__header">
+        <div class="nav__logo">
+           <div class="logo">
+            <img src="Blue 1.png" alt="Logo" class="shake-logo" />
+            <h3>Campus mart</h3>
+         </div>
+        </div>
+
+        <div class="nav__menu__btn" id="menu-btn">
+          <i class="ri-menu-3-line"></i>
+        </div>
+      </div>
+      <ul class="nav__links" id="nav-links">
+        <li><a href="#home">Home</a></li>
+        <li><a href="r.html">Sign Up</a></li>
+        <li><a href="blog1.html">Blog</a></li>
+        <li><a href="mailto:info.campusmart@gmail.com">Contact</a></li>
+      </ul>
+    </nav>
+
+    <header id="header">
+      <div class="header__image">
+        <img src="p1.png">
+      </div>
+      <div class="header__content">
+        <h1>The Pulse Of Student Commerce & Connection!</h1>
+      </div>
+    </header>
+
+    <section class="service">
+      <div class="section__container service__container" id="service">
+        <h2 class="section__header">How It Works</h2>
+        
+      </div>
+    </section>
+
+    <section class="experience">
+      <div class="experience__image">
+        <img src="y.png">
+      </div>
+      <div class="experience__content">
+        <h2 class="section__header">Your Campus, <br /> Your Marketplace!</h2>
+        <p>
+           The ultimate student marketplace designed exclusively for Covenant University students! Don’t just watch be part of the movement, from graphic design to tutoring, discover and showcase student talents.Need a designer, tutor, or photographer? Hire student pros & support your peers!
+        </p>
+        <div class="experience__btn">
+          <button class="btn" onclick="window.location.href='seller1.html '">Join Us</button>
+
+        </div>
+      </div>
+      
+    </section>
+
+    <section class="experience">
+      <div class="experience__image">
+        <img src="j2.png">
+      </div>
+      <div class="experience__content">
+        <h2 class="section__header">Epic Events, <br />  Exclusive Deals!</h2>
+        <p>
+           From fashion to gadgets, get the best student-to-student deals. Get quality goods from fellow students at unbeatable prices!From thrilling competitions to flash sales, there’s always something exciting happening. Flash sales, competitions, and exclusive student-only discounts!
+        </p>
+        <div class="experience__btn">
+          <button class="btn" onclick="window.location.href='r.html'">Sign Up</button>
+
+        </div>
+      </div>
+      
+    </section>
+
+   
+
+    <section class="subscribe" id="contact">
+      <h2 class="section__header">Follow<br />Our Instagram</h2>
+     
+    </section>
+
+    <footer>
+      <div class="section__container footer__container">
+        <div class="footer__col">
+          <div class="footer__logo">
+            <a href="#">Campusmart</a>
+          </div>
+          <p>
+            This isn’t just another marketplace—it’s a movement. Join CampusMart today and turn your campus connections into success! 
+          </p>
+          <ul class="footer__socials">
+            
+            <li>
+              <a href="https://www.instagram.com/_campusmart/?utm_source=ig_web_button_share_sheet"><i class="ri-instagram-fill"></i></a>
+            </li>
+          </ul>
+        </div>
+        <div class="footer__col">
+          <h4>OUR COMPANY</h4>
+          <ul class="footer__links">
+            <li><a href="#">Partners</a></li>
+            <li><a href="#">Our Services</a></li>
+            <li><a href="https://www.instagram.com/_campusmart/?utm_source=ig_web_button_share_sheet">Instagram</a></li>
+            <li><a href="mailto:info.campusmart@gmail.com">Email</a></li>
+          </ul>
+        </div>
+        
+        <div class="footer__col">
+          <h4>LOCATION</h4>
+          <div class="footer__property__detail">
+            <img src="Blue 1.png" alt="footer" />
+            <div>
+              <h5>Covenant University</h5>
+              <p>km 10 idiroko rd, ota 112104, ogun state</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="footer__bar">
+        Copyright © 2025 Campusmart. All rights reserved.
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script src="food.js"></script>
+
+
+    
+    <style>
+  /* === NAV OVERRIDE (DEBUG) === */
+  nav { position: fixed !important; top: 0; left: 0; width: 100%; z-index: 10000 !important; }
+  body { padding-top: 64px !important; } /* adjust if your nav is taller */
+
+  .nav__menu__btn { display: block !important; cursor: pointer; }
+  @media (min-width: 768px) {
+    nav { position: static !important; }
+    body { padding-top: 0 !important; }
+    .nav__menu__btn { display: none !important; }
+  }
+
+  /* Hidden by default on mobile */
+  #nav-links {
+    position: absolute !important;
+    top: 100% !important; left: 0 !important; width: 100% !important;
+    display: flex !important; flex-direction: column !important; align-items: center !important;
+    gap: 1.5rem !important; padding: 1.5rem !important;
+    background: var(--primary-color) !important;
+    transform: translateY(-250%) !important; /* HIDDEN */
+    transition: transform 0.3s ease !important;
+    z-index: 10001 !important;
+  }
+  #nav-links.open { transform: translateY(0) !important; } /* VISIBLE */
+
+  /* Optional: visual debug helpers (remove after testing) */
+  /* #nav-links { outline: 2px dashed red !important; } */
+</style>
+
+<script>
+  (function () {
+    const menuBtn  = document.getElementById('menu-btn');
+    const navLinks = document.getElementById('nav-links');
+    if (!menuBtn || !navLinks) return;
+
+    menuBtn.setAttribute('aria-label', 'Toggle menu');
+    menuBtn.setAttribute('aria-controls', 'nav-links');
+    menuBtn.setAttribute('aria-expanded', 'false');
+
+    function closeMenu() {
+      navLinks.classList.remove('open');
+      menuBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    menuBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      const willOpen = !navLinks.classList.contains('open');
+      navLinks.classList.toggle('open', willOpen);
+      menuBtn.setAttribute('aria-expanded', String(willOpen));
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!navLinks.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeMenu();
+    });
+  })();
+</script>
+
+  </body>
+</html>
+
+
+
+
