@@ -79,40 +79,7 @@ ScrollReveal().reveal(".subscribe form", {
   AOS.init();
 </script>
 
-/* === PRELOADER LOGIC (put this in food.js) === */
-(function(){
-  const preloader = document.getElementById('preloader');
-  if (!preloader) return;
 
-  // Hide helper (only run once)
-  let hidden = false;
-  function hidePreloader(immediate){
-    if (hidden) return;
-    hidden = true;
-    if (immediate) {
-      preloader.classList.add('preloader-hidden');
-      // remove from DOM after CSS transition completes
-      setTimeout(()=> preloader.remove?.(), 800);
-    } else {
-      // fade out smoothly
-      preloader.classList.add('preloader-hidden');
-      setTimeout(()=> preloader.remove?.(), 800);
-    }
-  }
-
-  // Hide when page fully loads (preferred)
-  window.addEventListener('load', ()=> {
-    // small delay to allow letter animation to finish nicely
-    setTimeout(()=> hidePreloader(false), 700);
-  });
-
-  // Fallback: ensure preloader doesn't hang forever (max 3500ms)
-  const fallbackTimeout = 3500;
-  setTimeout(()=> hidePreloader(true), fallbackTimeout);
-
-  // Allow click on preloader to dismiss (useful for dev/testing)
-  preloader.addEventListener('click', ()=> hidePreloader(true));
-})();
 
 
 
