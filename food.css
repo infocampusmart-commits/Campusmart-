@@ -179,6 +179,7 @@ nav {
 /* ============================= */
 /* DESKTOP VIEW (≥768px)         */
 /* ============================= */
+/* DESKTOP VIEW (≥768px) */
 @media (min-width: 768px) {
   nav {
     position: static;
@@ -191,19 +192,24 @@ nav {
   }
 
   .nav__menu__btn {
-    display: none; /* hide hamburger */
+    display: none; /* hide hamburger on desktop */
   }
 
   .nav__links {
-    position: static;
-    flex-direction: column;
+    display: flex; /* ✅ make sure it's visible and horizontal */
+    position: static; /* remove dropdown behavior */
+    flex-direction: row; /* ✅ horizontal layout */
     width: auto;
     gap: 1.5rem;
     padding: 0;
     background-color: transparent;
-    transform: none; /* always visible */
+    transform: none; /* no animation or slide-in */
+    top: auto;
+    left: auto;
+    height: auto;
   }
 }
+
 
 
 /* Align logo and heading horizontally */
@@ -800,6 +806,7 @@ header .btn {
 .nav__links.open {
   animation: slideIn 0.5s ease-out forwards;
 }
+
 
 
 
