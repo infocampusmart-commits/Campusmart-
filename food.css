@@ -2,7 +2,7 @@
 
 :root {
   --primary-color: whitesmoke;
-  --text-dark: #0000FF;
+  --text-dark: #333;
   --text-light: #2e46c0;
   --extra-light: #f3f4f6;
   --white: #ffffff;
@@ -800,6 +800,7 @@ header .btn {
 .nav__links.open {
   animation: slideIn 0.5s ease-out forwards;
 }
+
 
 
 
