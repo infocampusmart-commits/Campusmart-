@@ -668,7 +668,7 @@ header .btn {
   }
 }
 
-@media (width > 768px) {
+@media (width : 768px) {
   nav {
     position: static;
     padding: 2rem 1rem;
@@ -806,6 +806,7 @@ header .btn {
 .nav__links.open {
   animation: slideIn 0.5s ease-out forwards;
 }
+
 
 
 
