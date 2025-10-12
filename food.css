@@ -196,7 +196,7 @@ nav {
 
   .nav__links {
     position: static;
-    flex-direction: row;
+    flex-direction: column;
     width: auto;
     gap: 1.5rem;
     padding: 0;
@@ -800,6 +800,7 @@ header .btn {
 .nav__links.open {
   animation: slideIn 0.5s ease-out forwards;
 }
+
 
 
 
