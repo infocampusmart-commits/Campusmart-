@@ -2,7 +2,7 @@
 
 :root {
   --primary-color: whitesmoke;
-  --text-dark: purple;
+  --text-dark: #0000FF;
   --text-light: #2e46c0;
   --extra-light: #f3f4f6;
   --white: #ffffff;
@@ -69,7 +69,7 @@
 }
 
 .btn:hover {
-  background-color: #6a0dad;
+  background-color: #87CEEB;
 }
 
 img {
@@ -403,7 +403,7 @@ header .btn {
 }
 
 .btn {
-  background-color: purple;
+  background-color: #0000FF;
   border-radius: 10px;
 }
 
@@ -800,6 +800,7 @@ header .btn {
 .nav__links.open {
   animation: slideIn 0.5s ease-out forwards;
 }
+
 
 
 
