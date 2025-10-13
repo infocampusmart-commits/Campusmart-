@@ -94,6 +94,16 @@
 </head>
 <body>
 
+  <script>
+  const token = localStorage.getItem("token");
+  if (!token) {
+    // Save intended redirect
+    localStorage.setItem("redirectAfterLogin", "checkout.html");
+    window.location.href = "signin.html";
+  }
+</script>
+
+
   <header>CampusMart Checkout</header>
 
   <div class="checkout-container">
@@ -120,80 +130,81 @@
   </div>
 
   <script>
-    const productSummary = document.getElementById("productSummary");
-    const checkoutForm = document.getElementById("checkoutForm");
-    const message = document.getElementById("message");
+  const productSummary = document.getElementById("productSummary");
+  const checkoutForm = document.getElementById("checkoutForm");
+  const message = document.getElementById("message");
 
-    // Load selected product from localStorage
-    let cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
+  let cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
+  if (cart.length === 0) {
+    productSummary.innerHTML = "<p>No product selected.</p>";
+  } else {
+    const item = cart[0];
+    productSummary.innerHTML = `
+      <p><strong>Product:</strong> ${item.name}</p>
+      <p><strong>Price:</strong> ₦${item.price}</p>
+    `;
+  }
+
+  checkoutForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
     if (cart.length === 0) {
-      productSummary.innerHTML = "<p>No product selected.</p>";
-    } else {
-      const item = cart[0]; // only one product
-      productSummary.innerHTML = `
-        <p><strong>Product:</strong> ${item.name}</p>
-        <p><strong>Price:</strong> ₦${item.price}</p>
-      `;
+      message.textContent = "Please select a product first.";
+      return;
     }
 
-    // Submit order + initialize payment
-    checkoutForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
+    const hallRoom = document.getElementById("hallRoom").value;
+    const altHall = document.getElementById("altHall").value;
+    const deliveryInfo = document.getElementById("deliveryInfo").value;
 
-      if (cart.length === 0) {
-        message.textContent = "Please select a product first.";
-        return;
-      }
+    const token = localStorage.getItem("token");
+    if (!token) {
+      message.textContent = "You must be signed in.";
+      localStorage.setItem("redirectAfterLogin", "checkout.html");
+      return window.location.href = "signin.html";
+    }
 
-      const hallRoom = document.getElementById("hallRoom").value;
-      const altHall = document.getElementById("altHall").value;
-      const deliveryInfo = document.getElementById("deliveryInfo").value;
-
-      const orderData = {
-        totalAmount: cart[0].price,
-        hall_room_no: hallRoom,
-        alt_hall_room: altHall,
-        delivery_info: deliveryInfo,
-        items: [
-          {
-            name: cart[0].name,
-            quantity: 1,
-            price: cart[0].price
-          }
-        ]
-      };
-
-      try {
-        message.textContent = "Processing payment...";
-
-        const token = localStorage.getItem("token"); // user JWT
-        const response = await fetch("https://campus-mart-backend.onrender.com/api/order/initialize-payment", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify(orderData)
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to initialize payment");
+    const orderData = {
+      totalAmount: cart[0].price,
+      hall_room_no: hallRoom,
+      alt_hall_room: altHall,
+      delivery_info: deliveryInfo,
+      items: [
+        {
+          name: cart[0].name,
+          quantity: 1,
+          price: cart[0].price
         }
+      ]
+    };
 
-        // Redirect to Moniepoint payment link
-        if (data.paymentLink) {
-          window.location.href = data.paymentLink;
-        } else {
-          message.textContent = "Error: Payment link not received.";
-        }
+    try {
+      message.textContent = "Processing payment...";
 
-      } catch (err) {
-        console.error(err);
-        message.textContent = "❌ " + err.message;
+      const response = await fetch("https://campus-mart-backend.onrender.com/api/order/initialize-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.message || "Failed to initialize payment");
+
+      if (data.paymentLink) {
+        window.location.href = data.paymentLink;
+      } else {
+        message.textContent = "Error: Payment link not received.";
       }
-    });
-  </script>
+    } catch (err) {
+      console.error(err);
+      message.textContent = "❌ " + err.message;
+    }
+  });
+</script>
+
 </body>
 </html>
