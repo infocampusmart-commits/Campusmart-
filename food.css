@@ -684,3 +684,69 @@ header .btn {
 .nav__links.open {
   animation: slideIn 0.5s ease-out forwards;
 }
+
+
+
+
+
+/* ✅ Laptop & Large Screen Responsiveness Fix */
+@media (min-width: 1024px) {
+
+  .header__content h1 {
+    font-size: 3rem;
+    line-height: 3.5rem;
+  }
+
+  header form {
+    max-width: 700px;
+    padding: 1.5rem;
+  }
+
+  .section__header {
+    font-size: 2.2rem;
+    line-height: 2.8rem;
+  }
+
+  .service__card img {
+    max-width: 50px;
+  }
+
+  .service__card {
+    padding: 1.5rem;
+  }
+
+  .experience__content {
+    padding-block: 2rem 10rem;
+  }
+
+  .experience__stats h4 {
+    font-size: 1.8rem;
+  }
+
+  .experience__stats p {
+    font-size: 1rem;
+  }
+
+  .swiper-slide {
+    min-width: 300px;
+  }
+
+  .property__details__header h4 {
+    font-size: 1.1rem;
+  }
+
+  .property__details__header h5 {
+    font-size: 1rem;
+  }
+
+  .footer__container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .header__image,
+  .experience__image {
+    min-height: 12rem;
+    background-size: contain;
+  }
+}
+
