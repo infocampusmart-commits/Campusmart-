@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>About — CampusMart Online Marketplace</title>
+  <meta name="description" content="About CampusMart Online Marketplace — a student-to-student marketplace." />
+  <style>
+    :root{
+      --brand-1:#0b63f6;
+      --brand-2:#3b8ef3;
+      --muted:#6b7280;
+      --bg:#f9fbff;
+      --card:#ffffff;
+      --radius:12px;
+      --max-width:900px;
+      --gap:18px;
+      --accent:#0b63f6;
+      font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,var(--bg),#ffffff);
+      color:#111827;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.6;
+    }
+    header{
+      background:linear-gradient(135deg,var(--brand-1),var(--brand-2));
+      color:white;
+      padding:48px 20px;
+      text-align:center;
+    }
+    header h1{font-size:clamp(1.4rem,3.6vw,2.2rem); margin:0 0 8px}
+    header p{margin:0; opacity:0.95}
+    main{max-width:var(--max-width); margin:32px auto; padding:20px;}
+    .card{background:var(--card); border-radius:var(--radius); padding:26px; box-shadow:0 6px 20px rgba(11,99,246,0.08);}
+    h2{color:var(--accent); margin-top:0}
+    h3{margin-bottom:8px}
+    p{color:#1f2937; margin-bottom:14px}
+    ul{margin-left:20px; margin-bottom:14px}
+    footer{max-width:var(--max-width); margin:20px auto 60px; text-align:center; color:var(--muted); font-size:.95rem}
+    a{color:var(--brand-1)}
+    nav{position:fixed; top:12px; left:12px}
+    .back-link{background:#fff;padding:8px 12px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,0.06);font-weight:600}
+    /* cookie banner */
+    #cookie-banner{position:fixed; left:16px; right:16px; bottom:16px; z-index:1200; display:flex; align-items:center; gap:12px; padding:14px; background:#fff; border-radius:12px; box-shadow:0 10px 30px rgba(2,6,23,0.12); max-width:calc(100% - 32px)}
+    #cookie-banner p{margin:0; color:#0f172a; font-size:0.95rem}
+    #cookie-banner button{background:var(--brand-1); color:white; border:none; padding:10px 14px; border-radius:8px; font-weight:600; cursor:pointer}
+    @media(max-width:560px){ main{padding:14px} .card{padding:18px} #cookie-banner{flex-direction:column; align-items:flex-start}}
+  </style>
+</head>
+<body>
+  <nav><a class="back-link" href="index.html">← Back to Home</a></nav>
+
+  <header role="banner" aria-label="CampusMart header">
+    <h1>About CampusMart Online Marketplace</h1>
+    <p>Connecting students — buy, sell and discover goods & services across your campus.</p>
+  </header>
+
+  <main>
+    <article class="card" role="article" aria-labelledby="about1">
+      <h2 id="about1">Who we are</h2>
+      <p>CampusMart Online Marketplace is a student-centred platform designed to help students buy and sell goods and services within their campus community. From textbooks and fashion to tutoring and event tickets, CampusMart makes it easy for students to connect, trade, and support each other.</p>
+
+      <h2 id="about2">Our mission</h2>
+      <p>Our mission is to empower students with a safe, affordable, and simple marketplace where campus talent and products can find a ready audience. We aim to reduce waste, lower costs, and strengthen campus communities by promoting peer-to-peer commerce.</p>
+
+      <h2 id="about3">What we offer</h2>
+      <ul>
+        <li>Student seller storefronts and product listings</li>
+        <li>Secure checkout and payment initialization</li>
+        <li>Delivery coordination inside campus (hall/room drop-offs)</li>
+        <li>Service listings (tutoring, design, photography)</li>
+      </ul>
+
+      <h2 id="about4">Safety & Trust</h2>
+      <p>CampusMart encourages safe trading practices. While we provide tools to facilitate transactions, buyers and sellers should communicate clearly, inspect goods where possible, and report suspicious activity to our support team at <a href="mailto:info.campusmart@gmail.com">info.campusmart@gmail.com</a>.</p>
+
+      <h2 id="about5">Get involved</h2>
+      <p>If you'd like to partner with CampusMart, list a service, or give feedback, email us at <a href="mailto:info.campusmart@gmail.com">info.campusmart@gmail.com</a>. We're always looking for student ambassadors and campus partners.</p>
+    </article>
+  </main>
+
+  <footer aria-hidden="true">
+    <p style="text-align:center;color:#475569;font-size:.95rem">© 2025 CampusMart Online Marketplace — <a href="privacy.html">Privacy Policy</a> • <a href="terms.html">Terms &amp; Conditions</a></p>
+  </footer>
+
+  <!-- cookie banner -->
+  <div id="cookie-banner" style="display:none" role="dialog" aria-live="polite">
+    <div style="flex:1">
+      <p><strong>CampusMart uses cookies</strong> to improve your experience and to enable essential features. By continuing to use this site you consent to our use of cookies. You can change your preference later.</p>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center">
+      <button id="accept-cookies">Accept</button>
+      <button id="manage-cookies" style="background:#e6eefc; color:var(--brand-1); border:none; padding:10px 12px; border-radius:8px; cursor:pointer">Manage</button>
+    </div>
+  </div>
+
+  <script>
+    // cookie banner logic
+    (function(){
+      const key = 'campusmart_cookie_consent';
+      const banner = document.getElementById('cookie-banner');
+      const accepted = localStorage.getItem(key);
+      if(!accepted){
+        banner.style.display = 'flex';
+      }
+      document.getElementById('accept-cookies').addEventListener('click', ()=>{
+        localStorage.setItem(key,'accepted');
+        banner.style.display = 'none';
+      });
+      document.getElementById('manage-cookies').addEventListener('click', ()=>{
+        const current = localStorage.getItem(key);
+        if(current==='accepted'){
+          localStorage.setItem(key,'declined');
+          alert('Cookies declined. Some features may not work.');
+        } else {
+          localStorage.setItem(key,'accepted');
+          alert('Cookies accepted.');
+        }
+        banner.style.display='none';
+      });
+    })();
+  </script>
+</body>
+</html>
