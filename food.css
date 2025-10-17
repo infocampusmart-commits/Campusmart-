@@ -685,28 +685,35 @@ header .btn {
   animation: slideIn 0.5s ease-out forwards;
 }
 
-
-
-
-
-/* ✅ Laptop & Large Screen Responsiveness Fix */
+/* ========== Laptop & Large Screen Responsiveness Fix ========== */
 @media (min-width: 1024px) {
 
+  /* Hero headline */
   .header__content h1 {
     font-size: 3rem;
     line-height: 3.5rem;
+    max-width: 70ch;
+    margin-left: auto;
+    margin-right: auto;
   }
 
+  /* Reduce hero form size and spacing */
   header form {
     max-width: 700px;
     padding: 1.5rem;
+    transform: translateX(-50%);
+    left: 50%;
+    bottom: -1.5rem; /* slightly overlap but smaller */
   }
 
+  /* Smaller section headers */
   .section__header {
     font-size: 2.2rem;
     line-height: 2.8rem;
+    padding-bottom: 0.8rem;
   }
 
+  /* Service card image and padding adjustments */
   .service__card img {
     max-width: 50px;
   }
@@ -715,10 +722,12 @@ header .btn {
     padding: 1.5rem;
   }
 
+  /* Experience content padding tuned for wide screens */
   .experience__content {
     padding-block: 2rem 10rem;
   }
 
+  /* Stats sizing */
   .experience__stats h4 {
     font-size: 1.8rem;
   }
@@ -727,10 +736,12 @@ header .btn {
     font-size: 1rem;
   }
 
+  /* Swiper slide smaller width on large screens */
   .swiper-slide {
     min-width: 300px;
   }
 
+  /* Property details smaller typography */
   .property__details__header h4 {
     font-size: 1.1rem;
   }
@@ -739,14 +750,37 @@ header .btn {
     font-size: 1rem;
   }
 
+  /* Footer columns */
   .footer__container {
     grid-template-columns: repeat(3, 1fr);
   }
 
+  /* Image heights */
   .header__image,
   .experience__image {
     min-height: 12rem;
-    background-size: contain;
+    background-size: cover;
+  }
+
+  /* Reduce excessive top padding on header for large screens */
+  header {
+    padding: 3rem 2rem;
+  }
+
+  /* Tighten overall spacing in large screens */
+  .section__container {
+    padding: 3rem 1rem;
+  }
+
+  /* Reduce global font-size slightly for very wide screens */
+  html {
+    font-size: 15px;
   }
 }
 
+/* small fixes for very narrow screens */
+@media (max-width: 360px) {
+  .logo img { width: 30px; height: 30px; }
+  .nav__menu__btn { font-size: 1.4rem; }
+  .header__content h1 { font-size: 1.25rem; }
+}
