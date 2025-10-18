@@ -2,7 +2,7 @@
 
 :root {
   --primary-color: whitesmoke;
-  --text-dark: #333;
+  --text-dark: #231e22;
   --text-light: #2e46c0;
   --extra-light: #f3f4f6;
   --white: #ffffff;
@@ -69,7 +69,7 @@
 }
 
 .btn:hover {
-  background-color: #87CEEB;
+  background-color: #2e46c0;
 }
 
 img {
@@ -95,10 +95,11 @@ body {
   font-family: "Lato", serif;
 }
 
+
 h3 {
   font-family: Ravie Regular;
   color: #95A3FF;
-  font-size: 17px;
+  font-size: 17px
 }
 
 /* ============================= */
@@ -138,7 +139,7 @@ nav {
 /* Menu links – hidden by default */
 .nav__links {
   position: absolute;
-  top: 100%;
+  top: 100%; /* below navbar */
   left: 0;
   width: 100%;
   display: flex;
@@ -147,14 +148,22 @@ nav {
   gap: 2rem;
   padding: 2rem;
   background-color: var(--primary-color);
-  transform: translateY(-200%);
+  transform: translateY(-200%); /* hidden */
   transition: transform 0.5s ease-in-out;
   z-index: 9999;
 }
 
 .nav__links.open {
-  transform: translateY(0);
+  transform: translateY(0); /* visible */
 }
+.nav__links.open {
+  position: absolute; /* ensures it's taken out of flow */
+  top: 64px; /* adjust to match your nav height */
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+}
+
 
 .nav__links a {
   font-weight: 550;
@@ -186,28 +195,30 @@ nav {
   }
 
   .nav__links {
-    display: flex;
     position: static;
     flex-direction: row;
     width: auto;
     gap: 1.5rem;
     padding: 0;
     background-color: transparent;
-    transform: none;
+    transform: none; /* always visible */
   }
 }
+
 
 /* Align logo and heading horizontally */
 .logo {
   display: flex;
   align-items: center;
-  gap: 0.1px;
+  gap: 0.1px; /* space between image and text */
 }
 
+/* Resize logo if needed */
 .logo img {
   width: 40px;
   height: 40px;
 }
+
 
 header {
   padding-block: 5rem 4rem;
@@ -294,10 +305,10 @@ header .btn {
   gap: 2rem 1rem;
 }
 
-.logo img {
-  width: 40px;
-  margin-right: 9px;
-  margin-top: -9px;
+.logo img{
+    width: 40px;
+    margin-right: 9px;
+    margin-top: -9px;
 }
 
 .service__grid::before {
@@ -356,6 +367,8 @@ header .btn {
   line-height: 1.75rem;
 }
 
+
+
 .experience {
   padding-block: 5rem;
   display: grid;
@@ -390,9 +403,11 @@ header .btn {
 }
 
 .btn {
-  background-color: #0000FF;
+  background-color: #405be6;
   border-radius: 10px;
 }
+
+
 
 .experience__stats {
   position: absolute;
@@ -647,6 +662,107 @@ header .btn {
   }
 }
 
+@media (width > 768px) {
+  nav {
+    position: static;
+    padding: 2rem 1rem;
+    max-width: var(--max-width);
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .nav__header {
+    flex: 1;
+    padding: 0;
+    background-color: transparent;
+  }
+
+  .nav__logo a {
+    font-size: 1.55em;
+  }
+
+  .nav__menu__btn {
+    display: none;
+  }
+
+  .nav__links {
+    position: static;
+    width: fit-content;
+    padding: 0;
+    flex-direction: row;
+    background-color: transparent;
+    transform: none !important;
+  }
+
+  .nav__links a:hover {
+    color: var(--text-light);
+  }
+
+  header {
+    padding-top: 0;
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, calc(var(--max-width) / 2))
+      minmax(0, calc(var(--max-width) / 2))
+      minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .header__image {
+    grid-area: 1/3/2/5;
+    min-height: 30rem;
+    border-top-left-radius: 100%;
+  }
+
+  .header__content {
+    grid-column: 2/3;
+    padding-block: 6rem 12rem;
+  }
+
+  .header__content h1 {
+    text-align: left;
+  }
+
+  .service__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .experience {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, calc(var(--max-width) / 2))
+      minmax(0, calc(var(--max-width) / 2))
+      minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .experience__image {
+    grid-column: 1/3;
+    min-height: 30rem;
+    border-top-right-radius: 100%;
+  }
+
+  .experience__content {
+    grid-column: 3/4;
+    padding-block: 5rem 8rem;
+  }
+
+  .experience__content :is(.section__header, p, .experience__btn) {
+    text-align: right;
+  }
+
+  .footer__container {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .footer__col:nth-child(1) {
+    grid-column: 1/3;
+  }
+}
+
 @media (width > 1024px) {
   .service__grid {
     gap: 2rem;
@@ -685,102 +801,5 @@ header .btn {
   animation: slideIn 0.5s ease-out forwards;
 }
 
-/* ========== Laptop & Large Screen Responsiveness Fix ========== */
-@media (min-width: 1024px) {
 
-  /* Hero headline */
-  .header__content h1 {
-    font-size: 3rem;
-    line-height: 3.5rem;
-    max-width: 70ch;
-    margin-left: auto;
-    margin-right: auto;
-  }
 
-  /* Reduce hero form size and spacing */
-  header form {
-    max-width: 700px;
-    padding: 1.5rem;
-    transform: translateX(-50%);
-    left: 50%;
-    bottom: -1.5rem; /* slightly overlap but smaller */
-  }
-
-  /* Smaller section headers */
-  .section__header {
-    font-size: 2.2rem;
-    line-height: 2.8rem;
-    padding-bottom: 0.8rem;
-  }
-
-  /* Service card image and padding adjustments */
-  .service__card img {
-    max-width: 50px;
-  }
-
-  .service__card {
-    padding: 1.5rem;
-  }
-
-  /* Experience content padding tuned for wide screens */
-  .experience__content {
-    padding-block: 2rem 10rem;
-  }
-
-  /* Stats sizing */
-  .experience__stats h4 {
-    font-size: 1.8rem;
-  }
-
-  .experience__stats p {
-    font-size: 1rem;
-  }
-
-  /* Swiper slide smaller width on large screens */
-  .swiper-slide {
-    min-width: 300px;
-  }
-
-  /* Property details smaller typography */
-  .property__details__header h4 {
-    font-size: 1.1rem;
-  }
-
-  .property__details__header h5 {
-    font-size: 1rem;
-  }
-
-  /* Footer columns */
-  .footer__container {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  /* Image heights */
-  .header__image,
-  .experience__image {
-    min-height: 12rem;
-    background-size: cover;
-  }
-
-  /* Reduce excessive top padding on header for large screens */
-  header {
-    padding: 3rem 2rem;
-  }
-
-  /* Tighten overall spacing in large screens */
-  .section__container {
-    padding: 3rem 1rem;
-  }
-
-  /* Reduce global font-size slightly for very wide screens */
-  html {
-    font-size: 15px;
-  }
-}
-
-/* small fixes for very narrow screens */
-@media (max-width: 360px) {
-  .logo img { width: 30px; height: 30px; }
-  .nav__menu__btn { font-size: 1.4rem; }
-  .header__content h1 { font-size: 1.25rem; }
-}
