@@ -60,13 +60,13 @@
     // ✅ Check for token before proceeding
     const token = localStorage.getItem("token");
     if (!token) {
-      // Store redirect and go to login
       localStorage.setItem("redirectAfterLogin", "checkout.html");
       window.location.href = "signin.html";
     }
 
     checkoutForm.addEventListener("submit", async (e) => {
       e.preventDefault();
+
       if (cart.length === 0) {
         message.textContent = "Please select a product first.";
         return;
@@ -76,19 +76,23 @@
       const altHall = document.getElementById("altHall").value;
       const deliveryInfo = document.getElementById("deliveryInfo").value;
 
+      // ✅ Matches new API structure
       const orderData = {
         totalAmount: cart[0].price,
         hall_room_no: hallRoom,
         alt_hall_room: altHall,
         delivery_info: deliveryInfo,
-        items: [{ name: cart[0].name, quantity:1, price:cart[0].price }]
+        items: [
+          { name: cart[0].name, quantity: 1, price: cart[0].price }
+        ]
       };
 
       try {
         message.textContent = "Processing payment...";
 
         const token = localStorage.getItem("token");
-        const response = await fetch("https://campus-mart-backend.onrender.com/api/order/initialize-payment", {
+        // ✅ Updated endpoint (removed /api/order, now /orders/initialize-payment)
+        const response = await fetch("https://campus-mart-backend.onrender.com/orders/initialize-payment", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -98,7 +102,6 @@
         });
 
         if (response.status === 401) {
-          // Token expired/invalid
           localStorage.removeItem("token");
           localStorage.setItem("redirectAfterLogin", "checkout.html");
           window.location.href = "signin.html";
@@ -108,10 +111,13 @@
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || "Failed to initialize payment");
 
-        if (data.paymentLink) window.location.href = data.paymentLink;
-        else message.textContent = "Error: Payment link not received.";
+        if (data.paymentLink) {
+          window.location.href = data.paymentLink;
+        } else {
+          message.textContent = "Error: Payment link not received.";
+        }
 
-      } catch(err) {
+      } catch (err) {
         console.error(err);
         message.textContent = "❌ " + err.message;
       }
