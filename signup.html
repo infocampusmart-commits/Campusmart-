@@ -20,10 +20,11 @@
       width:100%;max-width:400px;
     }
     h2 {text-align:center;margin-bottom:20px;color:#0000FF;}
-    form input {
+    form input, form select {
       width:100%;padding:12px;margin:8px 0;
       border:1px solid #ccc;border-radius:8px;
       font-size:14px;
+      background-color:#fff;
     }
     button {
       width:100%;padding:12px;margin-top:12px;
@@ -44,7 +45,16 @@
       <input type="text" id="firstName" placeholder="First Name" required>
       <input type="text" id="lastName" placeholder="Last Name" required>
       <input type="text" id="preferredName" placeholder="Preferred Name">
-      <input type="text" id="institution" placeholder="Institution">
+
+      <!-- Institution selection dropdown -->
+      <select id="institution" required>
+        <option value="">Select Institution</option>
+        <option value="Covenant University">Covenant University</option>
+        <!-- Add more institutions below -->
+        <!-- <option value="University of Lagos">University of Lagos</option> -->
+        <!-- <option value="Obafemi Awolowo University">Obafemi Awolowo University</option> -->
+      </select>
+
       <input type="email" id="email" placeholder="Email" required>
       <input type="password" id="password" placeholder="Password" required>
       <button type="submit">Sign Up</button>
@@ -63,20 +73,24 @@
         email: document.getElementById("email").value,
         password: document.getElementById("password").value
       };
+
       try {
         const res = await fetch("https://campus-mart-backend.onrender.com/api/auth/user/create", {
           method: "POST",
           headers: {"Content-Type":"application/json"},
           body: JSON.stringify(body)
         });
-        if(res.ok){
+
+        if (res.ok) {
           alert("✅ Account created successfully! Please sign in.");
-          window.location.href="signin.html";
+          window.location.href = "signin.html";
         } else {
-          const data=await res.json();
-          alert("❌ "+(data.message||"Signup failed"));
+          const data = await res.json();
+          alert("❌ " + (data.message || "Signup failed"));
         }
-      } catch(err){alert("❌ Network error");}
+      } catch (err) {
+        alert("❌ Network error");
+      }
     });
   </script>
 </body>
