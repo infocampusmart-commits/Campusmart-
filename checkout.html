@@ -93,7 +93,7 @@
         const token = localStorage.getItem("token");
         // ✅ Updated endpoint (removed /api/order, now /orders/initialize-payment)
         const response = await // ✅ Use the working route on your current backend
-fetch("https://campus-mart-backend.onrender.com/api/order/initialize-payment", {
+fetch("https://campus-mart-backend.onrender.com/api/transaction/payment", {
 
           method: "POST",
           headers: {
