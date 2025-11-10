@@ -54,6 +54,12 @@
       margin-bottom:10px;
       font-size:13px;
     }
+    #message {
+      text-align:center;
+      margin-top:10px;
+      font-size:14px;
+      color:red;
+    }
   </style>
 </head>
 <body>
@@ -68,30 +74,35 @@
       </div>
 
       <a href="forgot.html" class="forgot-link">Forgot Password?</a>
-      <button type="submit">Sign In</button>
+      <button type="submit" id="loginBtn">Sign In</button>
     </form>
+    <div id="message"></div>
     <p>Don’t have an account? <a href="signup.html">Sign Up</a></p>
   </div>
 
   <script>
-    // Password visibility toggle
     const togglePassword = document.getElementById("togglePassword");
     const passwordInput = document.getElementById("password");
+    const message = document.getElementById("message");
+    const loginBtn = document.getElementById("loginBtn");
 
     togglePassword.addEventListener("click", () => {
       const type = passwordInput.getAttribute("type") === "password" ? "text" : "password";
       passwordInput.setAttribute("type", type);
-      // Change eye icon color slightly to indicate toggle
       togglePassword.style.color = type === "text" ? "#0000FF" : "#777";
     });
 
-    // Handle login
-    const params = new URLSearchParams(window.location.search);
-    const redirect = localStorage.getItem("redirectAfterLogin") || params.get("redirect") || "checkout.html";
+    const redirect = localStorage.getItem("redirectAfterLogin") || "index.html";
 
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      const body = { email: email.value, password: password.value };
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const body = { email, password };
+
+      loginBtn.disabled = true;
+      loginBtn.textContent = "Signing in...";
 
       try {
         const res = await fetch("https://campus-mart-backend.onrender.com/api/user/verify", {
@@ -100,16 +111,44 @@
           body: JSON.stringify(body),
         });
 
-        const data = await res.json();
+        // Read as text to avoid crash on HTML response
+        const text = await res.text();
+        console.log("LOGIN RESPONSE:", text);
 
-        if (res.ok && data.token) {
-          localStorage.setItem("token", data.token);
-          window.location.href = redirect;
-        } else {
-          alert("❌ " + (data.message || "Login failed"));
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          message.textContent = "Server error. Try again.";
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Sign In";
+          return;
         }
+
+        if (!res.ok || !data.token) {
+          message.textContent = data.message || "Invalid email or password.";
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Sign In";
+          return;
+        }
+
+        // ✅ Save token correctly
+        localStorage.setItem("token", data.token);
+
+        // ✅ Clear redirect and go to previous page or home
+        if (localStorage.getItem("redirectAfterLogin")) {
+          const redirectPage = localStorage.getItem("redirectAfterLogin");
+          localStorage.removeItem("redirectAfterLogin");
+          window.location.href = redirectPage;
+        } else {
+          window.location.href = "index.html";
+        }
+
       } catch (err) {
-        alert("❌ Wrong Password or Email");
+        console.error(err);
+        message.textContent = "Network error. Try again.";
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Sign In";
       }
     });
   </script>
