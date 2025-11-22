@@ -119,7 +119,7 @@
         try {
           data = JSON.parse(text);
         } catch {
-          message.textContent = "Server error. Try again.";
+          message.textContent = "check password or email. Try again.";
           loginBtn.disabled = false;
           loginBtn.textContent = "Sign In";
           return;
