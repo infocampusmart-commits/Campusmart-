@@ -68,6 +68,69 @@
 
     @media (max-width: 800px) { .container { flex-direction: column; } .filters { width: 100%; } }
 
+
+    .profile-panel {
+  position: fixed;
+  top: 0;
+  right: -350px;
+  width: 300px;
+  height: 100vh;
+  background: white;
+  box-shadow: -3px 0 10px rgba(0,0,0,0.2);
+  padding: 20px;
+  transition: 0.3s ease;
+  z-index: 2000;
+}
+
+.profile-panel.open {
+  right: 0;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  z-index: 1999;
+}
+
+.overlay.show {
+  display: block;
+}
+
+.profile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.profile-body p {
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+.logout-btn {
+  width: 100%;
+  margin-top: 30px;
+  padding: 10px;
+  background: crimson;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+
   </style>
 </head>
 <body>
@@ -284,6 +347,93 @@
   }
 });
 
+
+  const profileIcon = document.getElementById("profileIcon");
+const profilePanel = document.getElementById("profilePanel");
+const overlay = document.getElementById("profileOverlay");
+const closeProfile = document.getElementById("closeProfile");
+const profileContent = document.getElementById("profileContent");
+const logoutBtn = document.getElementById("logoutBtn");
+
+// API endpoint
+const PROFILE_URL = "https://campus-mart-backend.onrender.com/api/user/profile";
+
+profileIcon.addEventListener("click", async () => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    localStorage.setItem("redirectAfterLogin", "mart.html");
+    window.location.href = "signin.html";
+    return;
+  }
+
+  profilePanel.classList.add("open");
+  overlay.classList.add("show");
+
+  try {
+    profileContent.innerHTML = `<p style="color: gray;">Fetching profile...</p>`;
+
+    const response = await fetch(PROFILE_URL, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`Server Error: ${response.status}`);
+    }
+
+    const user = await response.json();
+
+    // Save locally for future quick access
+    localStorage.setItem("userData", JSON.stringify(user));
+
+    profileContent.innerHTML = `
+      <p><strong>Name:</strong> ${user.fullName || "Not provided"}</p>
+      <p><strong>Email:</strong> ${user.email}</p>
+      <p><strong>Campus:</strong> ${user.campus || "Not set"}</p>
+    `;
+  } catch (error) {
+    profileContent.innerHTML = `<p style="color: red;">Failed to load profile. Check network.</p>`;
+    console.error(error);
+  }
+});
+
+closeProfile.addEventListener("click", () => {
+  profilePanel.classList.remove("open");
+  overlay.classList.remove("show");
+});
+
+overlay.addEventListener("click", () => {
+  profilePanel.classList.remove("open");
+  overlay.classList.remove("show");
+});
+
+logoutBtn.addEventListener("click", () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("userData");
+  alert("Logged out successfully");
+  window.location.reload();
+});
+
+
 </script>
+
+  <div id="profilePanel" class="profile-panel">
+  <div class="profile-header">
+    <h2>My Profile</h2>
+    <button id="closeProfile" class="close-btn">✖</button>
+  </div>
+  
+  <div id="profileContent" class="profile-body">
+    <p>Loading...</p>
+  </div>
+
+  <button id="logoutBtn" class="logout-btn">Logout</button>
+</div>
+<div id="profileOverlay" class="overlay"></div>
+
 </body>
 </html>
