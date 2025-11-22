@@ -46,7 +46,7 @@
   const checkoutForm = document.getElementById("checkoutForm");
   const message = document.getElementById("message");
 
-  // ✅ Load cart from localStorage
+  // Load cart
   const cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
 
   if (cart.length === 0) {
@@ -59,12 +59,15 @@
     `;
   }
 
-  // ✅ Check for token
+  // Check token
   const token = localStorage.getItem("token");
-  if (!token) {
+
+  if (!token || token.trim() === "" || token === "undefined" || token === "null") {
     localStorage.setItem("redirectAfterLogin", "checkout.html");
     window.location.href = "signin.html";
   }
+
+  console.log("TOKEN SENT:", token); // Debug line
 
   checkoutForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -78,15 +81,12 @@
     const altHall = document.getElementById("altHall").value;
     const deliveryInfo = document.getElementById("deliveryInfo").value;
 
-    // ✅ Correct structure from official API docs
     const orderData = {
       totalAmount: cart[0].price,
       hall_room_no: hallRoom,
       alt_hall_room: altHall,
       delivery_info: deliveryInfo,
-      items: [
-        { item_id: cart[0].id, quantity: 1, price: cart[0].price }
-      ]
+      items: [{ item_id: cart[0].id, quantity: 1, price: cart[0].price }]
     };
 
     try {
@@ -96,40 +96,41 @@
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
+          "Accept": "application/json",
+          "Authorization": `Bearer ${token}`, 
+          "x-auth-token": token // Backup header some APIs require
         },
         body: JSON.stringify(orderData)
       });
 
-      // ✅ Read raw text to avoid JSON crash when backend returns HTML
       const text = await response.text();
-      console.log("SERVER RESPONSE:", text);
+      console.log("BACKEND RESPONSE:", text);
 
       let data;
       try {
         data = JSON.parse(text);
-      } catch (err) {
-        message.textContent = "❌ Server returned HTML instead of JSON. Backend route may be wrong or crashed.";
+      } catch {
+        message.textContent = "❌ Unexpected server response (not JSON)";
+        return;
+      }
+
+      if (response.status === 401) {
+        localStorage.removeItem("token");
+        localStorage.setItem("redirectAfterLogin", "checkout.html");
+        alert("Session expired. Please sign in again.");
+        window.location.href = "signin.html";
         return;
       }
 
       if (!response.ok) {
-        if (response.status === 401) {
-          localStorage.removeItem("token");
-          localStorage.setItem("redirectAfterLogin", "checkout.html");
-          window.location.href = "signin.html";
-          return;
-        }
-
-        message.textContent = "❌ " + (data.message || "Payment initialization failed");
+        message.textContent = `❌ ${data.message || "Payment initialization failed"}`;
         return;
       }
 
-      // ✅ Redirect to Paystack if URL exists
-      if (data.data && data.data.PAYSTACK_URL) {
+      if (data?.data?.PAYSTACK_URL) {
         window.location.href = data.data.PAYSTACK_URL;
       } else {
-        message.textContent = "❌ Error: Payment link not received from server.";
+        message.textContent = "❌ Payment URL not received from server.";
       }
 
     } catch (err) {
