@@ -207,155 +207,150 @@
 </div>
 
 <script>
-  const cards = document.querySelectorAll(".card");
-  const searchInput = document.getElementById("searchInput");
+/* ----------------------- CART & PRODUCT LOGIC ----------------------- */
 
-  const cartIcon = document.getElementById("cartIcon");
-  const cartWindow = document.getElementById("cartWindow");
-  const cartItemsContainer = document.getElementById("cartItems");
-  const cartTotal = document.getElementById("cartTotal");
-  const itemCount = document.getElementById("itemCount");
-  const checkoutBtn = document.getElementById("checkoutBtn");
-  const closeCartBtn = document.getElementById("closeCart");
-  const profileIcon = document.getElementById("profileIcon");
+const cards = document.querySelectorAll(".card");
+const searchInput = document.getElementById("searchInput");
 
-  let cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
+const cartIcon = document.getElementById("cartIcon");
+const cartWindow = document.getElementById("cartWindow");
+const cartItemsContainer = document.getElementById("cartItems");
+const cartTotal = document.getElementById("cartTotal");
+const itemCount = document.getElementById("itemCount");
+const checkoutBtn = document.getElementById("checkoutBtn");
+const closeCartBtn = document.getElementById("closeCart");
+const profileIcon = document.getElementById("profileIcon");
 
-  function updateCartUI() {
-    cartItemsContainer.innerHTML = "";
-    let total = 0;
-    cart.forEach((item, index) => {
-      total += item.price * item.quantity;
-      const div = document.createElement("div");
-      div.className = "cart-item";
-      div.innerHTML = `
-        <img src="${item.img}" alt="">
-        <div>
-          <p>${item.name}</p>
-          <small>₦${item.price} x ${item.quantity}</small>
-        </div>
-        <div>
-          <button onclick="removeItem(${index})">❌</button>
-          <button onclick="addOne(${index})">➕</button>
-          <button onclick="removeOne(${index})">➖</button>
-        </div>
-      `;
-      cartItemsContainer.appendChild(div);
-    });
-    cartTotal.textContent = `Total: ₦${total}`;
-    itemCount.textContent = cart.length;
-    itemCount.classList.toggle("non-empty", cart.length > 0);
-    localStorage.setItem("campusmartCart", JSON.stringify(cart));
-  }
+let cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
 
-  function addItem(name, price, img) {
-    const existingIndex = cart.findIndex(c => c.name === name);
-    if (existingIndex !== -1) { cart[existingIndex].quantity += 1; }
-    else { cart.push({ name, price, img, quantity: 1 }); }
-    updateCartUI();
-  }
+function updateCartUI() {
+  cartItemsContainer.innerHTML = "";
+  let total = 0;
 
-  function addOne(index) { cart[index].quantity += 1; updateCartUI(); }
-  function removeOne(index) { 
-    if (cart[index].quantity > 1) cart[index].quantity -= 1; 
-    else cart.splice(index,1);
-    updateCartUI(); 
-  }
-  function removeItem(index) { cart.splice(index, 1); updateCartUI(); }
+  cart.forEach((item, index) => {
+    total += item.price * item.quantity;
 
-  cartIcon.addEventListener("click", () => {
-    cartWindow.style.display = cartWindow.style.display === "block" ? "none" : "block";
-    cartWindow.classList.add("cart-animate");
-    setTimeout(() => cartWindow.classList.remove("cart-animate"), 300);
-  });
-  closeCartBtn.addEventListener("click", () => cartWindow.style.display = "none");
-
-  cards.forEach(btnCard => {
-    btnCard.querySelector("button").addEventListener("click", e => {
-      const card = e.target.closest(".card");
-      const name = card.dataset.name;
-      const price = parseInt(card.dataset.price);
-      const img = card.querySelector("img").src;
-      addItem(name, price, img);
-    });
+    const div = document.createElement("div");
+    div.className = "cart-item";
+    div.innerHTML = `
+      <img src="${item.img}" alt="">
+      <div>
+        <p>${item.name}</p>
+        <small>₦${item.price} × ${item.quantity}</small>
+      </div>
+      <div>
+        <button onclick="removeItem(${index})">❌</button>
+        <button onclick="addOne(${index})">➕</button>
+        <button onclick="removeOne(${index})">➖</button>
+      </div>
+    `;
+    cartItemsContainer.appendChild(div);
   });
 
-  searchInput.addEventListener("input", () => {
-    const query = searchInput.value.toLowerCase();
-    cards.forEach(card => card.style.display = card.dataset.name.toLowerCase().includes(query) ? "block" : "none");
-  });
+  cartTotal.textContent = `Total: ₦${total}`;
+  itemCount.textContent = cart.length;
+  itemCount.classList.toggle("non-empty", cart.length > 0);
 
-  // FILTER LOGIC
-  const filters = { category: [], price: [], promo: [], campus: [] };
-  function filterProducts() {
-    cards.forEach(card => {
-      const name = card.dataset.name.toLowerCase();
-      const price = parseInt(card.dataset.price);
-      const category = card.dataset.category;
-      const promo = card.dataset.promo;
-      const campus = card.dataset.campus;
+  localStorage.setItem("campusmartCart", JSON.stringify(cart));
+}
 
-      let show = true;
-      if (filters.category.length > 0 && !filters.category.includes(category)) show = false;
-      if (filters.price.length > 0) {
-        let priceMatch = false;
-        filters.price.forEach(range => {
-          const [min,max] = range.split('-').map(Number);
-          if (price >= min && price <= max) priceMatch = true;
-        });
-        if (!priceMatch) show = false;
-      }
-      if (filters.promo.length > 0 && !filters.promo.includes(promo)) show = false;
-      if (filters.campus.length > 0 && !filters.campus.includes(campus)) show = false;
-      if (!name.includes(searchInput.value.toLowerCase())) show = false;
-
-      card.style.display = show ? "block" : "none";
-    });
-  }
-
-  ["category","price","promo","campus"].forEach(type => {
-    document.querySelectorAll(`.filter-${type}`).forEach(cb => {
-      cb.addEventListener("change", () => {
-        filters[type] = Array.from(document.querySelectorAll(`.filter-${type}:checked`)).map(c => c.value);
-        filterProducts();
-      });
-    });
-  });
-
-  profileIcon.addEventListener("click", () => {
-    const token = localStorage.getItem("token");
-    if (token) window.location.href = "profile.html";
-    else window.location.href = "signin.html";
-  });
-
+function addItem(name, price, img) {
+  const existingIndex = cart.findIndex(c => c.name === name);
+  existingIndex !== -1 ? cart[existingIndex].quantity++ : cart.push({ name, price, img, quantity: 1 });
   updateCartUI();
+}
 
-  checkoutBtn.addEventListener("click", () => {
-  if (cart.length === 0) {
-    showToast("No product selected ❌");
-    return;
-  }
+function addOne(index) { cart[index].quantity++; updateCartUI(); }
+function removeOne(index) { cart[index].quantity > 1 ? cart[index].quantity-- : cart.splice(index,1); updateCartUI(); }
+function removeItem(index) { cart.splice(index, 1); updateCartUI(); }
 
-  const token = localStorage.getItem("token");
-  if (!token) {
-    // Store redirect so after login, user goes to checkout
-    localStorage.setItem("redirectAfterLogin", "checkout.html");
-    window.location.href = "signin.html";
-  } else {
-    // Redirect to checkout page
-    window.location.href = "checkout.html";
-  }
+cartIcon.addEventListener("click", () => {
+  cartWindow.style.display = cartWindow.style.display === "block" ? "none" : "block";
 });
 
+closeCartBtn.addEventListener("click", () => cartWindow.style.display = "none");
 
-  const profileIcon = document.getElementById("profileIcon");
+cards.forEach(btnCard => {
+  btnCard.querySelector("button").addEventListener("click", e => {
+    const card = e.target.closest(".card");
+    const name = card.dataset.name;
+    const price = parseInt(card.dataset.price);
+    const img = card.querySelector("img").src;
+    addItem(name, price, img);
+  });
+});
+
+searchInput.addEventListener("input", () => {
+  const query = searchInput.value.toLowerCase();
+  cards.forEach(card => card.style.display = card.dataset.name.toLowerCase().includes(query) ? "block" : "none");
+});
+
+/* ----------------------- FILTERS ----------------------- */
+
+const filters = { category: [], price: [], promo: [], campus: [] };
+
+function filterProducts() {
+  const query = searchInput.value.toLowerCase();
+
+  cards.forEach(card => {
+    const name = card.dataset.name.toLowerCase();
+    const price = parseInt(card.dataset.price);
+    const category = card.dataset.category;
+    const promo = card.dataset.promo;
+    const campus = card.dataset.campus;
+
+    let show = true;
+
+    if (filters.category.length && !filters.category.includes(category)) show = false;
+    if (filters.promo.length && !filters.promo.includes(promo)) show = false;
+    if (filters.campus.length && !filters.campus.includes(campus)) show = false;
+
+    if (filters.price.length) {
+      let match = filters.price.some(range => {
+        const [min, max] = range.split("-").map(Number);
+        return price >= min && price <= max;
+      });
+      if (!match) show = false;
+    }
+
+    if (!name.includes(query)) show = false;
+
+    card.style.display = show ? "block" : "none";
+  });
+}
+
+["category","price","promo","campus"].forEach(type => {
+  document.querySelectorAll(`.filter-${type}`).forEach(cb => {
+    cb.addEventListener("change", () => {
+      filters[type] = Array.from(document.querySelectorAll(`.filter-${type}:checked`)).map(c => c.value);
+      filterProducts();
+    });
+  });
+});
+
+/* ----------------------- CHECKOUT REDIRECT ----------------------- */
+
+checkoutBtn.addEventListener("click", () => {
+  if (cart.length === 0) return alert("No product selected ❌");
+
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    localStorage.setItem("redirectAfterLogin", "checkout.html");
+    return window.location.href = "signin.html";
+  }
+
+  window.location.href = "checkout.html";
+});
+
+/* ----------------------- PROFILE LOGIC ----------------------- */
+
 const profilePanel = document.getElementById("profilePanel");
 const overlay = document.getElementById("profileOverlay");
 const closeProfile = document.getElementById("closeProfile");
 const profileContent = document.getElementById("profileContent");
 const logoutBtn = document.getElementById("logoutBtn");
 
-// API endpoint
 const PROFILE_URL = "https://campus-mart-backend.onrender.com/api/user/profile";
 
 profileIcon.addEventListener("click", async () => {
@@ -363,41 +358,31 @@ profileIcon.addEventListener("click", async () => {
 
   if (!token) {
     localStorage.setItem("redirectAfterLogin", "mart.html");
-    window.location.href = "signin.html";
-    return;
+    return window.location.href = "signin.html";
   }
 
   profilePanel.classList.add("open");
   overlay.classList.add("show");
 
   try {
-    profileContent.innerHTML = `<p style="color: gray;">Fetching profile...</p>`;
+    profileContent.innerHTML = `<p style="color:gray;">loading profile...</p>`;
 
-    const response = await fetch(PROFILE_URL, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json"
-      }
+    const res = await fetch(PROFILE_URL, {
+      headers: { "Authorization": `Bearer ${token}` }
     });
 
-    if (!response.ok) {
-      throw new Error(`Server Error: ${response.status}`);
-    }
+    if (!res.ok) throw new Error("Failed to fetch");
 
-    const user = await response.json();
-
-    // Save locally for future quick access
+    const user = await res.json();
     localStorage.setItem("userData", JSON.stringify(user));
 
     profileContent.innerHTML = `
-      <p><strong>Name:</strong> ${user.fullName || "Not provided"}</p>
-      <p><strong>Email:</strong> ${user.email}</p>
+      <p><strong>Name:</strong> ${user.fullName || "Not available"}</p>
+      <p><strong>Email:</strong> ${user.email || "Unknown"}</p>
       <p><strong>Campus:</strong> ${user.campus || "Not set"}</p>
     `;
-  } catch (error) {
-    profileContent.innerHTML = `<p style="color: red;">Failed to load profile. Check network.</p>`;
-    console.error(error);
+  } catch {
+    profileContent.innerHTML = `<p style="color:red;">⚠ Could not load profile</p>`;
   }
 });
 
@@ -414,13 +399,15 @@ overlay.addEventListener("click", () => {
 logoutBtn.addEventListener("click", () => {
   localStorage.removeItem("token");
   localStorage.removeItem("userData");
-  alert("Logged out successfully");
+  alert("Logged out ✔");
   window.location.reload();
 });
 
-
+/* ----------------------- INIT ----------------------- */
+updateCartUI();
 </script>
 
+  
   <div id="profilePanel" class="profile-panel">
   <div class="profile-header">
     <h2>My Profile</h2>
