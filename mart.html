@@ -266,6 +266,24 @@
   });
 
   updateCartUI();
+
+  checkoutBtn.addEventListener("click", () => {
+  if (cart.length === 0) {
+    showToast("No product selected ❌");
+    return;
+  }
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    // Store redirect so after login, user goes to checkout
+    localStorage.setItem("redirectAfterLogin", "checkout.html");
+    window.location.href = "signin.html";
+  } else {
+    // Redirect to checkout page
+    window.location.href = "checkout.html";
+  }
+});
+
 </script>
 </body>
 </html>
