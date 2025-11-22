@@ -9,344 +9,263 @@
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap');
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
-
     body { background: #f9f9f9; color: #333; }
 
-    /* ======= HEADER ======= */
+    /* HEADER */
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      padding: 15px 20px;
-      background: #fff;
-      color: #333;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 15px 20px; background: #fff; position: sticky; top: 0; z-index: 100;
     }
-
-    .logo { font-size: 1.5rem; font-weight: bold; color: #333; flex: 1; }
-
-    .search-box {
-      flex: 2;
-      display: flex;
-      justify-content: center;
-      margin: 10px 0;
-    }
-
-    .search-box input {
-      width: 100%;
-      max-width: 250px;
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: bold;
-      outline: none;
-    }
-
-    .cart-icon {
-      position: relative;
-      cursor: pointer;
-      font-size: 22px;
-      flex: 0;
-    }
-    .cart-icon span {
-      position: absolute;
-      top: -8px; right: -10px;
-      background: #ff4b4b;
-      color: #fff;
-      font-size: 12px;
-      padding: 2px 6px;
-      border-radius: 50%;
-      display: none;
-    }
+    .logo { font-size: 1.5rem; font-weight: bold; }
+    .search-box input { width: 200px; padding: 8px; border-radius: 6px; border: 1px solid #ccc; outline: none; }
+    .cart-icon { position: relative; cursor: pointer; font-size: 22px; }
+    .cart-icon span { position: absolute; top: -8px; right: -10px; background: #ff4b4b; color: #fff; font-size: 12px; padding: 2px 6px; border-radius: 50%; display: none; }
     .cart-icon span.non-empty { display: inline-block; }
-
-    /* Responsive header */
-    @media (max-width: 600px) {
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .logo {
-        margin-bottom: 10px;
-      }
-      .search-box {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-      .cart-icon {
-        align-self: flex-end;
-      }
+    .profile-icon {
+      position: relative; display: flex; align-items: center; justify-content: center;
+      width: 35px; height: 35px; border-radius: 50%; background: #eee; font-size: 18px;
+      cursor: pointer; transition: background 0.2s;
     }
+    .profile-icon:hover { background: #0000FF; color: #fff; }
 
-    main {
-      padding: 30px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 20px;
-    }
+    /* LAYOUT */
+    .container { display: flex; padding: 20px; gap: 20px; }
+    .filters { width: 220px; background: #fff; padding: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); height: fit-content; }
+    .filters h3 { margin-bottom: 10px; }
+    .filters label { display: block; margin: 5px 0; font-size: 0.95rem; }
+    main { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; flex: 1; }
 
-    .card {
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      transition: transform 0.2s;
-    }
+    /* CARD */
+    .card { background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: transform 0.2s; }
     .card:hover { transform: translateY(-5px); }
     .card img { width: 100%; height: 180px; object-fit: cover; }
-
     .card-content { padding: 15px; }
-    .card-content h3 { font-size: 1.1rem; margin-bottom: 10px; }
-    .card-content p { font-size: 0.9rem; margin-bottom: 10px; }
-
-    .card-content button {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 6px;
-      background: #0000FF;
-      color: #fff;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+    .card-content h3 { font-size: 1.1rem; margin-bottom: 5px; }
+    .card-content p { font-size: 0.9rem; margin-bottom: 5px; }
+    .card-content .rating { color: #FFD700; font-size: 0.9rem; margin-left: 5px; }
+    .card-content button { padding: 8px 14px; border: none; border-radius: 6px; background: #0000FF; color: #fff; cursor: pointer; transition: background 0.2s; }
     .card-content button:hover { background: #87CEEB; }
 
-    /* Cart Window */
+    /* CART WINDOW */
     .whole-cart-window {
-      position: fixed;
-      top: 70px;
-      right: 20px;
-      width: 300px;
-      max-height: 80vh;
-      background: #fff;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
-      border-radius: 10px;
-      overflow-y: auto;
-      padding: 15px;
-      display: none;
-      z-index: 200;
+      position: fixed; top: 70px; right: 20px; width: 300px; max-height: 80vh; background: #fff;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2); border-radius: 10px; overflow-y: auto; padding: 15px; display: none; z-index: 200;
     }
-
-    .cart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-
-    #closeCart {
-      background: none;
-      border: none;
-      font-size: 18px;
-      cursor: pointer;
-      color: #333;
-    }
-    #closeCart:hover {
-      color: #0000FF;
-      transform: scale(1.2);
-      transition: 0.2s;
-    }
-
+    .cart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    #closeCart { background: none; border: none; font-size: 18px; cursor: pointer; color: #333; }
+    #closeCart:hover { color: #0000FF; transform: scale(1.2); transition: 0.2s; }
     .cart-animate { animation: slideDown 0.3s ease; }
-    @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-15px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .cart-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 8px;
-    }
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
+    .cart-item { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 8px; }
     .cart-item img { width: 50px; height: 50px; border-radius: 8px; margin-right: 10px; }
-
     .cart-total { font-weight: bold; margin-top: 10px; text-align: right; }
-
-    .checkout-btn {
-      width: 100%;
-      margin-top: 15px;
-      padding: 10px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: bold;
-      background: #0000FF;
-      color: #fff;
-      cursor: pointer;
-      transition: transform 0.2s, opacity 0.2s;
-    }
+    .checkout-btn { width: 100%; margin-top: 15px; padding: 10px; border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; background: #0000FF; color: #fff; cursor: pointer; transition: transform 0.2s, opacity 0.2s; }
     .checkout-btn:hover { transform: scale(1.05); opacity: 0.9; }
 
-    /* Toast */
-    .toast {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      background: #0000FF;
-      color: #fff;
-      padding: 12px 20px;
-      border-radius: 8px;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.3s ease;
-      z-index: 1000;
-    }
+    /* TOAST */
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #0000FF; color: #fff; padding: 12px 20px; border-radius: 8px; opacity: 0; transform: translateY(20px); transition: all 0.3s ease; z-index: 1000; }
     .toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 800px) { .container { flex-direction: column; } .filters { width: 100%; } }
+
   </style>
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header>
-    <div class="logo">MART</div>
-    <div class="search-box"><input type="text" id="searchInput" placeholder="Search products..."></div>
+<header>
+  <div class="logo">MART</div>
+  <div class="search-box"><input type="text" id="searchInput" placeholder="Search products..."></div>
+  <div style="display: flex; align-items: center; gap: 15px;">
     <div class="cart-icon" id="cartIcon">🛒 <span id="itemCount">0</span></div>
-  </header>
+    <div class="profile-icon" id="profileIcon">👤</div>
+  </div>
+</header>
 
-  <!-- MAIN PRODUCTS -->
+<div class="container">
+  <!-- FILTERS -->
+  <div class="filters">
+    <h3>Filter Products</h3>
+    <strong>Category</strong>
+    <label><input type="checkbox" class="filter-category" value="Perfume"> Perfume</label>
+    <label><input type="checkbox" class="filter-category" value="Tie"> Tie</label>
+    <label><input type="checkbox" class="filter-category" value="Hair"> Hair</label>
+
+    <strong>Price</strong>
+    <label><input type="checkbox" class="filter-price" value="0-3000"> ₦0 - ₦3,000</label>
+    <label><input type="checkbox" class="filter-price" value="3001-5000"> ₦3,001 - ₦5,000</label>
+
+    <strong>Promotion</strong>
+    <label><input type="checkbox" class="filter-promo" value="sale"> Sale</label>
+
+    <strong>Campus</strong>
+    <label><input type="checkbox" class="filter-campus" value="Main"> Main Campus</label>
+    <label><input type="checkbox" class="filter-campus" value="North"> North Campus</label>
+    <label><input type="checkbox" class="filter-campus" value="South"> South Campus</label>
+  </div>
+
+  <!-- PRODUCTS -->
   <main id="productList">
-    <div class="card" data-name="Perfume Oil" data-price="5000">
+    <div class="card" data-name="Perfume Oil" data-price="5000" data-category="Perfume" data-promo="sale" data-campus="Main" data-rating="4">
       <img src="https://via.placeholder.com/200x180.png?text=Perfume+Oil" alt="">
       <div class="card-content">
         <h3>Perfume Oil</h3>
-        <p>₦5000</p>
+        <p>₦5000 <span class="rating">★★★★☆</span></p>
         <button>Buy Now</button>
       </div>
     </div>
-    <div class="card" data-name="Custom Tie" data-price="3000">
+    <div class="card" data-name="Custom Tie" data-price="3000" data-category="Tie" data-promo="" data-campus="North" data-rating="5">
       <img src="https://via.placeholder.com/200x180.png?text=Custom+Tie" alt="">
       <div class="card-content">
         <h3>Custom Tie</h3>
-        <p>₦3000</p>
+        <p>₦3000 <span class="rating">★★★★★</span></p>
         <button>Buy Now</button>
       </div>
     </div>
-    <div class="card" data-name="Hair Oil" data-price="2500">
+    <div class="card" data-name="Hair Oil" data-price="2500" data-category="Hair" data-promo="sale" data-campus="South" data-rating="3">
       <img src="https://via.placeholder.com/200x180.png?text=Hair+Oil" alt="">
       <div class="card-content">
         <h3>Hair Oil</h3>
-        <p>₦2500</p>
+        <p>₦2500 <span class="rating">★★★☆☆</span></p>
         <button>Buy Now</button>
       </div>
     </div>
   </main>
+</div>
 
-  <!-- CART WINDOW -->
-  <div class="whole-cart-window hide" id="cartWindow">
-    <div class="cart-header">
-      <h3>Your Selection</h3>
-      <button id="closeCart">✖</button>
-    </div>
-    <div id="cartItems"></div>
-    <div class="cart-total" id="cartTotal">Total: ₦0</div>
-    <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+<!-- CART WINDOW -->
+<div class="whole-cart-window hide" id="cartWindow">
+  <div class="cart-header">
+    <h3>Your Selection</h3>
+    <button id="closeCart">✖</button>
   </div>
+  <div id="cartItems"></div>
+  <div class="cart-total" id="cartTotal">Total: ₦0</div>
+  <button class="checkout-btn" id="checkoutBtn">Checkout</button>
+</div>
 
-  <script>
-    // CART LOGIC
-    const cartIcon = document.getElementById("cartIcon");
-    const itemCount = document.getElementById("itemCount");
-    const cartWindow = document.getElementById("cartWindow");
-    const cartItemsContainer = document.getElementById("cartItems");
-    const cartTotal = document.getElementById("cartTotal");
-    const searchInput = document.getElementById("searchInput");
-    const cards = document.querySelectorAll(".card");
-    const checkoutBtn = document.getElementById("checkoutBtn");
-    const closeCartBtn = document.getElementById("closeCart");
+<script>
+  const cards = document.querySelectorAll(".card");
+  const searchInput = document.getElementById("searchInput");
 
-    let cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
+  const cartIcon = document.getElementById("cartIcon");
+  const cartWindow = document.getElementById("cartWindow");
+  const cartItemsContainer = document.getElementById("cartItems");
+  const cartTotal = document.getElementById("cartTotal");
+  const itemCount = document.getElementById("itemCount");
+  const checkoutBtn = document.getElementById("checkoutBtn");
+  const closeCartBtn = document.getElementById("closeCart");
+  const profileIcon = document.getElementById("profileIcon");
 
-    function updateCartUI() {
-      cartItemsContainer.innerHTML = "";
-      let total = 0;
-      cart.forEach((item, index) => {
-        total += item.price;
-        const div = document.createElement("div");
-        div.className = "cart-item";
-        div.innerHTML = `
-          <img src="${item.img}" alt="">
-          <div>
-            <p>${item.name}</p>
-            <small>₦${item.price}</small>
-          </div>
+  let cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
+
+  function updateCartUI() {
+    cartItemsContainer.innerHTML = "";
+    let total = 0;
+    cart.forEach((item, index) => {
+      total += item.price * item.quantity;
+      const div = document.createElement("div");
+      div.className = "cart-item";
+      div.innerHTML = `
+        <img src="${item.img}" alt="">
+        <div>
+          <p>${item.name}</p>
+          <small>₦${item.price} x ${item.quantity}</small>
+        </div>
+        <div>
           <button onclick="removeItem(${index})">❌</button>
-        `;
-        cartItemsContainer.appendChild(div);
-      });
-      cartTotal.textContent = `Total: ₦${total}`;
-      itemCount.textContent = cart.length;
-      itemCount.classList.toggle("non-empty", cart.length > 0);
-      localStorage.setItem("campusmartCart", JSON.stringify(cart));
-    }
-
-    function addItem(name, price, img) {
-      cart = [{ name, price, img }]; // single product
-      updateCartUI();
-      showToast(`${name} selected ✅`);
-      cartIcon.classList.add("bounce");
-      setTimeout(() => cartIcon.classList.remove("bounce"), 500);
-    }
-
-    function removeItem(index) {
-      cart.splice(index, 1);
-      updateCartUI();
-    }
-
-    function showToast(message) {
-      const toast = document.createElement("div");
-      toast.className = "toast"; toast.innerText = message;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.classList.add("show"), 50);
-      setTimeout(() => { toast.classList.remove("show"); setTimeout(() => toast.remove(), 300); }, 2000);
-    }
-
-    checkoutBtn.addEventListener("click", () => {
-      if (cart.length === 0) {
-        showToast("No product selected ❌");
-        return;
-      }
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.location.href = "signin.html?redirect=checkout.html";
-      } else {
-        window.location.href = "checkout.html";
-      }
+          <button onclick="addOne(${index})">➕</button>
+          <button onclick="removeOne(${index})">➖</button>
+        </div>
+      `;
+      cartItemsContainer.appendChild(div);
     });
+    cartTotal.textContent = `Total: ₦${total}`;
+    itemCount.textContent = cart.length;
+    itemCount.classList.toggle("non-empty", cart.length > 0);
+    localStorage.setItem("campusmartCart", JSON.stringify(cart));
+  }
 
-    cartIcon.addEventListener("click", () => {
-      cartWindow.style.display = cartWindow.style.display === "block" ? "none" : "block";
-      cartWindow.classList.add("cart-animate");
-      setTimeout(() => cartWindow.classList.remove("cart-animate"), 300);
-    });
-
-    // CLOSE CART WITH X
-    closeCartBtn.addEventListener("click", () => {
-      cartWindow.style.display = "none";
-    });
-
-    document.querySelectorAll(".card button").forEach(btn => {
-      btn.addEventListener("click", e => {
-        const card = e.target.closest(".card");
-        const name = card.dataset.name;
-        const price = parseInt(card.dataset.price);
-        const img = card.querySelector("img").src;
-        addItem(name, price, img);
-      });
-    });
-
-    searchInput.addEventListener("input", () => {
-      const query = searchInput.value.toLowerCase();
-      cards.forEach(card => {
-        const itemText = card.innerText.toLowerCase();
-        card.style.display = itemText.includes(query) ? "block" : "none";
-      });
-    });
-
+  function addItem(name, price, img) {
+    const existingIndex = cart.findIndex(c => c.name === name);
+    if (existingIndex !== -1) { cart[existingIndex].quantity += 1; }
+    else { cart.push({ name, price, img, quantity: 1 }); }
     updateCartUI();
-  </script>
+  }
+
+  function addOne(index) { cart[index].quantity += 1; updateCartUI(); }
+  function removeOne(index) { 
+    if (cart[index].quantity > 1) cart[index].quantity -= 1; 
+    else cart.splice(index,1);
+    updateCartUI(); 
+  }
+  function removeItem(index) { cart.splice(index, 1); updateCartUI(); }
+
+  cartIcon.addEventListener("click", () => {
+    cartWindow.style.display = cartWindow.style.display === "block" ? "none" : "block";
+    cartWindow.classList.add("cart-animate");
+    setTimeout(() => cartWindow.classList.remove("cart-animate"), 300);
+  });
+  closeCartBtn.addEventListener("click", () => cartWindow.style.display = "none");
+
+  cards.forEach(btnCard => {
+    btnCard.querySelector("button").addEventListener("click", e => {
+      const card = e.target.closest(".card");
+      const name = card.dataset.name;
+      const price = parseInt(card.dataset.price);
+      const img = card.querySelector("img").src;
+      addItem(name, price, img);
+    });
+  });
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+    cards.forEach(card => card.style.display = card.dataset.name.toLowerCase().includes(query) ? "block" : "none");
+  });
+
+  // FILTER LOGIC
+  const filters = { category: [], price: [], promo: [], campus: [] };
+  function filterProducts() {
+    cards.forEach(card => {
+      const name = card.dataset.name.toLowerCase();
+      const price = parseInt(card.dataset.price);
+      const category = card.dataset.category;
+      const promo = card.dataset.promo;
+      const campus = card.dataset.campus;
+
+      let show = true;
+      if (filters.category.length > 0 && !filters.category.includes(category)) show = false;
+      if (filters.price.length > 0) {
+        let priceMatch = false;
+        filters.price.forEach(range => {
+          const [min,max] = range.split('-').map(Number);
+          if (price >= min && price <= max) priceMatch = true;
+        });
+        if (!priceMatch) show = false;
+      }
+      if (filters.promo.length > 0 && !filters.promo.includes(promo)) show = false;
+      if (filters.campus.length > 0 && !filters.campus.includes(campus)) show = false;
+      if (!name.includes(searchInput.value.toLowerCase())) show = false;
+
+      card.style.display = show ? "block" : "none";
+    });
+  }
+
+  ["category","price","promo","campus"].forEach(type => {
+    document.querySelectorAll(`.filter-${type}`).forEach(cb => {
+      cb.addEventListener("change", () => {
+        filters[type] = Array.from(document.querySelectorAll(`.filter-${type}:checked`)).map(c => c.value);
+        filterProducts();
+      });
+    });
+  });
+
+  profileIcon.addEventListener("click", () => {
+    const token = localStorage.getItem("token");
+    if (token) window.location.href = "profile.html";
+    else window.location.href = "signin.html";
+  });
+
+  updateCartUI();
+</script>
 </body>
 </html>
