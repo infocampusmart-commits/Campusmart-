@@ -268,16 +268,21 @@ function updateCartUI() {
   localStorage.setItem("campusmartCart", JSON.stringify(cart));
 }
 
-// Add item: only adds one instance; if already exists, increase quantity
+// Add item: only one product at a time
 function addItem(name, price, img) {
-  const existingIndex = cart.findIndex(c => c.name === name);
+  if (cart.length > 0) {
+    const existingIndex = cart.findIndex(c => c.name === name);
 
-  if (existingIndex === -1) {
-    // Item not in cart, add it
-    cart.push({ name, price, img, quantity: 1 });
+    if (existingIndex !== -1) {
+      // Same product, increase quantity
+      cart[existingIndex].quantity++;
+    } else {
+      // Different product exists, replace old with new
+      cart = [{ name, price, img, quantity: 1 }];
+    }
   } else {
-    // Item already in cart, increase quantity
-    cart[existingIndex].quantity++;
+    // Cart empty, add new product
+    cart.push({ name, price, img, quantity: 1 });
   }
 
   updateCartUI();
