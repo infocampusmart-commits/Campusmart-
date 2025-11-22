@@ -50,27 +50,28 @@
   // Load cart
   const cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
 
-  if (cart.length === 0) {
-    productSummary.innerHTML = "<p>No product selected.</p>";
-  } else {
-    const item = cart[0];
-    productSummary.innerHTML = `
-      <p><strong>Product:</strong> ${item.name}</p>
-      <p><strong>Price:</strong> ₦${item.price}</p>
-    `;
-  }
-
   // Check token and redirect if missing
   const token = localStorage.getItem("token");
-
   if (!token || token === "null" || token === "undefined" || token.trim() === "") {
     localStorage.setItem("redirectAfterLogin", "checkout.html");
     window.location.href = "signin.html";
   }
 
-  console.log("TOKEN SENT:", token);
+  // Display cart summary
+  if (cart.length === 0) {
+    productSummary.innerHTML = "<p>No product selected.</p>";
+  } else {
+    const item = cart[0];
+    const itemTotal = item.price * item.quantity;
 
-  // Retry helper function to wake Render server if sleeping
+    productSummary.innerHTML = `
+      <p><strong>Product:</strong> ${item.name}</p>
+      <p><strong>Price:</strong> ₦${item.price} × ${item.quantity} = ₦${itemTotal}</p>
+      <p><strong>Total:</strong> ₦${itemTotal}</p>
+    `;
+  }
+
+  // Retry helper function for Render server wake-up
   async function fetchWithRetry(url, options, retries = 2) {
     try {
       return await fetch(url, options);
@@ -92,12 +93,19 @@
       return;
     }
 
+    const item = cart[0];
+    const totalAmount = item.price * item.quantity;
+
     const orderData = {
-      totalAmount: cart[0].price,
+      totalAmount: totalAmount,
       hall_room_no: document.getElementById("hallRoom").value,
       alt_hall_room: document.getElementById("altHall").value,
       delivery_info: document.getElementById("deliveryInfo").value,
-      items: [{ item_id: cart[0].id, quantity: 1, price: cart[0].price }]
+      items: [{
+        item_id: item.id || "unknown",
+        quantity: item.quantity,
+        price: item.price
+      }]
     };
 
     message.style.color = "black";
@@ -116,12 +124,8 @@
       });
 
       const text = await response.text();
-      console.log("SERVER RESPONSE:", text);
-
       let data;
-      try {
-        data = JSON.parse(text);
-      } catch {
+      try { data = JSON.parse(text); } catch {
         message.style.color = "red";
         message.textContent = "❌ Unexpected server response.";
         return;
