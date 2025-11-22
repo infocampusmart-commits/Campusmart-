@@ -233,10 +233,10 @@ const cartTotal = document.getElementById("cartTotal");
 const itemCount = document.getElementById("itemCount");
 const checkoutBtn = document.getElementById("checkoutBtn");
 const closeCartBtn = document.getElementById("closeCart");
-const profileIcon = document.getElementById("profileIcon");
 
 let cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
 
+// Update cart UI
 function updateCartUI() {
   cartItemsContainer.innerHTML = "";
   let total = 0;
@@ -268,36 +268,73 @@ function updateCartUI() {
   localStorage.setItem("campusmartCart", JSON.stringify(cart));
 }
 
+// Add item: only adds one instance; if already exists, increase quantity
 function addItem(name, price, img) {
   const existingIndex = cart.findIndex(c => c.name === name);
-  existingIndex !== -1 ? cart[existingIndex].quantity++ : cart.push({ name, price, img, quantity: 1 });
+
+  if (existingIndex === -1) {
+    // Item not in cart, add it
+    cart.push({ name, price, img, quantity: 1 });
+  } else {
+    // Item already in cart, increase quantity
+    cart[existingIndex].quantity++;
+  }
+
   updateCartUI();
 }
 
-function addOne(index) { cart[index].quantity++; updateCartUI(); }
-function removeOne(index) { cart[index].quantity > 1 ? cart[index].quantity-- : cart.splice(index,1); updateCartUI(); }
-function removeItem(index) { cart.splice(index, 1); updateCartUI(); }
+// Increase quantity
+function addOne(index) {
+  cart[index].quantity++;
+  updateCartUI();
+}
 
+// Decrease quantity or remove item if quantity is 1
+function removeOne(index) {
+  if (cart[index].quantity > 1) {
+    cart[index].quantity--;
+  } else {
+    cart.splice(index, 1);
+  }
+  updateCartUI();
+}
+
+// Remove item completely
+function removeItem(index) {
+  cart.splice(index, 1);
+  updateCartUI();
+}
+
+// Cart toggle
 cartIcon.addEventListener("click", () => {
   cartWindow.style.display = cartWindow.style.display === "block" ? "none" : "block";
 });
 
 closeCartBtn.addEventListener("click", () => cartWindow.style.display = "none");
 
-cards.forEach(btnCard => {
-  btnCard.querySelector("button").addEventListener("click", e => {
-    const card = e.target.closest(".card");
-    const name = card.dataset.name;
-    const price = parseInt(card.dataset.price);
-    const img = card.querySelector("img").src;
+// Buy Now button logic
+cards.forEach(card => {
+  card.querySelector("button").addEventListener("click", e => {
+    const cardEl = e.target.closest(".card");
+    const name = cardEl.dataset.name;
+    const price = parseInt(cardEl.dataset.price);
+    const img = cardEl.querySelector("img").src;
+
     addItem(name, price, img);
   });
 });
 
+// Search logic
 searchInput.addEventListener("input", () => {
   const query = searchInput.value.toLowerCase();
-  cards.forEach(card => card.style.display = card.dataset.name.toLowerCase().includes(query) ? "block" : "none");
+  cards.forEach(card => {
+    card.style.display = card.dataset.name.toLowerCase().includes(query) ? "block" : "none";
+  });
 });
+
+// Initial render
+updateCartUI();
+
 
 /* ----------------------- FILTERS ----------------------- */
 
