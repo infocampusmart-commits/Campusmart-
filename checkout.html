@@ -97,17 +97,20 @@
     const item = cart[0];
     const totalAmount = item.price * item.quantity;
 
-    const orderData = {
-      totalAmount: totalAmount,
-      hall_room_no: document.getElementById("hallRoom").value,
-      alt_hall_room: document.getElementById("altHall").value,
-      delivery_info: document.getElementById("deliveryInfo").value,
-      items: [{
-        item_id: item.id || "unknown",
-        quantity: item.quantity,
-        price: item.price
-      }]
-    };
+const orderData = {
+  totalAmount: totalAmount, // total for all items
+  hall_room_no: document.getElementById("hallRoom").value,
+  alt_hall_room: document.getElementById("altHall").value,
+  delivery_info: document.getElementById("deliveryInfo").value,
+  items: cart.map(item => ({
+    item_id: item.id,       // make sure every item has a valid id
+    name: item.name,        // include product name
+    quantity: Number(item.quantity), 
+    price: Number(item.price),
+    total: Number(item.price) * Number(item.quantity)
+  }))
+};
+
 
     message.style.color = "black";
     message.textContent = "⏳ Connecting to payment gateway...";
