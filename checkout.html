@@ -5,21 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="Blue 1.png">
   <title>Checkout - CampusMart</title>
+
   <style>
     body { font-family: 'Montserrat', sans-serif; background:#f9f9f9; margin:0; padding:0; color:#333; }
     header { background:#fff; color:black; text-align:center; padding:1rem; font-size:1.5rem; font-weight:bold; }
-    .checkout-container { max-width:600px; margin:2rem auto; background:#fff; padding:2rem; border-radius:10px; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
+    
+    .checkout-container {
+      max-width:600px;
+      margin:2rem auto;
+      background:#fff;
+      padding:2rem;
+      border-radius:10px;
+      box-shadow:0 4px 6px rgba(0,0,0,0.1);
+    }
+    
     h2 { color:#0000FF; margin-bottom:1rem; }
-    .product-summary { background:#f3e6ff; padding:1rem; border-radius:8px; margin-bottom:1.5rem; }
+
+    .product-summary {
+      background:#f3e6ff;
+      padding:1rem;
+      border-radius:8px;
+      margin-bottom:1.5rem;
+    }
+
     .product-summary p { margin:5px 0; font-size:1rem; }
+
     form label { display:block; margin:0.5rem 0 0.3rem; font-weight:600; }
-    form input, form textarea { width:100%; padding:10px; margin-bottom:1rem; border:1px solid #ccc; border-radius:6px; outline:none; }
-    form input:focus, form textarea:focus { border-color:#0000FF; }
-    .btn { background:#0000FF; color:white; border:none; padding:12px; border-radius:6px; font-size:1rem; font-weight:bold; cursor:pointer; width:100%; transition:background 0.2s; }
-    .btn:hover { background:#87CEEB; }
+    form input, form textarea {
+      width:100%;
+      padding:10px;
+      margin-bottom:1rem;
+      border:1px solid #ccc;
+      border-radius:6px;
+      outline:none;
+    }
+
+    .btn {
+      background:#0000FF;
+      color:white;
+      border:none;
+      padding:12px;
+      border-radius:6px;
+      font-size:1rem;
+      font-weight:bold;
+      cursor:pointer;
+      width:100%;
+      transition:0.2s;
+    }
+
+    .btn:hover { background:#1e90ff; }
+
     .message { margin-top:1rem; font-size:0.95rem; text-align:center; }
   </style>
 </head>
+
 <body>
 
 <header>CampusMart Checkout</header>
@@ -32,10 +71,13 @@
   <form id="checkoutForm">
     <label for="hallRoom">Hall & Room No.</label>
     <input type="text" id="hallRoom" required>
+
     <label for="altHall">Alternative Hall/Room</label>
     <input type="text" id="altHall">
+
     <label for="deliveryInfo">Additional Delivery Info</label>
     <textarea id="deliveryInfo" rows="3"></textarea>
+
     <button type="submit" class="btn">Proceed to Payment</button>
   </form>
 
@@ -43,21 +85,23 @@
 </div>
 
 <script>
+
   const productSummary = document.getElementById("productSummary");
   const checkoutForm = document.getElementById("checkoutForm");
   const message = document.getElementById("message");
 
-  // Load cart
   const cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
 
-  // Check token and redirect if missing
+  // Ensure login
   const token = localStorage.getItem("token");
-  if (!token || token === "null" || token === "undefined" || token.trim() === "") {
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  if (!token || !user || !user.email) {
     localStorage.setItem("redirectAfterLogin", "checkout.html");
     window.location.href = "signin.html";
   }
 
-  // Display cart summary
+  // Display cart
   if (cart.length === 0) {
     productSummary.innerHTML = "<p>No product selected.</p>";
   } else {
@@ -66,18 +110,19 @@
 
     productSummary.innerHTML = `
       <p><strong>Product:</strong> ${item.name}</p>
-      <p><strong>Price:</strong> ₦${item.price} × ${item.quantity} = ₦${itemTotal}</p>
-      <p><strong>Total:</strong> ₦${itemTotal}</p>
+      <p><strong>Price:</strong> ₦${item.price} × ${item.quantity}</p>
+      <p><strong>Total:</strong> <span style="color:green;font-weight:bold;">₦${itemTotal}</span></p>
     `;
   }
 
-  // Retry helper function for Render server wake-up
-  async function fetchWithRetry(url, options, retries = 2) {
+
+  // Retry fetch helper (Render servers sleep)
+  async function fetchWithRetry(url, options, retries = 3) {
     try {
       return await fetch(url, options);
     } catch (err) {
       if (retries > 0) {
-        message.textContent = "⚠ Server waking up... retrying payment request.";
+        message.textContent = "⚠ Server waking up... retrying...";
         await new Promise(res => setTimeout(res, 4000));
         return fetchWithRetry(url, options, retries - 1);
       }
@@ -85,11 +130,13 @@
     }
   }
 
+
   checkoutForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     if (cart.length === 0) {
-      message.textContent = "❌ Please select a product first.";
+      message.style.color = "red";
+      message.textContent = "❌ No product found in cart.";
       return;
     }
 
@@ -97,56 +144,50 @@
     const totalAmount = item.price * item.quantity;
 
     const orderData = {
-      totalAmount: totalAmount,
-      hall_room_no: document.getElementById("hallRoom").value,
-      alt_hall_room: document.getElementById("altHall").value,
-      delivery_info: document.getElementById("deliveryInfo").value,
-      items: [{
-        item_id: item.id || "unknown",
-        quantity: item.quantity,
-        price: item.price
-      }]
+      email: user.email,
+      amount: totalAmount * 100, // Kobo format for Paystack
+      metadata: {
+        hall_room_no: document.getElementById("hallRoom").value,
+        alt_hall_room: document.getElementById("altHall").value,
+        delivery_info: document.getElementById("deliveryInfo").value,
+        items: [
+          {
+            id: item.id || "unknown",
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity
+          }
+        ]
+      }
     };
 
     message.style.color = "black";
     message.textContent = "⏳ Connecting to payment gateway...";
 
     try {
-      const response = await fetchWithRetry("https://campus-mart-backend.onrender.com/api/transaction/payment", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Authorization": `Bearer ${token}`,
-          "x-auth-token": token
-        },
-        body: JSON.stringify(orderData)
-      });
+      const response = await fetchWithRetry(
+        "https://campus-mart-backend.onrender.com/api/transaction/payment",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify(orderData)
+        }
+      );
 
-      const text = await response.text();
-      let data;
-      try { data = JSON.parse(text); } catch {
-        message.style.color = "red";
-        message.textContent = "❌ Unexpected server response.";
-        return;
-      }
-
-      if (response.status === 401) {
-        localStorage.removeItem("token");
-        localStorage.setItem("redirectAfterLogin", "checkout.html");
-        alert("Session expired. Please login again.");
-        window.location.href = "signin.html";
-        return;
-      }
+      const result = await response.json();
+      console.log("SERVER RESPONSE:", result);
 
       if (!response.ok) {
         message.style.color = "red";
-        message.textContent = `❌ ${data.message || "Payment failed."}`;
+        message.textContent = `❌ ${result.message || "Payment failed."}`;
         return;
       }
 
-      if (data?.data?.PAYSTACK_URL) {
-        window.location.href = data.data.PAYSTACK_URL;
+      if (result?.data?.PAYSTACK_URL) {
+        window.location.href = result.data.PAYSTACK_URL;
       } else {
         message.style.color = "red";
         message.textContent = "❌ Payment link missing from server.";
@@ -158,6 +199,7 @@
       message.textContent = "🚫 Network error: " + err.message;
     }
   });
+
 </script>
 
 </body>
