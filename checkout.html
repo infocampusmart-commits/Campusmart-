@@ -84,6 +84,7 @@
     const item = cart[0];
     const totalAmount = item.price * item.quantity;
 
+    // Minimal payload to match backend exactly
     const orderData = {
       totalAmount: Number(totalAmount),
       hall_room_no: document.getElementById("hallRoom").value,
@@ -92,15 +93,13 @@
       items: [
         {
           item_id: Number(item.id) > 0 ? Number(item.id) : 9999,
-          name: item.name,
-          price: Number(item.price),
-          quantity: Number(item.quantity),
-          total: Number(totalAmount)
+          quantity: Number(item.quantity)
         }
       ]
     };
 
-    console.log("📦 Sending request:", orderData);
+    // Log payload for Postman comparison
+    console.log("📦 Sending request:", JSON.stringify(orderData, null, 2));
 
     message.style.color = "black";
     message.textContent = "⏳ Processing order...";
@@ -112,9 +111,7 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Accept": "application/json",
-            "Authorization": `Bearer ${token}`,
-            "x-auth-token": token
+            "Authorization": `Bearer ${token}`
           },
           body: JSON.stringify(orderData)
         }
