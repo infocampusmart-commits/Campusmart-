@@ -84,7 +84,7 @@
     const item = cart[0];
     const totalAmount = item.price * item.quantity;
 
-    // Minimal payload to match backend exactly
+    // Payload matches Postman working request
     const orderData = {
       totalAmount: Number(totalAmount),
       hall_room_no: document.getElementById("hallRoom").value,
@@ -93,12 +93,14 @@
       items: [
         {
           item_id: Number(item.id) > 0 ? Number(item.id) : 9999,
-          quantity: Number(item.quantity)
+          name: item.name,
+          price: Number(item.price),
+          quantity: Number(item.quantity),
+          total: Number(totalAmount)
         }
       ]
     };
 
-    // Log payload for Postman comparison
     console.log("📦 Sending request:", JSON.stringify(orderData, null, 2));
 
     message.style.color = "black";
