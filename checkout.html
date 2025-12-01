@@ -135,7 +135,7 @@ form.addEventListener("submit", async (e) => {
 
     message.textContent = "⏳ Sending order...";
 
-    const response = await fetch("YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL", {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbzEMwalUx5t2PBylVzziIFW72skdUJH-5w4YeiXUYY8fF-tKR_2yF2ZjJKcL_JJM0Lg/exec", {
       method: "POST",
       body: JSON.stringify(orderData),
       headers: { "Content-Type": "application/json" }
