@@ -1,238 +1,150 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" type="image/x-icon" href="Blue 1.png">
-<title>Become a Seller — CampusMart</title>
+<title>CampusMart Seller Registration</title>
 <style>
-  body{font-family:Arial,Helvetica,sans-serif;background:#f6f8fb;padding:20px}
-  .card{max-width:720px;margin:24px auto;padding:20px;border-radius:10px;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,0.06)}
-  h1{font-size:22px;margin-bottom:8px}
-  p.lead{color:#666;margin-bottom:18px}
-  label{display:block;margin:12px 0 6px;font-weight:600}
-  input[type="text"], input[type="email"], input[type="tel"], select, textarea{
-    width:100%;padding:10px;border:1px solid #ddd;border-radius:6px;box-sizing:border-box
-  }
-  input[type="file"]{margin-top:6px}
-  .two {display:flex;gap:12px}
-  .two > *{flex:1}
-  button{display:inline-block;margin-top:16px;padding:12px 18px;background:#0b8a00;color:#fff;border:0;border-radius:8px;font-weight:700;cursor:pointer}
-  .muted{color:#777;font-size:13px;margin-top:8px}
-  .status{margin-top:12px;font-weight:600}
+body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+input, select, textarea { width:100%; padding:10px; margin:8px 0; border-radius:5px; border:1px solid #ccc; }
+button { width:100%; padding:12px; background:#007bff; color:white; border:none; border-radius:5px; cursor:pointer; font-size:16px; }
+button:hover { background:#0056d6; }
 </style>
 </head>
+
 <body>
-  <div class="card">
-    <h1>Seller Registration — CampusMart</h1>
-    <p class="lead">Register to sell on CampusMart (only Covenant University, Bells University, Crawford University for now). Fee: ₦1,500.</p>
 
-    <form id="sellerForm">
-      <label>Full Name *</label>
-      <input type="text" id="fullName" required />
+<h2>Become a Seller on CampusMart</h2>
 
-      <div class="two">
-        <div>
-          <label>Email *</label>
-          <input type="email" id="email" required />
-        </div>
-        <div>
-          <label>WhatsApp / Phone *</label>
-          <input type="tel" id="phone" required />
-        </div>
-      </div>
+<form id="sellerForm">
 
-      <label>University *</label>
-      <select id="university" required>
-        <option value="">Select University</option>
-        <option value="Covenant University">Covenant University</option>
-        <option value="Bells University">Bells University</option>
-        <option value="Crawford University">Crawford University</option>
-      </select>
+  <input type="text" id="fullName" placeholder="Full Name" required>
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="text" id="phone" placeholder="Phone Number" required>
 
-      <label>Department / Level (optional)</label>
-      <input type="text" id="department" placeholder="e.g. Electrical Engineering, 300" />
+  <select id="university" required>
+    <option value="">Select University</option>
+    <option value="Covenant University">Covenant University</option>
+    <option value="Bells University">Bells University</option>
+    <option value="Crawford University">Crawford University</option>
+  </select>
 
-      <label>Matric Number / Student ID No. *</label>
-      <input type="text" id="matric" required />
+  <input type="text" id="department" placeholder="Department">
+  <input type="text" id="matric" placeholder="Matric/Student ID" required>
 
-      <label>Upload Student ID (photo) *</label>
-      <input type="file" id="studentIdFile" accept="image/*" required />
+  <input type="text" id="businessName" placeholder="Business Name" required>
 
-      <label>Business / Store Name *</label>
-      <input type="text" id="businessName" required />
+  <select id="businessCategory" required>
+    <option value="">Select Business Category</option>
+    <option value="Food">Food</option>
+    <option value="Fashion">Fashion</option>
+    <option value="Shoes / Bags">Shoes / Bags</option>
+    <option value="Phone Accessories">Phone Accessories</option>
+  </select>
 
-      <label>Business Category *</label>
-      <select id="businessCategory" required>
-        <option value="">Select category</option>
-        <option>Food</option>
-        <option>Clothing</option>
-        <option>Ties / Custom Clothing</option>
-        <option>Perfume / Oils</option>
-        <option>Beauty / Hair</option>
-        <option>Other</option>
-      </select>
+  <textarea id="bio" placeholder="Short Business Description"></textarea>
+  <textarea id="exampleProducts" placeholder="List 3 sample products"></textarea>
 
-      <label>Short Business Bio (1-2 sentences)</label>
-      <textarea id="bio" rows="3" placeholder="What do you sell? Where are you located?" ></textarea>
+  <label><strong>Upload Student ID</strong></label>
+  <input type="file" id="studentIdFile" accept="image/*" required>
 
-      <label>Example Products (comma separated)</label>
-      <input type="text" id="exampleProducts" placeholder="E.g. Spaghetti, Small Pack - ₦200" />
+  <label><strong>Upload Business Logo</strong></label>
+  <input type="file" id="logoFile" accept="image/*">
 
-      <label>Upload Business Logo (optional)</label>
-      <input type="file" id="logoFile" accept="image/*" />
+  <label><strong>Upload Payment Receipt</strong></label>
+  <input type="file" id="receiptFile" accept="image/*" required>
 
-      <label>Bank Name (for payouts)</label>
-      <input type="text" id="bankName" placeholder="e.g. GTBank" />
+  <button type="button" id="payBtn">Pay With Paystack (₦2,000)</button>
+  <button type="submit">Submit Application</button>
 
-      <label>Account Name</label>
-      <input type="text" id="accountName" />
+</form>
 
-      <label>Account Number</label>
-      <input type="text" id="accountNumber" />
-
-      <label><input type="checkbox" id="agreeTerms" required /> I confirm I am a student of the selected university and I accept CampusMart's seller terms. *</label>
-
-      <div style="display:flex;gap:12px;margin-top:14px">
-        <button type="button" id="paySellerFee">Pay ₦1,500 (Paystack)</button>
-        <button type="submit">Submit Registration</button>
-      </div>
-
-      <div class="status" id="status"></div>
-      <p class="muted">We will verify ID and payment before approving seller accounts.</p>
-    </form>
-  </div>
+<p id="status"></p>
 
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
-/*
-  Replace:
-    - WEB_APP_URL with your Google Apps Script Web App URL
-*/
-const WEB_APP_URL = "YOUR_APPS_SCRIPT_WEB_APP_URL_HERE"; // e.g. https://script.google.com/macros/s/XXXXXXXX/exec
 
-// convert file to base64
-function fileToBase64(file){
-  return new Promise((resolve, reject) => {
-    if(!file) return resolve("");
-    const r = new FileReader();
-    r.onload = () => resolve(r.result);
-    r.onerror = reject;
-    r.readAsDataURL(file);
-  });
-}
+document.getElementById("payBtn").addEventListener("click", () => {
+    const email = document.getElementById("email").value;
+    const name = document.getElementById("fullName").value;
 
-// store payment reference
-document.getElementById("paySellerFee").addEventListener("click", function(){
-  const email = document.getElementById("email").value;
-  const name = document.getElementById("fullName").value;
-  if(!email || !name){ alert("Please enter your name and email before paying."); return; }
-
-  const handler = PaystackPop.setup({
-    key: "PAYSTACK_PUBLIC_KEY", // replace with your Paystack public key
-    email: email,
-    amount: 1500 * 100,
-    currency: "NGN",
-    ref: "CMSELLER_" + Date.now(),
-    metadata: { custom_fields: [{ display_name: "Full Name", variable_name: "full_name", value: name }] },
-
-    callback: function(response){
-      // save ref to session so we include it when submitting form
-      sessionStorage.setItem("campusmart_seller_pay_ref", response.reference);
-      document.getElementById("status").style.color = "green";
-      document.getElementById("status").innerText = "Payment successful — reference saved. Now submit the form.";
-    },
-
-    onClose: function(){
-      document.getElementById("status").style.color = "orange";
-      document.getElementById("status").innerText = "Payment window closed.";
-    }
-  });
-
-  handler.openIframe();
-});
-
-// handle form submit
-document.getElementById("sellerForm").addEventListener("submit", async function(e){
-  e.preventDefault();
-  const statusEl = document.getElementById("status");
-  statusEl.style.color = "black";
-  statusEl.innerText = "Preparing submission...";
-
-  // basic required fields check
-  const required = ["fullName","email","phone","university","matric","businessName","businessCategory","agreeTerms"];
-  for(const id of required){
-    const el = document.getElementById(id);
-    if(!el) continue;
-    if((el.type === "checkbox" && !el.checked) || (el.value === "" && el.type !== "checkbox")){
-      statusEl.style.color = "red";
-      statusEl.innerText = "Please fill all required fields.";
+    if(!email || !name){
+      alert("Please enter your name and email before paying.");
       return;
     }
-  }
 
-  // ensure payment done
-  const payRef = sessionStorage.getItem("campusmart_seller_pay_ref");
-  if(!payRef){
-    statusEl.style.color = "red";
-    statusEl.innerText = "Please pay the ₦1,500 seller fee first.";
+    let handler = PaystackPop.setup({
+        key: "YOUR_PUBLIC_KEY_HERE",
+        email: email,
+        amount: 2000 * 100,
+        currency: "NGN",
+        ref: "SELLER_" + Date.now(),
+        callback: function(response){
+            alert("Payment Successful ✔");
+            sessionStorage.setItem("seller_payment_ref", response.reference);
+        },
+        onClose: function(){
+            alert("Payment Cancelled ❌");
+        }
+    });
+
+    handler.openIframe();
+});
+
+document.getElementById("sellerForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const paymentRef = sessionStorage.getItem("seller_payment_ref");
+  if(!paymentRef){
+    alert("⚠ Please complete payment first.");
     return;
   }
 
-  // convert files to base64
-  const studentFile = document.getElementById("studentIdFile").files[0];
-  const logoFile = document.getElementById("logoFile").files[0];
-  statusEl.innerText = "Uploading files (to backend)...";
+  const status = document.getElementById("status");
+  status.textContent = "⏳ Submitting...";
 
-  try{
-    const [studentIdBase64, logoBase64] = await Promise.all([
-      fileToBase64(studentFile),
-      fileToBase64(logoFile)
-    ]);
-
-    const payload = {
-      fullName: document.getElementById("fullName").value,
-      email: document.getElementById("email").value,
-      phone: document.getElementById("phone").value,
-      university: document.getElementById("university").value,
-      department: document.getElementById("department").value,
-      matric: document.getElementById("matric").value,
-      businessName: document.getElementById("businessName").value,
-      businessCategory: document.getElementById("businessCategory").value,
-      bio: document.getElementById("bio").value,
-      exampleProducts: document.getElementById("exampleProducts").value,
-      bankName: document.getElementById("bankName").value,
-      accountName: document.getElementById("accountName").value,
-      accountNumber: document.getElementById("accountNumber").value,
-      studentIdFile: studentIdBase64,
-      logoFile: logoBase64,
-      payment_reference: payRef,
-      timestamp: new Date().toISOString()
-    };
-
-    statusEl.innerText = "Sending registration...";
-    const res = await fetch(WEB_APP_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+  const convertToBase64 = file => {
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(file);
     });
+  };
 
-    const result = await res.json();
-    if(result.status === "success"){
-      statusEl.style.color = "green";
-      statusEl.innerText = "Registration submitted. We will review and email you.";
-      // optional: clear the form and payment ref
-      sessionStorage.removeItem("campusmart_seller_pay_ref");
-      document.getElementById("sellerForm").reset();
-    } else {
-      statusEl.style.color = "red";
-      statusEl.innerText = "Error: " + (result.message || "Try again later");
-    }
-  } catch(err){
-    statusEl.style.color = "red";
-    statusEl.innerText = "Network or upload error: " + err.message;
+  const data = {
+    fullName: fullName.value,
+    email: email.value,
+    phone: phone.value,
+    university: university.value,
+    department: department.value,
+    matric: matric.value,
+    businessName: businessName.value,
+    businessCategory: businessCategory.value,
+    bio: bio.value,
+    exampleProducts: exampleProducts.value,
+    payment_reference: paymentRef,
+    studentIdFile: await convertToBase64(studentIdFile.files[0]),
+    logoFile: logoFile.files.length ? await convertToBase64(logoFile.files[0]) : "",
+    receiptFile: await convertToBase64(receiptFile.files[0])
+  };
+
+  const res = await fetch("YOUR_GOOGLE_SCRIPT_URL_HERE", {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: { "Content-Type": "application/json" }
+  });
+
+  const result = await res.json();
+
+  if(result.status === "success"){
+    status.style.color = "green";
+    status.textContent = "✔ Submitted successfully! Wait for approval.";
+    sessionStorage.removeItem("seller_payment_ref");
+  } else {
+    status.style.color = "red";
+    status.textContent = "❌ Error: " + result.message;
   }
+
 });
+
 </script>
 </body>
 </html>
