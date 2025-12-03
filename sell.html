@@ -139,13 +139,13 @@
         </select>
 
         <textarea id="bio" placeholder="Short Business Description"></textarea>
-        <textarea id="exampleProducts" placeholder="List 3 sample products"></textarea>
+        <textarea id="exampleProducts" placeholder="Product Name"></textarea>
 
         <label>Upload Student ID</label>
         <div class="file-input">Choose Student ID Image</div>
         <input type="file" id="studentIdFile" accept="image/*" style="display:none" required>
 
-        <label>Upload Business Logo</label>
+        <label>Upload Product Image</label>
         <div class="file-input">Choose Logo Image</div>
         <input type="file" id="logoFile" accept="image/*" style="display:none">
 
@@ -153,7 +153,7 @@
         <div class="file-input">Choose Receipt Image</div>
         <input type="file" id="receiptFile" accept="image/*" style="display:none" required>
 
-        <button type="button" id="payBtn">Pay With Paystack (₦2,000)</button>
+        <button type="button" id="payBtn">Pay With Paystack (₦1,000)</button>
         <button type="submit">Submit Application</button>
 
         <p id="status"></p>
@@ -255,4 +255,5 @@ document.getElementById("sellerForm").addEventListener("submit", async (e) => {
 
 </body>
 </html>
+
 
