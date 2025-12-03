@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/x-icon" href="Blue 1.png">
+  <title>CampusmartStore Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 40px;
+      text-align: center;
+    }
+
+    #loginBox {
+      width: 300px;
+      background: white;
+      padding: 20px;
+      margin: 100px auto;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    #dashboard {
+      display: none;
+    }
+
+    table {
+      width: 90%;
+      margin: 30px auto;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      background: white;
+    }
+
+    th {
+      background: black;
+      color: white;
+    }
+
+    .btn {
+      padding: 8px 15px;
+      border: none;
+      background: black;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Password Login Box -->
+  <div id="loginBox">
+    <h2>Admin Login</h2>
+    <input type="password" id="password" placeholder="Enter Admin Password" style="width: 90%; padding: 10px;"><br><br>
+    <button class="btn" onclick="checkPassword()">Login</button>
+  </div>
+
+  <!-- Dashboard Section -->
+  <div id="dashboard">
+    <h1>CampusmartStore Admin Dashboard</h1>
+    <p>Viewing seller registrations from Google Sheets</p>
+
+    <button class="btn" onclick="loadData()">Refresh Data</button>
+
+    <table id="dataTable">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Full Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>University</th>
+          <th>Business Name</th>
+          <th>Category</th>
+          <th>Payment Reference</th>
+          <th>ID Image</th>
+          <th>Logo</th>
+          <th>Receipt</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+  </div>
+
+<script>
+  // ===============================
+  //   PASSWORD PROTECTION
+  // ===============================
+  const ADMIN_PASSWORD = "Campusmartstore2025"; // <-- CHANGE THIS
+
+  function checkPassword() {
+    const input = document.getElementById("password").value;
+
+    if (input === ADMIN_PASSWORD) {
+      document.getElementById("loginBox").style.display = "none";
+      document.getElementById("dashboard").style.display = "block";
+      loadData();
+    } else {
+      alert("Incorrect password!");
+    }
+  }
+
+  // ====================================
+  //    LOAD DATA FROM APPS SCRIPT WEB APP
+  // ====================================
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPbcgD3kn6V-uLmF92SBJ6dG5zE-sFcG6EjARM69gqwovY5ZqscqCnKrjRtMxOYCoTPA/exec"; // replace with your WebApp link
+
+  async function loadData() {
+    const tbody = document.querySelector("#dataTable tbody");
+    tbody.innerHTML = "<tr><td colspan='12'>Loading...</td></tr>";
+
+    try {
+      const res = await fetch(WEB_APP_URL);
+      const data = await res.json();
+
+      tbody.innerHTML = "";
+
+      data.forEach(row => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${row.timestamp}</td>
+            <td>${row.fullName}</td>
+            <td>${row.email}</td>
+            <td>${row.phone}</td>
+            <td>${row.university}</td>
+            <td>${row.businessName}</td>
+            <td>${row.category}</td>
+            <td>${row.payment_reference}</td>
+            <td><a href="${row.studentIdUrl}" target="_blank">View ID</a></td>
+            <td><a href="${row.logoUrl}" target="_blank">View Logo</a></td>
+            <td><a href="${row.receiptUrl}" target="_blank">View Receipt</a></td>
+            <td>${row.status}</td>
+          </tr>
+        `;
+      });
+
+    } catch (err) {
+      tbody.innerHTML = "<tr><td colspan='12'>Failed to load data.</td></tr>";
+    }
+  }
+</script>
+
+</body>
+</html>
