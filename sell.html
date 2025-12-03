@@ -234,7 +234,7 @@ document.getElementById("sellerForm").addEventListener("submit", async (e) => {
         receiptFile: await toBase64(receiptFile.files[0])
     };
 
-    const res = await fetch("YOUR_APPS_SCRIPT_URL", {
+    const res = await fetch("https://script.google.com/macros/s/AKfycbzPbcgD3kn6V-uLmF92SBJ6dG5zE-sFcG6EjARM69gqwovY5ZqscqCnKrjRtMxOYCoTPA/exec", {
         method: "POST",
         body: JSON.stringify(data),
         headers: { "Content-Type": "application/json" }
@@ -255,3 +255,4 @@ document.getElementById("sellerForm").addEventListener("submit", async (e) => {
 
 </body>
 </html>
+
