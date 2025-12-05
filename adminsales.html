@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="icon" type="image/x-icon" href="Blue 1.png">
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CampusMart — Sales Dashboard</title>
+<style>
+  :root{--accent:#007bff;--muted:#666}
+  body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#f2f6fb;color:#222}
+  .wrap{max-width:1100px;margin:28px auto;padding:18px}
+  .card{background:#fff;border-radius:10px;padding:18px;box-shadow:0 6px 18px rgba(20,30,50,0.06)}
+  h1{margin:0 0 6px;color:var(--accent)}
+  p.lead{margin:0 0 14px;color:var(--muted)}
+  .login-row{display:flex;gap:8px;align-items:center}
+  input[type=password]{flex:1;padding:10px;border-radius:8px;border:1px solid #d6dbe6}
+  button.btn{padding:10px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer}
+  .controls{display:flex;gap:12px;margin:12px 0;flex-wrap:wrap}
+  .search{flex:1;min-width:180px;padding:10px;border-radius:8px;border:1px solid #ddd}
+  select.filter{padding:10px;border-radius:8px;border:1px solid #ddd}
+  table{width:100%;border-collapse:collapse;margin-top:10px}
+  th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;vertical-align:middle}
+  th{background:#f7fbff;color:#333;position:sticky;top:0}
+  img.thumb{height:60px;border-radius:6px;object-fit:cover}
+  .small{font-size:13px;color:var(--muted)}
+  .center{text-align:center}
+  @media (max-width:900px){
+    th:nth-child(1), td:nth-child(1){display:none}
+    .thumb{height:44px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" id="loginCard">
+    <h1>Sales Dashboard — Admin</h1>
+    <p class="lead">Enter admin password to view orders</p>
+    <div class="login-row">
+      <input id="adminPassword" type="password" placeholder="Admin password" />
+      <button id="loginBtn" class="btn">Unlock</button>
+    </div>
+    <p id="loginMsg" class="small"></p>
+  </div>
+
+  <div class="card" id="dashboardCard" style="display:none;margin-top:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+      <div>
+        <h1>Orders</h1>
+        <p class="small">Live list from Google Sheet</p>
+      </div>
+
+      <div>
+        <button id="logoutBtn" class="btn" style="background:#444">Logout</button>
+      </div>
+    </div>
+
+    <div class="controls">
+      <input id="searchInput" class="search" placeholder="Search by name, email, items or reference..." />
+      <select id="univFilter" class="filter">
+        <option value="">All Universities</option>
+      </select>
+      <select id="statusFilter" class="filter">
+        <option value="">All Status</option>
+        <option value="Pending">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Completed">Completed</option>
+      </select>
+      <div style="min-width:160px">
+        <span class="small">Orders: <strong id="count">0</strong></span>
+      </div>
+    </div>
+
+    <div style="overflow:auto">
+      <table id="ordersTable">
+        <thead>
+          <tr>
+            <th class="small">TS</th>
+            <th>Name / Email</th>
+            <th>Phone</th>
+            <th>University</th>
+            <th>Items</th>
+            <th>Amount</th>
+            <th>Payment Ref</th>
+            <th>Receipt</th>
+            <th class="small">Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- CONFIG ---------- */
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzEMwalUx5t2PBylVzziIFW72skdUJH-5w4YeiXUYY8fF-tKR_2yF2ZjJKcL_JJM0Lg/exec?action=getOrders"; // << REPLACE with your Apps Script URL + ?action=getOrders
+const ADMIN_PASSWORD = "campusmartstore2025"; // password you gave
+/* ---------------------------- */
+
+const loginCard = document.getElementById('loginCard');
+const dashboardCard = document.getElementById('dashboardCard');
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+const adminPasswordInput = document.getElementById('adminPassword');
+const loginMsg = document.getElementById('loginMsg');
+
+const ordersTableBody = document.querySelector('#ordersTable tbody');
+const countEl = document.getElementById('count');
+const searchInput = document.getElementById('searchInput');
+const univFilter = document.getElementById('univFilter');
+const statusFilter = document.getElementById('statusFilter');
+
+let orders = [];
+
+// --- Login logic (client-side password)
+loginBtn.addEventListener('click', () => {
+  const v = adminPasswordInput.value;
+  if (v === ADMIN_PASSWORD) {
+    localStorage.setItem('sales_admin_auth','1');
+    showDashboard();
+  } else {
+    loginMsg.textContent = 'Incorrect password';
+    loginMsg.style.color = 'crimson';
+  }
+});
+
+logoutBtn.addEventListener('click', () => {
+  localStorage.removeItem('sales_admin_auth');
+  location.reload();
+});
+
+function showDashboard(){
+  loginCard.style.display = 'none';
+  dashboardCard.style.display = 'block';
+  fetchOrders();
+}
+
+// auto show if already authed
+if (localStorage.getItem('sales_admin_auth')) showDashboard();
+
+// --- fetch orders from Apps Script
+async function fetchOrders(){
+  try {
+    ordersTableBody.innerHTML = '<tr><td colspan="9" class="center small">Loading...</td></tr>';
+    const res = await fetch(WEB_APP_URL);
+    const data = await res.json();
+
+    // data expected as array of objects
+    orders = Array.isArray(data) ? data : [];
+
+    // normalize each order (stringify dates)
+    orders = orders.map(o => {
+      const normalized = {};
+      for (const k in o) {
+        normalized[k] = (o[k] === null || o[k] === undefined) ? '' : o[k];
+      }
+      // Some common keys may be named differently in your sheet headers.
+      // We'll attempt to map typical names:
+      normalized.timestamp = normalized.timestamp || normalized.time || normalized.Ts || '';
+      normalized.name = normalized.name || normalized.fullName || normalized.full_name || '';
+      normalized.email = normalized.email || normalized.emailaddress || '';
+      normalized.phone = normalized.phone || normalized.whatsappnumber || '';
+      normalized.university = normalized.university || normalized.school || '';
+      normalized.items = normalized.items || normalized.order || normalized.itemsOrdered || '';
+      normalized.amount = normalized.amount || normalized.total || normalized.amountPaid || '';
+      normalized.paymentReference = normalized.paymentReference || normalized.payment_reference || normalized.paymentref || '';
+      normalized.receiptUrl = normalized.receiptUrl || normalized.receipt || normalized.receipturl || normalized.receiptURL || '';
+      normalized.status = normalized.status || normalized.orderStatus || 'Pending';
+      return normalized;
+    });
+
+    renderOrders();
+    populateFilters();
+  } catch (err) {
+    ordersTableBody.innerHTML = `<tr><td colspan="9" class="center small">Failed to load orders: ${err.message}</td></tr>`;
+  }
+}
+
+function renderOrders(filterText=''){
+  const text = (filterText || searchInput.value || '').toLowerCase().trim();
+  const univ = univFilter.value;
+  const status = statusFilter.value;
+
+  const filtered = orders.filter(o => {
+    if (univ && String(o.university).toLowerCase() !== univ.toLowerCase()) return false;
+    if (status && String(o.status).toLowerCase() !== status.toLowerCase()) return false;
+    if (!text) return true;
+    // search in several fields
+    return (
+      (String(o.name||'') + ' ' + String(o.email||'') + ' ' + String(o.items||'') + ' ' + String(o.paymentReference||''))
+      .toLowerCase().includes(text)
+    );
+  });
+
+  ordersTableBody.innerHTML = '';
+  filtered.reverse().forEach(o => {
+    const ts = o.timestamp ? new Date(o.timestamp).toLocaleString() : '';
+    const receiptLink = o.receiptUrl ? `<a href="${o.receiptUrl}" target="_blank"><img class="thumb" src="${o.receiptUrl}"></a>` : '—';
+    const phone = o.phone || '';
+    const amt = o.amount ? `₦${o.amount}` : '';
+
+    ordersTableBody.innerHTML += `
+      <tr>
+        <td class="small">${ts}</td>
+        <td><strong>${escapeHtml(o.name)}</strong><div class="small">${escapeHtml(o.email)}</div></td>
+        <td>${escapeHtml(phone)}</td>
+        <td>${escapeHtml(o.university)}</td>
+        <td class="small">${escapeHtml(o.items)}</td>
+        <td>${escapeHtml(amt)}</td>
+        <td class="small">${escapeHtml(o.paymentReference)}</td>
+        <td>${receiptLink}</td>
+        <td class="small">${escapeHtml(o.status)}</td>
+      </tr>
+    `;
+  });
+
+  countEl.textContent = filtered.length;
+}
+
+searchInput.addEventListener('input', () => renderOrders());
+
+univFilter.addEventListener('change', () => renderOrders());
+statusFilter.addEventListener('change', () => renderOrders());
+
+// build university filter options from orders
+function populateFilters(){
+  const univs = new Set(orders.map(o => (o.university||'').toString()).filter(x=>x));
+  // clear current options except first
+  univFilter.innerHTML = '<option value="">All Universities</option>';
+  Array.from(univs).sort().forEach(u => {
+    const opt = document.createElement('option');
+    opt.value = u;
+    opt.innerText = u;
+    univFilter.appendChild(opt);
+  });
+}
+
+// utility
+function escapeHtml(s){
+  if (!s && s !== 0) return '';
+  return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];});
+}
+</script>
+</body>
+</html>
