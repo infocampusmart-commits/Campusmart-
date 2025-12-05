@@ -82,7 +82,7 @@ document.getElementById("payBtn").addEventListener("click", function () {
   const totalAmount = cart.reduce((sum, i) => sum + i.price * i.quantity, 0) * 100;
 
   let handler = PaystackPop.setup({
-    key: "PAYSTACK_PUBLIC_KEY",
+    key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107",
     email: email,
     amount: totalAmount,
     currency: "NGN",
