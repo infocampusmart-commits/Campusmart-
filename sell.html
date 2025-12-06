@@ -183,7 +183,7 @@ document.getElementById("payBtn").addEventListener("click", () => {
     let handler = PaystackPop.setup({
         key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107",
         email: email,
-        amount: 2000 * 100,
+        amount: 10 * 100,
         currency: "NGN",
         ref: "SELLER_" + Date.now(),
         callback: function (response) {
@@ -255,6 +255,7 @@ document.getElementById("sellerForm").addEventListener("submit", async (e) => {
 
 </body>
 </html>
+
 
 
 
