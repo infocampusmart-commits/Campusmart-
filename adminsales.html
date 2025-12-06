@@ -93,8 +93,11 @@
 
 <script>
 /* ---------- CONFIG ---------- */
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzEMwalUx5t2PBylVzziIFW72skdUJH-5w4YeiXUYY8fF-tKR_2yF2ZjJKcL_JJM0Lg/exec?action=getOrders"; // << REPLACE with your Apps Script URL + ?action=getOrders
-const ADMIN_PASSWORD = "campusmartstore2025"; // password you gave
+const WEB_APP_BASE = "https://script.google.com/macros/s/AKfycbzEMwalUx5t2PBylVzziIFW72skdUJH-5w4YeiXUYY8fF-tKR_2yF2ZjJKcL_JJM0Lg/exec"; 
+const GET_ORDERS = WEB_APP_BASE + "?action=getOrders";
+const UPDATE_STATUS_URL = WEB_APP_BASE + "?action=updateStatus";
+
+const ADMIN_PASSWORD = "campusmartstore2025"; 
 /* ---------------------------- */
 
 const loginCard = document.getElementById('loginCard');
@@ -112,10 +115,9 @@ const statusFilter = document.getElementById('statusFilter');
 
 let orders = [];
 
-// --- Login logic (client-side password)
+/* ---------- LOGIN ---------- */
 loginBtn.addEventListener('click', () => {
-  const v = adminPasswordInput.value;
-  if (v === ADMIN_PASSWORD) {
+  if (adminPasswordInput.value === ADMIN_PASSWORD) {
     localStorage.setItem('sales_admin_auth','1');
     showDashboard();
   } else {
@@ -135,111 +137,152 @@ function showDashboard(){
   fetchOrders();
 }
 
-// auto show if already authed
 if (localStorage.getItem('sales_admin_auth')) showDashboard();
 
-// --- fetch orders from Apps Script
+/* ---------- FETCH ORDERS ---------- */
 async function fetchOrders(){
   try {
     ordersTableBody.innerHTML = '<tr><td colspan="9" class="center small">Loading...</td></tr>';
-    const res = await fetch(WEB_APP_URL);
+    const res = await fetch(GET_ORDERS);
     const data = await res.json();
 
-    // data expected as array of objects
     orders = Array.isArray(data) ? data : [];
 
-    // normalize each order (stringify dates)
-    orders = orders.map(o => {
-      const normalized = {};
-      for (const k in o) {
-        normalized[k] = (o[k] === null || o[k] === undefined) ? '' : o[k];
-      }
-      // Some common keys may be named differently in your sheet headers.
-      // We'll attempt to map typical names:
-      normalized.timestamp = normalized.timestamp || normalized.time || normalized.Ts || '';
-      normalized.name = normalized.name || normalized.fullName || normalized.full_name || '';
-      normalized.email = normalized.email || normalized.emailaddress || '';
-      normalized.phone = normalized.phone || normalized.whatsappnumber || '';
-      normalized.university = normalized.university || normalized.school || '';
-      normalized.items = normalized.items || normalized.order || normalized.itemsOrdered || '';
-      normalized.amount = normalized.amount || normalized.total || normalized.amountPaid || '';
-      normalized.paymentReference = normalized.paymentReference || normalized.payment_reference || normalized.paymentref || '';
-      normalized.receiptUrl = normalized.receiptUrl || normalized.receipt || normalized.receipturl || normalized.receiptURL || '';
-      normalized.status = normalized.status || normalized.orderStatus || 'Pending';
-      return normalized;
-    });
+    orders = orders.map(o => ({
+      timestamp: o.timestamp || o.time || '',
+      name: o.name || o.fullName || '',
+      email: o.email || '',
+      phone: o.phone || '',
+      university: o.university || '',
+      items: o.items || '',
+      amount: o.amount || '',
+      paymentReference: o.paymentReference || '',
+      receiptUrl: o.receiptUrl || '',
+      status: o.status || 'Pending'
+    }));
 
     renderOrders();
     populateFilters();
   } catch (err) {
-    ordersTableBody.innerHTML = `<tr><td colspan="9" class="center small">Failed to load orders: ${err.message}</td></tr>`;
+    ordersTableBody.innerHTML = `<tr><td colspan="9" class="center small">Error: ${err.message}</td></tr>`;
   }
 }
 
-function renderOrders(filterText=''){
-  const text = (filterText || searchInput.value || '').toLowerCase().trim();
+/* ---------- RENDER ---------- */
+function renderOrders(){
+  const text = searchInput.value.toLowerCase().trim();
   const univ = univFilter.value;
   const status = statusFilter.value;
 
   const filtered = orders.filter(o => {
-    if (univ && String(o.university).toLowerCase() !== univ.toLowerCase()) return false;
-    if (status && String(o.status).toLowerCase() !== status.toLowerCase()) return false;
-    if (!text) return true;
-    // search in several fields
+    if (univ && o.university.toLowerCase() !== univ.toLowerCase()) return false;
+    if (status && o.status.toLowerCase() !== status.toLowerCase()) return false;
+
     return (
-      (String(o.name||'') + ' ' + String(o.email||'') + ' ' + String(o.items||'') + ' ' + String(o.paymentReference||''))
-      .toLowerCase().includes(text)
+      (o.name + o.email + o.items + o.paymentReference)
+      .toLowerCase()
+      .includes(text)
     );
   });
 
   ordersTableBody.innerHTML = '';
+
   filtered.reverse().forEach(o => {
     const ts = o.timestamp ? new Date(o.timestamp).toLocaleString() : '';
-    const receiptLink = o.receiptUrl ? `<a href="${o.receiptUrl}" target="_blank"><img class="thumb" src="${o.receiptUrl}"></a>` : '—';
-    const phone = o.phone || '';
-    const amt = o.amount ? `₦${o.amount}` : '';
+    const receipt = o.receiptUrl 
+      ? `<a href="${o.receiptUrl}" target="_blank"><img class="thumb" src="${o.receiptUrl}"></a>` 
+      : '—';
 
     ordersTableBody.innerHTML += `
       <tr>
         <td class="small">${ts}</td>
         <td><strong>${escapeHtml(o.name)}</strong><div class="small">${escapeHtml(o.email)}</div></td>
-        <td>${escapeHtml(phone)}</td>
+        <td>${escapeHtml(o.phone)}</td>
         <td>${escapeHtml(o.university)}</td>
         <td class="small">${escapeHtml(o.items)}</td>
-        <td>${escapeHtml(amt)}</td>
+        <td>₦${escapeHtml(o.amount)}</td>
         <td class="small">${escapeHtml(o.paymentReference)}</td>
-        <td>${receiptLink}</td>
-        <td class="small">${escapeHtml(o.status)}</td>
+        <td>${receipt}</td>
+        <td class="small">
+          <select class="statusSelect" data-ref="${o.paymentReference}">
+            <option ${o.status==="Pending"?"selected":""}>Pending</option>
+            <option ${o.status==="Approved"?"selected":""}>Approved</option>
+            <option ${o.status==="Completed"?"selected":""}>Completed</option>
+          </select>
+        </td>
       </tr>
     `;
   });
 
   countEl.textContent = filtered.length;
+
+  document.querySelectorAll(".statusSelect").forEach(sel => {
+    sel.addEventListener("change", updateStatus);
+  });
 }
 
-searchInput.addEventListener('input', () => renderOrders());
+/* ---------- UPDATE STATUS ---------- */
+async function updateStatus(e){
+  const newStatus = e.target.value;
+  const ref = e.target.dataset.ref;
 
-univFilter.addEventListener('change', () => renderOrders());
-statusFilter.addEventListener('change', () => renderOrders());
+  try {
+    await fetch(`${UPDATE_STATUS_URL}&reference=${ref}&status=${newStatus}`);
+    alert("Status updated successfully!");
+  } catch (err) {
+    alert("Failed to update status: " + err.message);
+  }
+}
 
-// build university filter options from orders
+/* ---------- FILTERS ---------- */
+searchInput.addEventListener('input', renderOrders);
+univFilter.addEventListener('change', renderOrders);
+statusFilter.addEventListener('change', renderOrders);
+
 function populateFilters(){
-  const univs = new Set(orders.map(o => (o.university||'').toString()).filter(x=>x));
-  // clear current options except first
+  const univs = new Set(orders.map(o => o.university).filter(Boolean));
   univFilter.innerHTML = '<option value="">All Universities</option>';
   Array.from(univs).sort().forEach(u => {
     const opt = document.createElement('option');
     opt.value = u;
-    opt.innerText = u;
+    opt.textContent = u;
     univFilter.appendChild(opt);
   });
 }
 
-// utility
+/* ---------- EXPORT CSV ---------- */
+function exportCSV(){
+  let csv = "Timestamp,Name,Email,Phone,University,Items,Amount,Reference,Status\n";
+
+  orders.forEach(o => {
+    csv += `"${o.timestamp}","${o.name}","${o.email}","${o.phone}","${o.university}","${o.items}","${o.amount}","${o.paymentReference}","${o.status}"\n`;
+  });
+
+  const link = document.createElement("a");
+  link.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
+  link.download = "campusmart_orders.csv";
+  link.click();
+}
+
+/* ---------- EXPORT EXCEL (.xlsx via HTML table trick) ---------- */
+function exportExcel(){
+  const table = document.getElementById("ordersTable").outerHTML;
+  const file = new Blob([table], {type:"application/vnd.ms-excel"});
+  const url = URL.createObjectURL(file);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "campusmart_orders.xls";
+  a.click();
+}
+
 function escapeHtml(s){
-  if (!s && s !== 0) return '';
-  return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m];});
+  return String(s).replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  })[m]);
 }
 </script>
+
 </body>
 </html>
+
