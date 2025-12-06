@@ -25,27 +25,17 @@
         padding: 25px;
         border-radius: 12px;
         box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        animation: fadeIn 0.4s ease-in-out;
         margin: 30px 0;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
     }
 
     h2 {
         text-align: center;
         color: #007bff;
-        margin-bottom: 10px;
-        font-size: 22px;
     }
 
     p {
         text-align: center;
         color: #666;
-        margin-bottom: 25px;
-        font-size: 14px;
     }
 
     input, select, textarea {
@@ -55,12 +45,6 @@
         border-radius: 8px;
         margin-bottom: 15px;
         font-size: 15px;
-        transition: 0.2s;
-    }
-
-    input:focus, select:focus, textarea:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 5px rgba(0,123,255,0.3);
     }
 
     label {
@@ -78,6 +62,15 @@
         cursor: pointer;
         text-align: center;
         color: #555;
+        margin-bottom: 10px;
+    }
+
+    .preview {
+        width: 100%;
+        max-height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        display: none;
         margin-bottom: 15px;
     }
 
@@ -139,19 +132,25 @@
         </select>
 
         <textarea id="bio" placeholder="Short Business Description"></textarea>
-        <textarea id="exampleProducts" placeholder="Product Name"></textarea>
+        <textarea id="exampleProducts" placeholder="Product Example (e.g. Shawarma, Sneakers)"></textarea>
 
-        <label>Upload NIN slip or card image</label>
-        <div class="file-input">Choose NIN slip or card Image</div>
+        <!-- NIN -->
+        <label>Upload NIN slip or card</label>
+        <div class="file-input" data-target="studentIdFile">Choose NIN Image</div>
         <input type="file" id="studentIdFile" accept="image/*" style="display:none" required>
+        <img id="studentIdPreview" class="preview">
 
+        <!-- Product Image -->
         <label>Upload Product Image</label>
-        <div class="file-input">Choose Product Image</div>
+        <div class="file-input" data-target="logoFile">Choose Product Image</div>
         <input type="file" id="logoFile" accept="image/*" style="display:none">
+        <img id="logoPreview" class="preview">
 
+        <!-- Receipt -->
         <label>Upload Payment Receipt</label>
-        <div class="file-input">Choose Receipt Image</div>
+        <div class="file-input" data-target="receiptFile">Choose Receipt Image</div>
         <input type="file" id="receiptFile" accept="image/*" style="display:none" required>
+        <img id="receiptPreview" class="preview">
 
         <button type="button" id="payBtn">Pay With Paystack (₦1,000)</button>
         <button type="submit">Submit Application</button>
@@ -163,28 +162,48 @@
 <script src="https://js.paystack.co/v1/inline.js"></script>
 
 <script>
-// Make file inputs clickable
-document.querySelectorAll(".file-input").forEach((box, index) => {
+// 🔹 Make file boxes open actual hidden file input
+document.querySelectorAll(".file-input").forEach(box => {
     box.addEventListener("click", () => {
-        box.nextElementSibling.click();
+        const inputId = box.getAttribute("data-target");
+        document.getElementById(inputId).click();
     });
 });
 
-// PAYSTACK PAYMENT
-document.getElementById("payBtn").addEventListener("click", () => {
-    const email = email.value;
-    const name = fullName.value;
+// 🔹 Show Preview for Uploaded Images
+function previewImage(input, previewId) {
+    const file = input.files[0];
+    const preview = document.getElementById(previewId);
 
-    if (!email || !name) {
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+            preview.src = reader.result;
+            preview.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+studentIdFile.onchange = () => previewImage(studentIdFile, "studentIdPreview");
+logoFile.onchange = () => previewImage(logoFile, "logoPreview");
+receiptFile.onchange = () => previewImage(receiptFile, "receiptPreview");
+
+
+// 🔹 Paystack Payment
+document.getElementById("payBtn").addEventListener("click", () => {
+    const emailVal = email.value;
+    const nameVal = fullName.value;
+
+    if (!emailVal || !nameVal) {
         alert("Please enter your name and email before paying.");
         return;
     }
 
     let handler = PaystackPop.setup({
         key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107",
-        email: email,
-        amount: 10 * 100,
-        currency: "NGN",
+        email: emailVal,
+        amount: 1000 * 100,
         ref: "SELLER_" + Date.now(),
         callback: function (response) {
             alert("Payment Successful ✔");
@@ -198,7 +217,8 @@ document.getElementById("payBtn").addEventListener("click", () => {
     handler.openIframe();
 });
 
-// SUBMIT FORM
+
+// 🔹 Submit Form After Payment
 document.getElementById("sellerForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -255,9 +275,3 @@ document.getElementById("sellerForm").addEventListener("submit", async (e) => {
 
 </body>
 </html>
-
-
-
-
-
-
