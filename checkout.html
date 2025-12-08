@@ -68,7 +68,6 @@ input, textarea, select { width:100%; padding:10px; margin:5px 0 10px 0; border-
 <div class="message" id="message"></div>
 </div>
 
-<script src="https://js.paystack.co/v1/inline.js"></script>
 
 <script>
 const productBox = document.getElementById("productSummary");
@@ -91,7 +90,7 @@ if (cart.length === 0) {
   }).join("") + `<hr><p><strong>Total: ₦${total}</strong></p>`;
 }
 
-// 🖼 Show Receipt Image Preview
+// 🖼 Show receipt preview
 document.getElementById("receipt").addEventListener("change", function () {
   const file = this.files[0];
   if (!file) return;
@@ -104,7 +103,7 @@ document.getElementById("receipt").addEventListener("change", function () {
   reader.readAsDataURL(file);
 });
 
-// 💳 PAYSTACK PAYMENT BUTTON
+// 💳 PAYSTACK PAYMENT
 document.getElementById("payBtn").addEventListener("click", function () {
 
   const name = document.getElementById("name").value;
@@ -137,7 +136,7 @@ document.getElementById("payBtn").addEventListener("click", function () {
   handler.openIframe();
 });
 
-// 📤 SUBMIT ORDER TO GOOGLE APPS SCRIPT
+// 📤 Submit order
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -154,26 +153,37 @@ form.addEventListener("submit", async (e) => {
     return;
   }
 
+  // Validate other fields
+  const phone = document.getElementById("phone").value;
+  const university = document.getElementById("university").value;
+  const delivery = document.getElementById("delivery").value;
+
+  if (!phone || !university || !delivery) {
+    message.style.color = "red";
+    message.textContent = "⚠ All fields are required.";
+    return;
+  }
+
   const receiptFile = document.getElementById("receipt").files[0];
   const reader = new FileReader();
 
-  reader.onload = async () => {
+  const sendOrder = async (receiptBase64) => {
     const orderData = {
       name: document.getElementById("name").value,
       email: document.getElementById("email").value,
-      phone: document.getElementById("phone").value,
-      university: document.getElementById("university").value,
-      delivery: document.getElementById("delivery").value,
+      phone: phone,
+      university: university,
+      delivery: delivery,
       items: cart.map(i => `${i.name} x ${i.quantity}`).join(", "),
       amount: cart.reduce((s, i) => s + i.price * i.quantity, 0),
-      receipt: reader.result,
+      receipt: receiptBase64,
       payment_reference: payRef
     };
 
     message.textContent = "⏳ Sending order... please wait...";
 
     const response = await fetch(
-      "https://script.google.com/macros/s/AKfycbzEMwalUx5t2PBylVzziIFW72skdUJH-5w4YeiXUYY8fF-tKR_2yF2ZjJKcL_JJM0Lg/exec",    // <-- Replace with your Apps Script URL
+      "https://script.google.com/macros/s/AKfycbzEMwalUx5t2PBylVzziIFW72skdUJH-5w4YeiXUYY8fF-tKR_2yF2ZjJKcL_JJM0Lg/exec",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -187,7 +197,6 @@ form.addEventListener("submit", async (e) => {
       message.style.color = "green";
       message.textContent = "✅ Order submitted successfully!";
 
-      // Clear data
       localStorage.removeItem("campusmartCart");
       sessionStorage.removeItem("campusmart_pay_ref");
 
@@ -198,9 +207,20 @@ form.addEventListener("submit", async (e) => {
     }
   };
 
+  // If no receipt, send without image
+  if (!receiptFile) {
+    sendOrder(null);
+    return;
+  }
+
+  reader.onload = () => sendOrder(reader.result);
   reader.readAsDataURL(receiptFile);
 });
 </script>
+
+
+  
+
 
 </body>
 </html>
