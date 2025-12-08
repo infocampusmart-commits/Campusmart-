@@ -4,274 +4,176 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CampusmartStore Seller Registration</title>
-<link rel="icon" type="image/x-icon" href="Blue 1.png">
-
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: #eef2f5;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-    }
-
-    .container {
-        width: 90%;
-        max-width: 500px;
-        background: #fff;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        margin: 30px 0;
-    }
-
-    h2 {
-        text-align: center;
-        color: #007bff;
-    }
-
-    p {
-        text-align: center;
-        color: #666;
-    }
-
-    input, select, textarea {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        margin-bottom: 15px;
-        font-size: 15px;
-    }
-
-    label {
-        font-weight: bold;
-        font-size: 14px;
-        display: block;
-        margin-bottom: 5px;
-    }
-
-    .file-input {
-        background: #f8f9fb;
-        border: 2px dashed #c8cbd0;
-        padding: 15px;
-        border-radius: 8px;
-        cursor: pointer;
-        text-align: center;
-        color: #555;
-        margin-bottom: 10px;
-    }
-
-    .preview {
-        width: 100%;
-        max-height: 200px;
-        object-fit: cover;
-        border-radius: 8px;
-        display: none;
-        margin-bottom: 15px;
-    }
-
-    button {
-        width: 100%;
-        padding: 14px;
-        background: #007bff;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 5px;
-        transition: 0.2s;
-    }
-
-    button:hover {
-        background: #0058cc;
-    }
-
-    #status {
-        margin-top: 15px;
-        font-weight: bold;
-        text-align: center;
-    }
+/* Simplified styling */
+body { font-family: Arial; background: #eef2f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin:0; }
+.container { width: 90%; max-width: 500px; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);}
+h2 { text-align: center; color: #007bff; }
+input, select, textarea { width:100%; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc; }
+.file-input { padding:10px; border:2px dashed #c8cbd0; border-radius:8px; text-align:center; cursor:pointer; margin-bottom:10px;}
+.preview { width:100%; max-height:200px; margin-bottom:10px; display:none; object-fit:cover; border-radius:8px;}
+button { width:100%; padding:12px; margin-top:5px; background:#007bff; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:16px;}
+button:hover { background:#0058cc;}
+#status { text-align:center; margin-top:10px; font-weight:bold;}
 </style>
 </head>
-
 <body>
 
 <div class="container">
-    <h2>Become a Seller</h2>
-    <p>Fill in your details to join CampusmartStore</p>
+<h2>Become a Seller</h2>
 
-    <form id="sellerForm">
+<form id="sellerForm">
+  <input type="text" id="fullName" placeholder="Full Name" required>
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="text" id="phone" placeholder="Phone Number" required>
+  <select id="university" required>
+    <option value="">Select University</option>
+    <option value="Covenant University">Covenant University</option>
+    <option value="Bells University">Bells University</option>
+    <option value="Crawford University">Crawford University</option>
+  </select>
+  <input type="text" id="department" placeholder="Department">
+  <input type="text" id="matric" placeholder="Matric/Student ID" required>
+  <input type="text" id="businessName" placeholder="Business Name" required>
+  <select id="businessCategory" required>
+    <option value="">Select Business Category</option>
+    <option value="Food">Food</option>
+    <option value="Fashion">Fashion</option>
+    <option value="Shoes / Bags">Shoes / Bags</option>
+    <option value="Phone Accessories">Phone Accessories</option>
+  </select>
+  <textarea id="bio" placeholder="Short Business Description"></textarea>
+  <textarea id="exampleProducts" placeholder="Product Example"></textarea>
 
-        <input type="text" id="fullName" placeholder="Full Name" required>
-        <input type="email" id="email" placeholder="Email" required>
-        <input type="text" id="phone" placeholder="Phone Number" required>
+  <!-- File Inputs -->
+  <label>NIN</label>
+  <div class="file-input" data-target="studentIdFile">Choose NIN Image</div>
+  <input type="file" id="studentIdFile" accept="image/*" style="display:none" required>
+  <img id="studentIdPreview" class="preview">
 
-        <select id="university" required>
-            <option value="">Select University</option>
-            <option value="Covenant University">Covenant University</option>
-            <option value="Bells University">Bells University</option>
-            <option value="Crawford University">Crawford University</option>
-        </select>
+  <label>Product Logo</label>
+  <div class="file-input" data-target="logoFile">Choose Product Image</div>
+  <input type="file" id="logoFile" accept="image/*" style="display:none">
+  <img id="logoPreview" class="preview">
 
-        <input type="text" id="department" placeholder="Department">
-        <input type="text" id="matric" placeholder="Matric/Student ID" required>
+  <label>Payment Receipt</label>
+  <div class="file-input" data-target="receiptFile">Choose Receipt Image</div>
+  <input type="file" id="receiptFile" accept="image/*" style="display:none" required>
+  <img id="receiptPreview" class="preview">
 
-        <input type="text" id="businessName" placeholder="Business Name" required>
-
-        <select id="businessCategory" required>
-            <option value="">Select Business Category</option>
-            <option value="Food">Food</option>
-            <option value="Fashion">Fashion</option>
-            <option value="Shoes / Bags">Shoes / Bags</option>
-            <option value="Phone Accessories">Phone Accessories</option>
-        </select>
-
-        <textarea id="bio" placeholder="Short Business Description"></textarea>
-        <textarea id="exampleProducts" placeholder="Product Example (e.g. Shawarma, Sneakers)"></textarea>
-
-        <!-- NIN -->
-        <label>Upload NIN slip or card</label>
-        <div class="file-input" data-target="studentIdFile">Choose NIN Image</div>
-        <input type="file" id="studentIdFile" accept="image/*" style="display:none" required>
-        <img id="studentIdPreview" class="preview">
-
-        <!-- Product Image -->
-        <label>Upload Product Image</label>
-        <div class="file-input" data-target="logoFile">Choose Product Image</div>
-        <input type="file" id="logoFile" accept="image/*" style="display:none">
-        <img id="logoPreview" class="preview">
-
-        <!-- Receipt -->
-        <label>Upload Payment Receipt</label>
-        <div class="file-input" data-target="receiptFile">Choose Receipt Image</div>
-        <input type="file" id="receiptFile" accept="image/*" style="display:none" required>
-        <img id="receiptPreview" class="preview">
-
-        <button type="button" id="payBtn">Pay With Paystack (₦1,000)</button>
-        <button type="submit">Submit Application</button>
-
-        <p id="status"></p>
-    </form>
+  <button type="button" id="payBtn">Pay With Paystack (₦1,000)</button>
+  <button type="submit">Submit Application</button>
+  <p id="status"></p>
+</form>
 </div>
 
 <script src="https://js.paystack.co/v1/inline.js"></script>
 
 <script>
-// 🔹 Make file boxes open actual hidden file input
-document.querySelectorAll(".file-input").forEach(box => {
-    box.addEventListener("click", () => {
-        const inputId = box.getAttribute("data-target");
-        document.getElementById(inputId).click();
-    });
-});
+const CLOUD_NAME = "your_cloud_name";          // <-- Update
+const UPLOAD_PRESET = "your_unsigned_preset";  // <-- Update
 
-// 🔹 Show Preview for Uploaded Images
+// Helper to preview images
 function previewImage(input, previewId) {
-    const file = input.files[0];
-    const preview = document.getElementById(previewId);
-
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = () => {
-            preview.src = reader.result;
-            preview.style.display = "block";
-        };
-        reader.readAsDataURL(file);
-    }
+  const file = input.files[0];
+  const preview = document.getElementById(previewId);
+  if(file){
+    const reader = new FileReader();
+    reader.onload = () => { preview.src = reader.result; preview.style.display = "block"; }
+    reader.readAsDataURL(file);
+  }
 }
 
-studentIdFile.onchange = () => previewImage(studentIdFile, "studentIdPreview");
-logoFile.onchange = () => previewImage(logoFile, "logoPreview");
-receiptFile.onchange = () => previewImage(receiptFile, "receiptPreview");
-
-
-// 🔹 Paystack Payment
-document.getElementById("payBtn").addEventListener("click", () => {
-    const emailVal = email.value;
-    const nameVal = fullName.value;
-
-    if (!emailVal || !nameVal) {
-        alert("Please enter your name and email before paying.");
-        return;
-    }
-
-    let handler = PaystackPop.setup({
-        key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107",
-        email: emailVal,
-        amount: 1000 * 100,
-        ref: "SELLER_" + Date.now(),
-        callback: function (response) {
-            alert("Payment Successful ✔");
-            sessionStorage.setItem("seller_payment_ref", response.reference);
-        },
-        onClose: function () {
-            alert("Payment Cancelled ❌");
-        }
-    });
-
-    handler.openIframe();
+// Show previews and trigger file inputs
+document.querySelectorAll(".file-input").forEach(box=>{
+  box.addEventListener("click",()=>document.getElementById(box.dataset.target).click());
 });
 
+studentIdFile.onchange = () => previewImage(studentIdFile,"studentIdPreview");
+logoFile.onchange = () => previewImage(logoFile,"logoPreview");
+receiptFile.onchange = () => previewImage(receiptFile,"receiptPreview");
 
-// 🔹 Submit Form After Payment
-document.getElementById("sellerForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
+// Paystack Payment
+payBtn.addEventListener("click", ()=>{
+  if(!email.value || !fullName.value){ alert("Enter name & email first"); return;}
+  let handler = PaystackPop.setup({
+    key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107",
+    email: email.value,
+    amount: 1000*100,
+    ref: "SELLER_"+Date.now(),
+    callback: function(resp){ sessionStorage.setItem("seller_payment_ref", resp.reference); alert("Payment Successful ✔"); },
+    onClose: function(){ alert("Payment Cancelled ❌"); }
+  });
+  handler.openIframe();
+});
 
-    const paymentRef = sessionStorage.getItem("seller_payment_ref");
-    if (!paymentRef) {
-        alert("⚠ Please complete payment first.");
-        return;
-    }
+// Upload image to Cloudinary
+async function uploadToCloudinary(file, prefix){
+  if(!file) return "";
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", UPLOAD_PRESET);
+  formData.append("public_id", prefix+"_"+Date.now());
 
-    const status = document.getElementById("status");
-    status.textContent = "⏳ Submitting...";
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,{
+    method:"POST",
+    body:formData
+  });
+  const data = await res.json();
+  return data.secure_url || "";
+}
 
-    const toBase64 = file => new Promise(resolve => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.readAsDataURL(file);
-    });
+// Submit Form
+sellerForm.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+  const paymentRef = sessionStorage.getItem("seller_payment_ref");
+  if(!paymentRef){ alert("Complete payment first"); return; }
 
-    const data = {
-        fullName: fullName.value,
-        email: email.value,
-        phone: phone.value,
-        university: university.value,
-        department: department.value,
-        matric: matric.value,
-        businessName: businessName.value,
-        businessCategory: businessCategory.value,
-        bio: bio.value,
-        exampleProducts: exampleProducts.value,
-        payment_reference: paymentRef,
-        studentIdFile: await toBase64(studentIdFile.files[0]),
-        logoFile: logoFile.files.length ? await toBase64(logoFile.files[0]) : "",
-        receiptFile: await toBase64(receiptFile.files[0])
-    };
+  const status = document.getElementById("status");
+  status.textContent = "⏳ Uploading images...";
 
-    const res = await fetch("https://script.google.com/macros/s/AKfycbzPbcgD3kn6V-uLmF92SBJ6dG5zE-sFcG6EjARM69gqwovY5ZqscqCnKrjRtMxOYCoTPA/exec", {
-        method: "POST",
-        body: JSON.stringify(data),
-        headers: { "Content-Type": "application/json" }
-    });
+  // Upload images
+  const studentIdUrl = await uploadToCloudinary(studentIdFile.files[0], "studentId_"+matric.value);
+  const logoUrl = await uploadToCloudinary(logoFile.files[0], "logo_"+businessName.value);
+  const receiptUrl = await uploadToCloudinary(receiptFile.files[0], "receipt_"+fullName.value);
 
-    const result = await res.json();
+  status.textContent = "⏳ Submitting form...";
 
-    if (result.status === "success") {
-        status.style.color = "green";
-        status.textContent = "✔ Application Submitted Successfully!";
-        sessionStorage.removeItem("seller_payment_ref");
-    } else {
-        status.style.color = "red";
-        status.textContent = "❌ Error: " + result.message;
-    }
+  // Send data to Apps Script
+  const payload = {
+    fullName: fullName.value,
+    email: email.value,
+    phone: phone.value,
+    university: university.value,
+    department: department.value,
+    matric: matric.value,
+    businessName: businessName.value,
+    businessCategory: businessCategory.value,
+    bio: bio.value,
+    exampleProducts: exampleProducts.value,
+    payment_reference: paymentRef,
+    studentIdFile: studentIdUrl,
+    logoFile: logoUrl,
+    receiptFile: receiptUrl
+  };
+
+  const res = await fetch("YOUR_APPS_SCRIPT_URL",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify(payload)
+  });
+
+  const result = await res.json();
+
+  if(result.status==="success"){
+    status.style.color="green";
+    status.textContent="✔ Application Submitted Successfully!";
+    sessionStorage.removeItem("seller_payment_ref");
+  } else {
+    status.style.color="red";
+    status.textContent="❌ Error: "+result.message;
+  }
 });
 </script>
-
 </body>
 </html>
