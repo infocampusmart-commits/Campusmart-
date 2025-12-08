@@ -157,7 +157,7 @@ sellerForm.addEventListener("submit", async (e)=>{
     receiptFile: receiptUrl
   };
 
-  const res = await fetch("YOUR_APPS_SCRIPT_URL",{
+  const res = await fetch("https://script.google.com/macros/s/AKfycbzPbcgD3kn6V-uLmF92SBJ6dG5zE-sFcG6EjARM69gqwovY5ZqscqCnKrjRtMxOYCoTPA/exec",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
     body: JSON.stringify(payload)
@@ -177,4 +177,5 @@ sellerForm.addEventListener("submit", async (e)=>{
 </script>
 </body>
 </html>
+
 
