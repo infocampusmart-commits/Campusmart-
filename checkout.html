@@ -52,55 +52,46 @@ input, textarea, select { width:100%; padding:10px; margin:5px 0 10px 0; border-
   <div class="message" id="message"></div>
 </div>
 
+<!-- Paystack inline -->
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
-/* CONFIG */
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEMwalUx5t2PBylVzziIFW72skdUJH-5w4YeiXUYY8fF-tKR_2yF2ZjJKcL_JJM0Lg/exec";
 const CLOUDINARY_CLOUD_NAME = "dgyrt3rpj";
 const CLOUDINARY_UPLOAD_PRESET = "campusmart_uploads";
-const PAYSTACK_PUBLIC_KEY = "YOUR_PAYSTACK_PUBLIC_KEY_HERE";
+const PAYSTACK_PUBLIC_KEY = "YOUR_PAYSTACK_PUBLIC_KEY"; // Replace with your live key
 
-/* DOM Elements */
-const productBox = document.getElementById("productSummary");
 const form = document.getElementById("orderForm");
 const receiptInput = document.getElementById("receipt");
 const previewImg = document.getElementById("previewImg");
+const productBox = document.getElementById("productSummary");
 const message = document.getElementById("message");
 
-/* Load cart from localStorage */
+// Load cart and show summary
 let cart = JSON.parse(localStorage.getItem("campusmartCart") || "[]");
 
-function renderCart() {
-  if (!cart || cart.length === 0) {
-    productBox.innerHTML = "<p>No product selected.</p>";
-    return;
-  }
-
+if(cart.length === 0){
+  productBox.innerHTML = "<p>No products in cart.</p>";
+}else{
   let total = 0;
-  productBox.innerHTML = cart.map(item => {
+  productBox.innerHTML = cart.map(item=>{
     const itemTotal = item.price * item.quantity;
     total += itemTotal;
     return `<p>${item.name} x ${item.quantity} = ₦${itemTotal}</p>`;
   }).join("") + `<hr><p><strong>Total: ₦${total}</strong></p>`;
 }
 
-renderCart();
-
-/* Preview receipt image */
-receiptInput.addEventListener("change", () => {
-  const file = receiptInput.files[0];
-  if (!file) return previewImg.style.display = "none";
+// Preview receipt image
+receiptInput.addEventListener("change", function() {
+  const file = this.files[0];
+  if(!file){ previewImg.style.display="none"; return; }
   const reader = new FileReader();
-  reader.onload = () => {
-    previewImg.src = reader.result;
-    previewImg.style.display = "block";
-  };
+  reader.onload = ()=> { previewImg.src = reader.result; previewImg.style.display="block"; };
   reader.readAsDataURL(file);
 });
 
-/* Upload receipt to Cloudinary */
-async function uploadReceipt(file) {
-  if (!file) return "";
+// Upload receipt to Cloudinary
+async function uploadReceipt(file){
+  if(!file) return "";
   const formData = new FormData();
   formData.append("file", file);
   formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
@@ -109,73 +100,70 @@ async function uploadReceipt(file) {
   return data.secure_url;
 }
 
-/* Paystack payment */
-document.getElementById("payBtn").addEventListener("click", () => {
+// Paystack payment
+document.getElementById("payBtn").addEventListener("click", function(){
   const email = document.getElementById("email").value.trim();
-  if (!email) return alert("Please enter your email before paying.");
+  if(!email) return alert("Enter email first!");
+  const totalAmount = cart.reduce((s,i)=>s + i.price*i.quantity,0)*100;
 
-  const totalAmount = cart.reduce((sum, i) => sum + i.price * i.quantity, 0) * 100;
-  if (totalAmount <= 0) return alert("Cart is empty.");
-
-  const handler = PaystackPop.setup({
+  let handler = PaystackPop.setup({
     key: PAYSTACK_PUBLIC_KEY,
     email: email,
     amount: totalAmount,
     currency: "NGN",
     ref: "CAMPUSMART_" + Date.now(),
-    callback: function(response) {
+    callback: function(response){
       sessionStorage.setItem("campusmart_pay_ref", response.reference);
-      alert("Payment successful! Reference saved.");
+      alert("Payment successful!");
     },
-    onClose: function() { alert("Payment cancelled."); }
+    onClose: function(){ alert("Payment cancelled."); }
   });
   handler.openIframe();
 });
 
-/* Submit order */
-form.addEventListener("submit", async (e) => {
+// Submit order
+form.addEventListener("submit", async (e)=>{
   e.preventDefault();
-  try {
-    const payRef = sessionStorage.getItem("campusmart_pay_ref");
-    if (!payRef) throw new Error("Please complete payment before submitting.");
 
-    message.style.color = "black";
-    message.textContent = "⏳ Uploading receipt...";
+  const payRef = sessionStorage.getItem("campusmart_pay_ref");
+  if(!payRef) return alert("Please complete payment first.");
 
-    const file = receiptInput.files[0];
-    const imageUrl = await uploadReceipt(file);
+  message.style.color="black";
+  message.textContent = "⏳ Uploading receipt...";
 
-    const orderData = {
-      name: document.getElementById("name").value,
-      email: document.getElementById("email").value,
-      phone: document.getElementById("phone").value,
-      delivery: document.getElementById("delivery").value,
-      university: document.getElementById("university").value,
-      items: cart.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
-      amount: cart.reduce((sum, i) => sum + i.price * i.quantity, 0),
-      payment_reference: payRef,
-      image_url: imageUrl
-    };
+  const file = receiptInput.files[0];
+  const imageUrl = await uploadReceipt(file);
 
-    message.textContent = "⏳ Sending order to server...";
+  const orderData = {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    delivery: document.getElementById("delivery").value,
+    university: document.getElementById("university").value,
+    items: cart.map(i=>({ name: i.name, quantity: i.quantity, price: i.price })),
+    amount: cart.reduce((s,i)=>s + i.price*i.quantity,0),
+    payment_reference: payRef,
+    image_url: imageUrl
+  };
 
+  try{
     const res = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
+      headers: { "Content-Type":"application/json" },
       body: JSON.stringify(orderData)
     });
-
     const result = await res.json();
-    if (result.status !== "success") throw new Error(result.message || "Server error");
+    if(result.status !== "success") throw new Error(result.message || "Server error");
 
-    message.style.color = "green";
+    message.style.color="green";
     message.textContent = "✅ Order submitted successfully!";
     localStorage.removeItem("campusmartCart");
     sessionStorage.removeItem("campusmart_pay_ref");
-    setTimeout(() => location.href = "mart.html", 2000);
+    setTimeout(()=> location.href="mart.html", 2000);
 
-  } catch (err) {
-    message.style.color = "red";
-    message.textContent = "❌ " + err.message;
+  }catch(err){
+    message.style.color="red";
+    message.textContent="❌ " + err.message;
     console.error(err);
   }
 });
