@@ -1,154 +1,230 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Checkout - CampusmartStore</title>
-<link rel="icon" type="image/x-icon" href="Blue 1.png">
-<style>
-  body { font-family: Arial, sans-serif; background:#f2f2f2; margin:0; padding:0; }
-  header { background:white; padding:15px; font-size:22px; text-align:center; font-weight:bold; }
-  .checkout-container { width:90%; max-width:560px; background:white; margin:20px auto; padding:20px; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
-  .btn { width:100%; background:#003cff; color:white; padding:12px; border:none; border-radius:6px; cursor:pointer; font-size:16px; font-weight:700; margin-top:10px; }
-  .btn.secondary { background:#eee; color:#222; }
-  .message { text-align:center; margin-top:12px; font-size:14px; color:black; min-height:20px; }
-  .product-box { background:#f3f6ff; padding:12px; border-radius:8px; margin-bottom:16px; }
-  input, textarea, select { width:100%; padding:10px; margin:6px 0 12px 0; border-radius:6px; border:1px solid #ddd; box-sizing:border-box; }
-  #previewImg { width:100%; max-height:280px; margin-top:10px; display:none; border-radius:8px; border:1px solid #ddd; object-fit:contain; }
-  label.small { font-size:13px; color:#333; display:block; margin-bottom:6px; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Checkout - CampusmartStore</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;margin:0;padding:0}
+    header{background:#fff;padding:16px;text-align:center;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+    .container{max-width:680px;margin:24px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+    .section{margin-bottom:18px}
+    .product-box{background:#f1f5ff;padding:12px;border-radius:8px}
+    .item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e6ecff}
+    .item:last-child{border-bottom:none}
+    .total{font-size:18px;font-weight:700;margin-top:12px;text-align:right}
+    input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid #ddd;margin-top:8px;box-sizing:border-box}
+    .row{display:flex;gap:12px}
+    .col{flex:1}
+    .btn{display:inline-block;width:100%;padding:12px;background:#003cff;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;margin-top:10px}
+    .btn.secondary{background:#eee;color:#111}
+    .message{min-height:26px;margin-top:10px;text-align:center}
+    #previewImg{display:none;width:100%;max-height:280px;object-fit:contain;margin-top:10px;border-radius:8px}
+    small.hint{color:#666}
+  </style>
 </head>
 <body>
+  <header>CampusmartStore — Checkout</header>
 
-<header>Checkout</header>
+  <div class="container">
+    <div class="section">
+      <h3>Order Summary</h3>
+      <div class="product-box" id="productSummary">Loading...</div>
+      <div class="total">Total: <span id="totalDisplay">₦0</span></div>
+    </div>
 
-<div class="checkout-container">
-  <h2>Order Summary</h2>
-  <div class="product-box" id="productSummary">Loading...</div>
+    <div class="section">
+      <h3>Delivery Info</h3>
+      <form id="orderForm" autocomplete="off">
+        <input id="name" type="text" placeholder="Full name" required />
+        <input id="email" type="email" placeholder="Email" required />
+        <input id="phone" type="text" placeholder="WhatsApp number" required />
+        <textarea id="delivery" rows="2" placeholder="Hall / Room / Hostel delivery info" required></textarea>
 
-  <h2>Delivery Info</h2>
-  <form id="orderForm" autocomplete="off">
-    <input type="text" id="name" placeholder="Full Name" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <input type="text" id="phone" placeholder="WhatsApp Number" required>
+        <label class="hint">Select your university</label>
+        <select id="university" required>
+          <option value="">Select university</option>
+          <option>Covenant University</option>
+          <option>Bells University</option>
+          <option>Crawford University</option>
+        </select>
 
-    <label class="small">Delivery (Hall / Room / Hostel)</label>
-    <textarea id="delivery" placeholder="e.g. Hall 4, Room 101" required></textarea>
+        <label class="hint" style="margin-top:10px"><strong>Upload payment receipt (screenshot)</strong></label>
+        <input id="receipt" type="file" accept="image/*" required />
+        <img id="previewImg" alt="receipt preview" />
 
-    <label class="small">Select Your University</label>
-    <select id="university" required>
-      <option value="">Select University</option>
-      <option value="Covenant University">Covenant University</option>
-      <option value="Bells University">Bells University</option>
-      <option value="Crawford University">Crawford University</option>
-    </select>
+        <button type="button" id="payBtn" class="btn">💳 Pay with Paystack</button>
+        <button type="submit" id="submitBtn" class="btn secondary">Submit Order</button>
+      </form>
 
-    <label class="small"><strong>Upload Payment Receipt (Screenshot)</strong></label>
-    <input type="file" id="receipt" accept="image/*" required>
-    <img id="previewImg" alt="Receipt preview">
+      <div class="message" id="message"></div>
+    </div>
+  </div>
 
-    <button type="button" class="btn" id="payBtn">💳 Pay With Paystack</button>
-    <button class="btn secondary" type="submit">Submit Order</button>
-  </form>
+  <!-- Paystack inline -->
+  <script src="https://js.paystack.co/v1/inline.js"></script>
+  <script>
+  /***** CONFIG - REPLACE THESE BEFORE USAGE *****/
+  const PAYSTACK_PUBLIC_KEY = "pk_live_b43df11e368a73ac564defaf565f7a626069d107";   // e.g. pk_live_xxx
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEMwalUx5t2PBylVzziIFW72skdUJH-5w4YeiXUYY8fF-tKR_2yF2ZjJKcL_JJM0Lg/exec";          // e.g. https://script.google.com/macros/s/XXXXX/exec
+  const CLOUDINARY_CLOUD_NAME = "dgyrt3rpj";
+  const CLOUDINARY_UPLOAD_PRESET = "campusmart_uploads";
+  /***********************************************/
 
-  <div class="message" id="message"></div>
-</div>
+  // Elements
+  const productSummary = document.getElementById('productSummary');
+  const totalDisplay = document.getElementById('totalDisplay');
+  const orderForm = document.getElementById('orderForm');
+  const payBtn = document.getElementById('payBtn');
+  const submitBtn = document.getElementById('submitBtn');
+  const receiptInput = document.getElementById('receipt');
+  const previewImg = document.getElementById('previewImg');
+  const messageEl = document.getElementById('message');
 
-<script src="https://js.paystack.co/v1/inline.js"></script>
-<script>
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"; // replace with your script URL
-const CLOUDINARY_CLOUD_NAME = "dgyrt3rpj";
-const CLOUDINARY_UPLOAD_PRESET = "campusmart_uploads";
+  // Load cart from localStorage (key: campusmartCart)
+  const cart = JSON.parse(localStorage.getItem('campusmartCart') || '[]');
+  console.log("Loaded cart:", cart);
 
-const form = document.getElementById("orderForm");
-const receiptInput = document.getElementById("receipt");
+  function renderCart() {
+    if (!cart || cart.length === 0) {
+      productSummary.innerHTML = '<p style="color:#c00;font-weight:600">Your cart is empty.</p>';
+      totalDisplay.textContent = '₦0';
+      return;
+    }
+    let total = 0;
+    productSummary.innerHTML = cart.map(item => {
+      const lineTotal = Number(item.price || 0) * Number(item.quantity || 1);
+      total += lineTotal;
+      return `<div class="item"><div>${escapeHtml(item.name)} <small>× ${escapeHtml(String(item.quantity))}</small></div><div>₦${formatNumber(lineTotal)}</div></div>`;
+    }).join('');
+    totalDisplay.textContent = '₦' + formatNumber(total);
+    // store total for later use
+    productSummary.dataset.total = total;
+  }
 
-// Upload receipt to Cloudinary
-async function uploadReceipt(file) {
-  if (!file) return "";
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+  function formatNumber(n){ return new Intl.NumberFormat().format(n); }
+  function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 
-  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, {
-    method: "POST",
-    body: formData
+  renderCart();
+
+  // Preview receipt image
+  receiptInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) { previewImg.style.display = 'none'; return; }
+    previewImg.src = URL.createObjectURL(file);
+    previewImg.style.display = 'block';
   });
 
-  const data = await res.json();
-  return data.secure_url;
-}
+  // Upload image to Cloudinary (unsigned)
+  async function uploadToCloudinary(file){
+    if (!file) return "";
+    const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
 
-// Paystack payment
-document.getElementById("payBtn").addEventListener("click", function() {
-  const email = document.getElementById("email").value.trim();
-  if (!email) return alert("Enter email first!");
+    const res = await fetch(url, { method: 'POST', body: fd });
+    if (!res.ok) throw new Error('Cloudinary upload failed: ' + res.statusText);
+    const j = await res.json();
+    return j.secure_url || '';
+  }
 
-  const cart = JSON.parse(localStorage.getItem("campusmartCart") || "[]");
-  if (!cart.length) return alert("Your cart is empty!");
+  // Paystack - open popup and save reference to sessionStorage
+  payBtn.addEventListener('click', () => {
+    // basic validation
+    const email = document.getElementById('email').value.trim();
+    if (!email) return alert('Please enter an email before paying.');
+    if (!cart || cart.length === 0) return alert('Cart is empty.');
 
-  const totalAmount = cart.reduce((sum, i) => sum + i.price * i.quantity, 0) * 100;
+    // compute total in kobo
+    const total = Number(productSummary.dataset.total || 0);
+    if (!total || total <= 0) return alert('Invalid cart total.');
+    const amountKobo = Math.round(total * 100);
 
-  let handler = PaystackPop.setup({
-    key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107", // replace
-    email: email,
-    amount: totalAmount,
-    currency: "NGN",
-    ref: "CAMPUSMART_" + Date.now(),
-    callback: function(response) {
-      sessionStorage.setItem("campusmart_pay_ref", response.reference);
-      alert("Payment successful!");
-    },
-    onClose: function() { alert("Payment cancelled"); }
-  });
-  handler.openIframe();
-});
-
-// Form submit
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const payRef = sessionStorage.getItem("campusmart_pay_ref");
-  if (!payRef) return alert("Please complete Paystack payment first!");
-
-  const file = receiptInput.files[0];
-  const imageUrl = await uploadReceipt(file);
-
-  const cart = JSON.parse(localStorage.getItem("campusmartCart") || "[]");
-
-  const orderData = {
-    name: document.getElementById("name").value,
-    email: document.getElementById("email").value,
-    phone: document.getElementById("phone").value,
-    delivery: document.getElementById("delivery").value,
-    university: document.getElementById("university").value,
-    items: cart.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
-    amount: cart.reduce((sum, i) => sum + i.price * i.quantity, 0),
-    payment_reference: payRef,
-    image_url: imageUrl
-  };
-
-  try {
-    const res = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData)
+    const handler = PaystackPop.setup({
+      key: PAYSTACK_PUBLIC_KEY,
+      email: email,
+      amount: amountKobo,
+      currency: 'NGN',
+      ref: 'CAMPUSMART_' + Date.now(),
+      callback: function(response){
+        // save reference
+        sessionStorage.setItem('campusmart_pay_ref', response.reference);
+        messageEl.style.color = 'green';
+        messageEl.textContent = 'Payment successful — reference saved.';
+      },
+      onClose: function(){ alert('Payment popup closed.'); }
     });
 
-    const result = await res.json();
+    handler.openIframe();
+  });
 
-    if (result.status !== "success") throw new Error(result.message || "Server error");
+  // Submit order
+  orderForm.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    try {
+      messageEl.style.color = 'black';
+      messageEl.textContent = 'Validating order...';
 
-    alert("✅ Order submitted successfully!");
-    localStorage.removeItem("campusmartCart");
-    sessionStorage.removeItem("campusmart_pay_ref");
-    location.href = "mart.html";
-  } catch (err) {
-    console.error(err);
-    alert("❌ " + err.message);
-  }
-});
-</script>
+      // Ensure payment completed
+      const payRef = sessionStorage.getItem('campusmart_pay_ref');
+      if (!payRef) throw new Error('Please complete the Paystack payment first (click Pay and finish).');
 
+      // Gather fields
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const delivery = document.getElementById('delivery').value.trim();
+      const university = document.getElementById('university').value.trim();
+
+      if (!name || !email || !phone || !delivery || !university) throw new Error('Please fill all required fields.');
+
+      messageEl.textContent = 'Uploading receipt...';
+      const receiptFile = receiptInput.files[0];
+      const receiptUrl = await uploadToCloudinary(receiptFile);
+
+      // Build payload
+      const payload = {
+        name, email, phone, delivery, university,
+        items: cart.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
+        amount: Number(productSummary.dataset.total || 0),
+        payment_reference: payRef,
+        image_url: receiptUrl
+      };
+
+      messageEl.textContent = 'Sending order to server...';
+
+      // POST to Apps Script (expects JSON)
+      const resp = await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      // network error handling
+      if (!resp.ok) {
+        const txt = await resp.text().catch(()=>null);
+        throw new Error('Server error: ' + (txt || resp.statusText));
+      }
+
+      const json = await resp.json().catch(()=>{ throw new Error('Invalid server response'); });
+      if (json.status !== 'success') throw new Error(json.message || 'Server returned error');
+
+      messageEl.style.color = 'green';
+      messageEl.textContent = 'Order submitted successfully — thank you!';
+      // cleanup
+      localStorage.removeItem('campusmartCart');
+      sessionStorage.removeItem('campusmart_pay_ref');
+      // redirect after short delay
+      setTimeout(()=> window.location.href = 'mart.html', 1600);
+
+    } catch (err) {
+      messageEl.style.color = 'red';
+      messageEl.textContent = '❌ ' + (err.message || err);
+      console.error(err);
+    }
+  });
+
+  </script>
 </body>
 </html>
