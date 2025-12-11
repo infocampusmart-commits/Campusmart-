@@ -56,158 +56,99 @@
 
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
-/* ============ CONFIG - REPLACE THESE ============ */
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzEMwalUx5t2PBylVzziIFW72skdUJH-5w4YeiXUYY8fF-tKR_2yF2ZjJKcL_JJM0Lg/exec";            // example: https://script.google.com/macros/s/XXX/exec
-const PAYSTACK_PUBLIC_KEY = "pk_live_b43df11e368a73ac564defaf565f7a626069d107";   // example: pk_live_xxx
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec"; // replace with your script URL
 const CLOUDINARY_CLOUD_NAME = "dgyrt3rpj";
 const CLOUDINARY_UPLOAD_PRESET = "campusmart_uploads";
-/* ================================================ */
 
-/* DOM */
-const productBox = document.getElementById("productSummary");
 const form = document.getElementById("orderForm");
 const receiptInput = document.getElementById("receipt");
-const previewImg = document.getElementById("previewImg");
-const message = document.getElementById("message");
-const payBtn = document.getElementById("payBtn");
 
-/* Load cart from localStorage */
-let cart = JSON.parse(localStorage.getItem("campusmartCart") || "[]");
-
-function renderCart() {
-  if (!cart || cart.length === 0) {
-    productBox.innerHTML = "<p>No product selected. Please add items to your cart.</p>";
-    return;
-  }
-  let total = 0;
-  const html = cart.map(item => {
-    const itemTotal = (Number(item.price) || 0) * (Number(item.quantity) || 0);
-    total += itemTotal;
-    return `<div><strong>${escapeHtml(item.name)}</strong> × ${escapeHtml(String(item.quantity))} — ₦${formatNumber(itemTotal)}</div>`;
-  }).join("");
-  productBox.innerHTML = html + `<hr><p><strong>Total: ₦${formatNumber(total)}</strong></p>`;
-}
-
-/* Small helpers */
-function formatNumber(n){ return new Intl.NumberFormat().format(n); }
-function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
-
-renderCart();
-
-/* Preview receipt */
-receiptInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) { previewImg.style.display = 'none'; return; }
-  previewImg.src = URL.createObjectURL(file);
-  previewImg.style.display = 'block';
-});
-
-/* Upload to Cloudinary (unsigned preset) */
-async function uploadToCloudinary(file){
+// Upload receipt to Cloudinary
+async function uploadReceipt(file) {
   if (!file) return "";
-  const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
-  const fd = new FormData();
-  fd.append("file", file);
-  fd.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
 
-  const resp = await fetch(url, { method: "POST", body: fd });
-  if(!resp.ok) throw new Error("Cloudinary upload failed: " + resp.statusText);
-  const j = await resp.json();
-  return j.secure_url || "";
-}
-
-/* Paystack payment */
-payBtn.addEventListener('click', () => {
-  const email = document.getElementById("email").value.trim();
-  if(!email) return alert("Please enter your email before paying.");
-
-  const total = cart.reduce((s,i)=> s + (Number(i.price)||0) * (Number(i.quantity)||0), 0);
-  if (total <= 0) return alert("Cart is empty or invalid total.");
-
-  const amountKobo = Math.round(total * 100);
-
-  const handler = PaystackPop.setup({
-    key: PAYSTACK_PUBLIC_KEY,
-    email: email,
-    amount: amountKobo,
-    currency: "NGN",
-    ref: "CAMPUSMART_" + Date.now(),
-    callback: function(response){
-      // Save reference for submit
-      sessionStorage.setItem("campusmart_pay_ref", response.reference);
-      alert("Payment successful! Reference saved.");
-    },
-    onClose: function(){ alert("Payment cancelled"); }
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`, {
+    method: "POST",
+    body: formData
   });
 
+  const data = await res.json();
+  return data.secure_url;
+}
+
+// Paystack payment
+document.getElementById("payBtn").addEventListener("click", function() {
+  const email = document.getElementById("email").value.trim();
+  if (!email) return alert("Enter email first!");
+
+  const cart = JSON.parse(localStorage.getItem("campusmartCart") || "[]");
+  if (!cart.length) return alert("Your cart is empty!");
+
+  const totalAmount = cart.reduce((sum, i) => sum + i.price * i.quantity, 0) * 100;
+
+  let handler = PaystackPop.setup({
+    key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107", // replace
+    email: email,
+    amount: totalAmount,
+    currency: "NGN",
+    ref: "CAMPUSMART_" + Date.now(),
+    callback: function(response) {
+      sessionStorage.setItem("campusmart_pay_ref", response.reference);
+      alert("Payment successful!");
+    },
+    onClose: function() { alert("Payment cancelled"); }
+  });
   handler.openIframe();
 });
 
-/* Submit order: upload receipt -> send to Apps Script */
-form.addEventListener('submit', async (e) => {
+// Form submit
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  const payRef = sessionStorage.getItem("campusmart_pay_ref");
+  if (!payRef) return alert("Please complete Paystack payment first!");
+
+  const file = receiptInput.files[0];
+  const imageUrl = await uploadReceipt(file);
+
+  const cart = JSON.parse(localStorage.getItem("campusmartCart") || "[]");
+
+  const orderData = {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    delivery: document.getElementById("delivery").value,
+    university: document.getElementById("university").value,
+    items: cart.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
+    amount: cart.reduce((sum, i) => sum + i.price * i.quantity, 0),
+    payment_reference: payRef,
+    image_url: imageUrl
+  };
+
   try {
-    message.style.color = "black";
-    message.textContent = "Validating...";
-
-    // Ensure payment done
-    const payRef = sessionStorage.getItem("campusmart_pay_ref");
-    if(!payRef) throw new Error("Please complete the Paystack payment first (click Pay button and finish).");
-
-    // Basic form validation
-    const name = document.getElementById("name").value.trim();
-    const email = document.getElementById("email").value.trim();
-    const phone = document.getElementById("phone").value.trim();
-    const delivery = document.getElementById("delivery").value.trim();
-    const university = document.getElementById("university").value.trim();
-
-    if(!name || !email || !phone || !delivery || !university) throw new Error("Please fill all required fields.");
-
-    message.textContent = "⏳ Uploading receipt...";
-    const file = receiptInput.files[0];
-    const imageUrl = await uploadToCloudinary(file);
-
-    // Prepare order payload
-    const amount = cart.reduce((s,i)=> s + (Number(i.price)||0) * (Number(i.quantity)||0), 0);
-    const orderData = {
-      name, email, phone, delivery, university,
-      items: cart,
-      amount,
-      payment_reference: payRef,
-      image_url: imageUrl
-    };
-
-    message.textContent = "⏳ Sending order to server...";
-    const resp = await fetch(APPS_SCRIPT_URL, {
+    const res = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(orderData)
     });
 
-    // handle network / non-json
-    if (!resp.ok) {
-      const txt = await resp.text().catch(()=>null);
-      throw new Error("Server error: " + (txt || resp.statusText));
-    }
+    const result = await res.json();
 
-    const json = await resp.json().catch(()=>{ throw new Error("Invalid JSON response from server") });
+    if (result.status !== "success") throw new Error(result.message || "Server error");
 
-    if (json.status !== "success") throw new Error(json.message || "Server returned an error");
-
-    message.style.color = "green";
-    message.textContent = "✅ Order submitted — thank you!";
-    // cleanup
+    alert("✅ Order submitted successfully!");
     localStorage.removeItem("campusmartCart");
     sessionStorage.removeItem("campusmart_pay_ref");
-    // Redirect after short delay
-    setTimeout(()=> window.location.href = "mart.html", 1800);
-
+    location.href = "mart.html";
   } catch (err) {
-    message.style.color = "red";
-    message.textContent = "❌ " + (err.message || err);
     console.error(err);
+    alert("❌ " + err.message);
   }
 });
 </script>
+
 </body>
 </html>
