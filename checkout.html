@@ -24,208 +24,177 @@
     small.hint{color:#666}
   </style>
 </head>
+
 <body>
-  <header>CampusmartStore — Checkout</header>
+<header>CampusmartStore — Checkout</header>
 
-  <div class="container">
-    <div class="section">
-      <h3>Order Summary</h3>
-      <div class="product-box" id="productSummary">Loading...</div>
-      <div class="total">Total: <span id="totalDisplay">₦0</span></div>
-    </div>
-
-    <div class="section">
-      <h3>Delivery Info</h3>
-      <form id="orderForm" autocomplete="off">
-        <input id="name" type="text" placeholder="Full name" required />
-        <input id="email" type="email" placeholder="Email" required />
-        <input id="phone" type="text" placeholder="WhatsApp number" required />
-        <textarea id="delivery" rows="2" placeholder="Hall / Room / Hostel delivery info" required></textarea>
-
-        <label class="hint">Select your university</label>
-        <select id="university" required>
-          <option value="">Select university</option>
-          <option>Covenant University</option>
-          <option>Bells University</option>
-          <option>Crawford University</option>
-        </select>
-
-        <label class="hint" style="margin-top:10px"><strong>Upload payment receipt (screenshot)</strong></label>
-        <input id="receipt" type="file" accept="image/*" required />
-        <img id="previewImg" alt="receipt preview" />
-
-        <button type="button" id="payBtn" class="btn">💳 Pay with Paystack</button>
-        <button type="submit" id="submitBtn" class="btn secondary">Submit Order</button>
-      </form>
-
-      <div class="message" id="message"></div>
-    </div>
+<div class="container">
+  <div class="section">
+    <h3>Order Summary</h3>
+    <div class="product-box" id="productSummary">Loading...</div>
+    <div class="total">Total: <span id="totalDisplay">₦0</span></div>
   </div>
 
-  <!-- Paystack inline -->
-  <script src="https://js.paystack.co/v1/inline.js"></script>
-  <script>
-  /***** CONFIG - REPLACE THESE BEFORE USAGE *****/
-  const PAYSTACK_PUBLIC_KEY = "pk_live_b43df11e368a73ac564defaf565f7a626069d107";   // e.g. pk_live_xxx
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec";          // e.g. https://script.google.com/macros/s/XXXXX/exec
-  const CLOUDINARY_CLOUD_NAME = "dgyrt3rpj";
-  const CLOUDINARY_UPLOAD_PRESET = "campusmart_uploads";
-  /***********************************************/
+  <div class="section">
+    <h3>Delivery Info</h3>
 
-  // Elements
-  const productSummary = document.getElementById('productSummary');
-  const totalDisplay = document.getElementById('totalDisplay');
-  const orderForm = document.getElementById('orderForm');
-  const payBtn = document.getElementById('payBtn');
-  const submitBtn = document.getElementById('submitBtn');
-  const receiptInput = document.getElementById('receipt');
-  const previewImg = document.getElementById('previewImg');
-  const messageEl = document.getElementById('message');
+    <form id="orderForm" autocomplete="off">
+      <input id="name" type="text" placeholder="Full name" required />
+      <input id="email" type="email" placeholder="Email" required />
+      <input id="phone" type="text" placeholder="WhatsApp number" required />
+      <textarea id="delivery" rows="2" placeholder="Hall / Room / Hostel delivery info" required></textarea>
 
-  // Load cart from localStorage (key: campusmartCart)
-  const cart = JSON.parse(localStorage.getItem('campusmartCart') || '[]');
-  console.log("Loaded cart:", cart);
+      <label class="hint">Select your university</label>
+      <select id="university" required>
+        <option value="">Select university</option>
+        <option>Covenant University</option>
+        <option>Bells University</option>
+        <option>Crawford University</option>
+      </select>
 
-  function renderCart() {
-    if (!cart || cart.length === 0) {
-      productSummary.innerHTML = '<p style="color:#c00;font-weight:600">Your cart is empty.</p>';
-      totalDisplay.textContent = '₦0';
-      return;
-    }
-    let total = 0;
-    productSummary.innerHTML = cart.map(item => {
-      const lineTotal = Number(item.price || 0) * Number(item.quantity || 1);
-      total += lineTotal;
-      return `<div class="item"><div>${escapeHtml(item.name)} <small>× ${escapeHtml(String(item.quantity))}</small></div><div>₦${formatNumber(lineTotal)}</div></div>`;
-    }).join('');
-    totalDisplay.textContent = '₦' + formatNumber(total);
-    // store total for later use
-    productSummary.dataset.total = total;
+      <label class="hint" style="margin-top:10px"><strong>Upload payment receipt (screenshot)</strong></label>
+      <input id="receipt" type="file" accept="image/*" required />
+      <img id="previewImg" alt="receipt preview" />
+
+      <button type="button" id="payBtn" class="btn">💳 Pay with Paystack</button>
+      <button type="submit" id="submitBtn" class="btn secondary">Submit Order</button>
+    </form>
+
+    <div class="message" id="message"></div>
+  </div>
+</div>
+
+<script src="https://js.paystack.co/v1/inline.js"></script>
+
+<script>
+/******************** CONFIG ********************/
+const PAYSTACK_PUBLIC_KEY = "pk_live_b43df11e368a73ac564defaf565f7a626069d107";
+const APPS_SCRIPT_URL = "YOUR_NEW_WEBCAM_MODE_URL";  // IMPORTANT
+const CLOUDINARY_CLOUD_NAME = "dgyrt3rpj";
+const CLOUDINARY_UPLOAD_PRESET = "campusmart_uploads";
+/*************************************************/
+
+/* === ELEMENTS === */
+const productSummary = document.getElementById("productSummary");
+const totalDisplay = document.getElementById("totalDisplay");
+const receiptInput = document.getElementById("receipt");
+const previewImg = document.getElementById("previewImg");
+const messageEl = document.getElementById("message");
+
+/* === LOAD CART === */
+const cart = JSON.parse(localStorage.getItem("campusmartCart") || "[]");
+renderCart();
+
+function renderCart() {
+  if (!cart.length) {
+    productSummary.innerHTML = "<p style='color:red;font-weight:600'>Your cart is empty.</p>";
+    totalDisplay.textContent = "₦0";
+    return;
   }
+  let total = 0;
+  productSummary.innerHTML = cart.map(item => {
+    const line = item.price * item.quantity;
+    total += line;
+    return `<div class="item"><div>${item.name} × ${item.quantity}</div><div>₦${line.toLocaleString()}</div></div>`;
+  }).join("");
+  totalDisplay.textContent = "₦" + total.toLocaleString();
+  productSummary.dataset.total = total;
+}
 
-  function formatNumber(n){ return new Intl.NumberFormat().format(n); }
-  function escapeHtml(s){ return String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+/* === IMAGE PREVIEW === */
+receiptInput.addEventListener("change", e => {
+  const file = e.target.files[0];
+  previewImg.src = URL.createObjectURL(file);
+  previewImg.style.display = "block";
+});
 
-  renderCart();
+/* === CLOUDINARY UPLOAD === */
+async function uploadToCloudinary(file) {
+  const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+  const res = await fetch(url, { method: "POST", body: fd });
+  const j = await res.json();
+  return j.secure_url || "";
+}
 
-  // Preview receipt image
-  receiptInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) { previewImg.style.display = 'none'; return; }
-    previewImg.src = URL.createObjectURL(file);
-    previewImg.style.display = 'block';
+/* === PAYSTACK === */
+document.getElementById("payBtn").addEventListener("click", () => {
+  const email = document.getElementById("email").value.trim();
+  if (!email) return alert("Enter your email first.");
+
+  const total = Number(productSummary.dataset.total || 0) * 100;
+
+  const handler = PaystackPop.setup({
+    key: PAYSTACK_PUBLIC_KEY,
+    email,
+    amount: total,
+    currency: "NGN",
+    ref: "CAMPUSMART_" + Date.now(),
+    callback: function(resp) {
+      sessionStorage.setItem("campusmart_pay_ref", resp.reference);
+      messageEl.style.color = "green";
+      messageEl.textContent = "Payment completed.";
+    }
   });
 
-  // Upload image to Cloudinary (unsigned)
-  async function uploadToCloudinary(file){
-    if (!file) return "";
-    const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/upload`;
-    const fd = new FormData();
-    fd.append('file', file);
-    fd.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  handler.openIframe();
+});
 
-    const res = await fetch(url, { method: 'POST', body: fd });
-    if (!res.ok) throw new Error('Cloudinary upload failed: ' + res.statusText);
-    const j = await res.json();
-    return j.secure_url || '';
-  }
+/* === SUBMIT ORDER (CORS-FREE) === */
+document.getElementById("orderForm").addEventListener("submit", async e => {
+  e.preventDefault();
 
-  // Paystack - open popup and save reference to sessionStorage
-  payBtn.addEventListener('click', () => {
-    // basic validation
-    const email = document.getElementById('email').value.trim();
-    if (!email) return alert('Please enter an email before paying.');
-    if (!cart || cart.length === 0) return alert('Cart is empty.');
+  try {
+    messageEl.style.color = "black";
+    messageEl.textContent = "Processing...";
 
-    // compute total in kobo
+    const payRef = sessionStorage.getItem("campusmart_pay_ref");
+    if (!payRef) throw new Error("Please complete payment first.");
+
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = document.getElementById("phone").value.trim();
+    const delivery = document.getElementById("delivery").value.trim();
+    const university = document.getElementById("university").value.trim();
+    const receiptFile = receiptInput.files[0];
     const total = Number(productSummary.dataset.total || 0);
-    if (!total || total <= 0) return alert('Invalid cart total.');
-    const amountKobo = Math.round(total * 100);
 
-    const handler = PaystackPop.setup({
-      key: PAYSTACK_PUBLIC_KEY,
-      email: email,
-      amount: amountKobo,
-      currency: 'NGN',
-      ref: 'CAMPUSMART_' + Date.now(),
-      callback: function(response){
-        // save reference
-        sessionStorage.setItem('campusmart_pay_ref', response.reference);
-        messageEl.style.color = 'green';
-        messageEl.textContent = 'Payment successful — reference saved.';
-      },
-      onClose: function(){ alert('Payment popup closed.'); }
-    });
+    messageEl.textContent = "Uploading receipt...";
+    const receiptUrl = await uploadToCloudinary(receiptFile);
 
-    handler.openIframe();
-  });
+    const fd = new FormData();
+    fd.append("name", name);
+    fd.append("email", email);
+    fd.append("phone", phone);
+    fd.append("delivery", delivery);
+    fd.append("university", university);
+    fd.append("items", JSON.stringify(cart));
+    fd.append("amount", total);
+    fd.append("payment_reference", payRef);
+    fd.append("image_url", receiptUrl);
 
-  // Submit order
-  orderForm.addEventListener('submit', async (ev) => {
-    ev.preventDefault();
-    try {
-      messageEl.style.color = 'black';
-      messageEl.textContent = 'Validating order...';
+    messageEl.textContent = "Submitting order...";
 
-      // Ensure payment completed
-      const payRef = sessionStorage.getItem('campusmart_pay_ref');
-      if (!payRef) throw new Error('Please complete the Paystack payment first (click Pay and finish).');
+    const r = await fetch(APPS_SCRIPT_URL, { method: "POST", body: fd });
+    const txt = await r.text();
+    console.log("Server response:", txt);
 
-      // Gather fields
-      const name = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const phone = document.getElementById('phone').value.trim();
-      const delivery = document.getElementById('delivery').value.trim();
-      const university = document.getElementById('university').value.trim();
+    messageEl.style.color = "green";
+    messageEl.textContent = "Order submitted successfully!";
 
-      if (!name || !email || !phone || !delivery || !university) throw new Error('Please fill all required fields.');
+    localStorage.removeItem("campusmartCart");
+    sessionStorage.removeItem("campusmart_pay_ref");
 
-      messageEl.textContent = 'Uploading receipt...';
-      const receiptFile = receiptInput.files[0];
-      const receiptUrl = await uploadToCloudinary(receiptFile);
+    setTimeout(() => location.href = "mart.html", 1500);
 
-      // Build payload
-      const payload = {
-        name, email, phone, delivery, university,
-        items: cart.map(i => ({ name: i.name, quantity: i.quantity, price: i.price })),
-        amount: Number(productSummary.dataset.total || 0),
-        payment_reference: payRef,
-        image_url: receiptUrl
-      };
+  } catch(err) {
+    messageEl.style.color = "red";
+    messageEl.textContent = err.message;
+  }
+});
 
-      messageEl.textContent = 'Sending order to server...';
-
-      // POST to Apps Script (expects JSON)
-      const resp = await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      // network error handling
-      if (!resp.ok) {
-        const txt = await resp.text().catch(()=>null);
-        throw new Error('Server error: ' + (txt || resp.statusText));
-      }
-
-      const json = await resp.json().catch(()=>{ throw new Error('Invalid server response'); });
-      if (json.status !== 'success') throw new Error(json.message || 'Server returned error');
-
-      messageEl.style.color = 'green';
-      messageEl.textContent = 'Order submitted successfully — thank you!';
-      // cleanup
-      localStorage.removeItem('campusmartCart');
-      sessionStorage.removeItem('campusmart_pay_ref');
-      // redirect after short delay
-      setTimeout(()=> window.location.href = 'mart.html', 1600);
-
-    } catch (err) {
-      messageEl.style.color = 'red';
-      messageEl.textContent = '❌ ' + (err.message || err);
-      console.error(err);
-    }
-  });
-
-  </script>
+</script>
 </body>
 </html>
