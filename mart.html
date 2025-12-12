@@ -538,7 +538,7 @@ checkoutBtn.addEventListener("click", () => {
 
   if (!token) {
     localStorage.setItem("redirectAfterLogin", "checkout.html");
-    return window.location.href = "signin.html";
+    return window.location.href = "checkout.html";
   }
 
   window.location.href = "checkout.html";
