@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/x-icon" href="Blue 1.png">
+  <title>Delivery Notice | Campusmart</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #f5f7ff, #eef2ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: #ffffff;
+      max-width: 520px;
+      width: 100%;
+      padding: 28px 24px;
+      border-radius: 14px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    .icon {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 14px;
+      color: #111827;
+    }
+
+    p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #4b5563;
+      margin-bottom: 14px;
+    }
+
+    .highlight {
+      background: #eef2ff;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #1f2937;
+      margin-bottom: 18px;
+    }
+
+    /* Checkbox section */
+    .confirm {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      text-align: left;
+      margin-bottom: 18px;
+      font-size: 14px;
+      color: #374151;
+    }
+
+    .confirm input {
+      margin-top: 3px;
+      cursor: pointer;
+    }
+
+    .btn {
+      display: inline-block;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 700;
+      background: #003cff;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      cursor: not-allowed;
+      opacity: 0.5;
+      text-decoration: none;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn.enabled {
+      cursor: pointer;
+      opacity: 1;
+    }
+
+    .btn.enabled:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px rgba(0, 60, 255, 0.25);
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: #6b7280;
+    }
+
+    @media (max-width: 420px) {
+      h1 {
+        font-size: 20px;
+      }
+      p {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <div class="icon">🎓</div>
+
+    <h1>Important Delivery Notice</h1>
+
+    <p>
+      To help you <strong>pay less for delivery</strong> and receive your order faster,
+      Campusmart delivers <strong>only within your university campus</strong>.
+    </p>
+
+    <div class="highlight">
+      📦 Please ensure the product you are ordering is
+      <strong>within your university</strong>.
+      Ordering outside your campus may attract <strong>high delivery fees</strong>.
+    </div>
+
+    <div class="confirm">
+      <input type="checkbox" id="agree" />
+      <label for="agree">
+        I understand that Campusmart delivers only within my university and
+        that ordering outside my campus may increase delivery fees.
+      </label>
+    </div>
+
+    <a href="mart.html" id="continueBtn" class="btn">Continue to Mart</a>
+
+    <div class="footer-note">
+      Campusmart — Smart shopping for campus life
+    </div>
+  </div>
+
+  <script>
+    const checkbox = document.getElementById("agree");
+    const button = document.getElementById("continueBtn");
+
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) {
+        button.classList.add("enabled");
+        button.style.pointerEvents = "auto";
+      } else {
+        button.classList.remove("enabled");
+        button.style.pointerEvents = "none";
+      }
+    });
+
+    // Disable button on load
+    button.style.pointerEvents = "none";
+  </script>
+
+</body>
+</html>
