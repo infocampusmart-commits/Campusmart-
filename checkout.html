@@ -1,36 +1,63 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Checkout - CampusmartStore</title>
-<style>
-body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;margin:0}
-header{background:#fff;padding:16px;text-align:center;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
-.container{max-width:680px;margin:24px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
-.section{margin-bottom:18px}
-.product-box{background:#f1f5ff;padding:12px;border-radius:8px}
-.item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e6ecff}
-.item:last-child{border-bottom:none}
-.total{font-size:18px;font-weight:700;margin-top:12px;text-align:right}
-input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid #ddd;margin-top:8px}
-.btn{width:100%;padding:12px;background:#003cff;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;margin-top:10px}
-.btn.secondary{background:#16a34a}
-.message{text-align:center;margin-top:12px;min-height:24px}
-.instruction{
-  display:none;
-  background:#fff7ed;
-  color:#9a3412;
-  border:1px solid #fed7aa;
-  padding:10px;
-  border-radius:6px;
-  margin-top:12px;
-  font-size:14px;
-  text-align:center;
-  font-weight:600;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="Blue 1.png">
+  <title>Checkout - CampusmartStore</title>
+
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;margin:0}
+    header{background:#fff;padding:16px;text-align:center;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+    .container{max-width:680px;margin:24px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+    .section{margin-bottom:18px}
+    .product-box{background:#f1f5ff;padding:12px;border-radius:8px}
+    .item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e6ecff}
+    .item:last-child{border-bottom:none}
+    .total{font-size:18px;font-weight:700;margin-top:12px;text-align:right}
+    input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid #ddd;margin-top:8px}
+    .btn{width:100%;padding:12px;background:#003cff;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;margin-top:10px}
+    .btn.secondary{background:#16a34a}
+    .message{text-align:center;margin-top:12px;min-height:24px}
+    .instruction{
+      display:none;
+      background:#fff7ed;
+      color:#9a3412;
+      border:1px solid #fed7aa;
+      padding:10px;
+      border-radius:6px;
+      margin-top:12px;
+      font-size:14px;
+      text-align:center;
+      font-weight:600;
+    }
+    /* SUCCESS MODAL */
+    #successModal{
+      display:none;
+      position:fixed;
+      top:0; left:0; right:0; bottom:0;
+      background:rgba(0,0,0,0.5);
+      justify-content:center;
+      align-items:center;
+      z-index:9999;
+    }
+    #successModal div{
+      background:#fff;
+      padding:20px;
+      border-radius:10px;
+      max-width:400px;
+      width:90%;
+      text-align:center;
+      box-shadow:0 5px 20px rgba(0,0,0,0.3);
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn{
+      from{transform:translateY(-30px);opacity:0;}
+      to{transform:translateY(0);opacity:1;}
+    }
+  </style>
 </head>
+
 <body>
 <header>CampusmartStore — Checkout</header>
 
@@ -61,21 +88,49 @@ input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid
         <option>University of Lagos</option>
       </select>
 
-      <button type="button" id="payBtn" class="btn">💳 Pay with Paystack</button>
+      <!-- PAY BUTTON -->
+      <button type="button" id="payBtn" class="btn">
+        💳 Pay with Paystack
+      </button>
+
+      <!-- INSTRUCTION -->
       <div class="instruction" id="instruction">
         ⚠️ After paying, do not close this page. Please make sure you submit your form.
       </div>
-      <button type="submit" id="submitBtn" class="btn secondary" style="display:none;">Submit Order</button>
+
+      <!-- SUBMIT BUTTON -->
+      <button type="submit" id="submitBtn" class="btn secondary" style="display:none;">
+        Submit Order
+      </button>
     </form>
 
     <div class="message" id="message"></div>
   </div>
 </div>
 
+<!-- SUCCESS POPUP -->
+<div id="successModal">
+  <div>
+    <h3>✅ Order Submitted!</h3>
+    <p id="modalText"></p>
+    <button id="modalOkBtn" style="
+      margin-top:15px;
+      padding:10px 20px;
+      background:#003cff;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      font-weight:700;
+      cursor:pointer;
+    ">OK</button>
+  </div>
+</div>
+
 <script src="https://js.paystack.co/v1/inline.js"></script>
+
 <script>
 const PAYSTACK_PUBLIC_KEY = "pk_live_b43df11e368a73ac564defaf565f7a626069d107";
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec"; // replace with your latest Apps Script deployment URL
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec";
 
 const productSummary = document.getElementById("productSummary");
 const totalDisplay = document.getElementById("totalDisplay");
@@ -90,6 +145,7 @@ productSummary.innerHTML = cart.map(i=>{
   total += i.price * i.quantity;
   return `<div class="item"><div>${i.name} × ${i.quantity}</div><div>₦${(i.price*i.quantity).toLocaleString()}</div></div>`;
 }).join("");
+
 totalDisplay.textContent = "₦" + total.toLocaleString();
 
 /* PAYSTACK */
@@ -120,39 +176,40 @@ document.getElementById("orderForm").onsubmit = async e => {
   const payRef = sessionStorage.getItem("campusmart_pay_ref");
   if(!payRef) return alert("Please complete payment first.");
 
-  const nameInput = document.getElementById("name");
-  const emailInput = document.getElementById("email");
-  const phoneInput = document.getElementById("phone");
-  const deliveryInput = document.getElementById("delivery");
-  const universityInput = document.getElementById("university");
-
   const fd = new FormData();
-  fd.append("name", nameInput.value);
-  fd.append("email", emailInput.value);
-  fd.append("phone", phoneInput.value);
-  fd.append("delivery", deliveryInput.value);
-  fd.append("university", universityInput.value);
+  fd.append("name", name.value);
+  fd.append("email", email.value);
+  fd.append("phone", phone.value);
+  fd.append("delivery", delivery.value);
+  fd.append("university", university.value);
   fd.append("items", JSON.stringify(cart));
   fd.append("amount", total);
   fd.append("payment_reference", payRef);
 
   messageEl.textContent = "Submitting order...";
 
-  try {
-    const res = await fetch(APPS_SCRIPT_URL, { method:"POST", body:fd });
-    const text = await res.text();
-    console.log("Server response:", text);
+  const response = await fetch(APPS_SCRIPT_URL, { method:"POST", body:fd });
+  const text = await response.text();
 
-    if(text.includes("SUCCESS")) {
-      messageEl.textContent = "Order submitted successfully!";
-      localStorage.removeItem("campusmartCart");
-      sessionStorage.removeItem("campusmart_pay_ref");
-      setTimeout(()=>location.href="mart.html",1500);
-    } else {
-      messageEl.textContent = "Error submitting order: " + text;
-    }
-  } catch(err) {
-    messageEl.textContent = "Network error: " + err.message;
+  if(text.includes("SUCCESS")){
+    // Show modal
+    const modal = document.getElementById("successModal");
+    const modalText = document.getElementById("modalText");
+    modalText.innerHTML = `Your order of ₦${total.toLocaleString()} has been successfully submitted!<br>Delivery day will be communicated to you shortly.`;
+    modal.style.display = "flex";
+
+    // Clear cart & session
+    localStorage.removeItem("campusmartCart");
+    sessionStorage.removeItem("campusmart_pay_ref");
+
+    // OK button redirects to mart.html
+    document.getElementById("modalOkBtn").onclick = () => {
+      modal.style.display = "none";
+      location.href = "mart.html";
+    };
+  } else {
+    messageEl.style.color = "red";
+    messageEl.textContent = "Error submitting order: " + text;
   }
 };
 </script>
