@@ -1,37 +1,39 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Checkout - CampusmartStore</title>
-<style>
-body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;margin:0}
-header{background:#fff;padding:16px;text-align:center;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
-.container{max-width:680px;margin:24px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
-.section{margin-bottom:18px}
-.product-box{background:#f1f5ff;padding:12px;border-radius:8px}
-.item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e6ecff}
-.item:last-child{border-bottom:none}
-.total{font-size:18px;font-weight:700;margin-top:12px;text-align:right}
-input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid #ddd;margin-top:8px}
-.btn{width:100%;padding:12px;background:#003cff;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;margin-top:10px}
-.btn.secondary{background:#16a34a}
-.message{text-align:center;margin-top:12px;min-height:24px}
-.instruction{
-  display:none;
-  background:#fff7ed;
-  color:#9a3412;
-  border:1px solid #fed7aa;
-  padding:10px;
-  border-radius:6px;
-  margin-top:12px;
-  font-size:14px;
-  text-align:center;
-  font-weight:600;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="Blue 1.png">
+  <title>Checkout - CampusmartStore</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fb;margin:0}
+    header{background:#fff;padding:16px;text-align:center;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+    .container{max-width:680px;margin:24px auto;padding:20px;background:#fff;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+    .section{margin-bottom:18px}
+    .product-box{background:#f1f5ff;padding:12px;border-radius:8px}
+    .item{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dashed #e6ecff}
+    .item:last-child{border-bottom:none}
+    .total{font-size:18px;font-weight:700;margin-top:12px;text-align:right}
+    input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid #ddd;margin-top:8px}
+    .btn{width:100%;padding:12px;background:#003cff;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;margin-top:10px}
+    .btn.secondary{background:#16a34a}
+    .message{text-align:center;margin-top:12px;min-height:24px}
+    .instruction{
+      display:none;
+      background:#fff7ed;
+      color:#9a3412;
+      border:1px solid #fed7aa;
+      padding:10px;
+      border-radius:6px;
+      margin-top:12px;
+      font-size:14px;
+      text-align:center;
+      font-weight:600;
+    }
+  </style>
 </head>
 <body>
+
 <header>CampusmartStore — Checkout</header>
 
 <div class="container">
@@ -48,7 +50,6 @@ input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid
       <input id="email" type="email" placeholder="Email" required />
       <input id="phone" type="text" placeholder="WhatsApp number" required />
       <textarea id="delivery" rows="2" placeholder="Hall / Room / Hostel delivery info" required></textarea>
-
       <select id="university" required>
         <option value="">Select university</option>
         <option>Covenant University</option>
@@ -61,10 +62,15 @@ input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid
         <option>University of Lagos</option>
       </select>
 
+      <!-- PAYSTACK BUTTON -->
       <button type="button" id="payBtn" class="btn">💳 Pay with Paystack</button>
+
+      <!-- INSTRUCTION -->
       <div class="instruction" id="instruction">
         ⚠️ After paying, do not close this page. Please make sure you submit your form.
       </div>
+
+      <!-- SUBMIT BUTTON -->
       <button type="submit" id="submitBtn" class="btn secondary" style="display:none;">Submit Order</button>
     </form>
 
@@ -75,7 +81,7 @@ input,textarea,select{width:100%;padding:10px;border-radius:6px;border:1px solid
 <script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
 const PAYSTACK_PUBLIC_KEY = "pk_live_b43df11e368a73ac564defaf565f7a626069d107";
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec"; // replace with your latest Apps Script deployment URL
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec";
 
 const productSummary = document.getElementById("productSummary");
 const totalDisplay = document.getElementById("totalDisplay");
@@ -83,16 +89,16 @@ const messageEl = document.getElementById("message");
 const submitBtn = document.getElementById("submitBtn");
 const instruction = document.getElementById("instruction");
 
+// Load cart
 const cart = JSON.parse(localStorage.getItem("campusmartCart") || "[]");
-
 let total = 0;
-productSummary.innerHTML = cart.map(i=>{
+productSummary.innerHTML = cart.map(i => {
   total += i.price * i.quantity;
   return `<div class="item"><div>${i.name} × ${i.quantity}</div><div>₦${(i.price*i.quantity).toLocaleString()}</div></div>`;
 }).join("");
 totalDisplay.textContent = "₦" + total.toLocaleString();
 
-/* PAYSTACK */
+// PAYSTACK
 document.getElementById("payBtn").onclick = () => {
   const email = document.getElementById("email").value.trim();
   if(!email) return alert("Enter your email first");
@@ -109,49 +115,46 @@ document.getElementById("payBtn").onclick = () => {
       messageEl.textContent = "Payment successful. Please submit your order.";
       instruction.style.display = "block";
       submitBtn.style.display = "block";
-    }
+    },
+    onClose: () => alert("Payment cancelled.")
   }).openIframe();
 };
 
-/* SUBMIT ORDER */
+// SUBMIT ORDER
 document.getElementById("orderForm").onsubmit = async e => {
   e.preventDefault();
-
   const payRef = sessionStorage.getItem("campusmart_pay_ref");
   if(!payRef) return alert("Please complete payment first.");
 
-  const nameInput = document.getElementById("name");
-  const emailInput = document.getElementById("email");
-  const phoneInput = document.getElementById("phone");
-  const deliveryInput = document.getElementById("delivery");
-  const universityInput = document.getElementById("university");
-
   const fd = new FormData();
-  fd.append("name", nameInput.value);
-  fd.append("email", emailInput.value);
-  fd.append("phone", phoneInput.value);
-  fd.append("delivery", deliveryInput.value);
-  fd.append("university", universityInput.value);
+  fd.append("name", document.getElementById("name").value);
+  fd.append("email", document.getElementById("email").value);
+  fd.append("phone", document.getElementById("phone").value);
+  fd.append("delivery", document.getElementById("delivery").value);
+  fd.append("university", document.getElementById("university").value);
   fd.append("items", JSON.stringify(cart));
   fd.append("amount", total);
   fd.append("payment_reference", payRef);
 
+  messageEl.style.color = "black";
   messageEl.textContent = "Submitting order...";
 
   try {
-    const res = await fetch(APPS_SCRIPT_URL, { method:"POST", body:fd });
-    const text = await res.text();
-    console.log("Server response:", text);
+    const response = await fetch(APPS_SCRIPT_URL, { method:"POST", body:fd });
+    const text = await response.text();
 
-    if(text.includes("SUCCESS")) {
+    if(text.includes("SUCCESS")){
+      messageEl.style.color = "green";
       messageEl.textContent = "Order submitted successfully!";
       localStorage.removeItem("campusmartCart");
       sessionStorage.removeItem("campusmart_pay_ref");
       setTimeout(()=>location.href="mart.html",1500);
     } else {
+      messageEl.style.color = "red";
       messageEl.textContent = "Error submitting order: " + text;
     }
-  } catch(err) {
+  } catch(err){
+    messageEl.style.color = "red";
     messageEl.textContent = "Network error: " + err.message;
   }
 };
