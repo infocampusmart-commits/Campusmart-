@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="Blue 1.png">
   <title>Checkout - CampusmartStore</title>
+
   <style>
     body{font-family:Arial,sans-serif;background:#f5f7fb;margin:0}
     header{background:#fff;padding:16px;text-align:center;font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
@@ -21,8 +22,10 @@
     .instruction{display:none;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;padding:10px;border-radius:6px;margin-top:12px;font-size:14px;text-align:center;font-weight:600}
   </style>
 </head>
+
 <body>
 <header>CampusmartStore — Checkout</header>
+
 <div class="container">
   <div class="section">
     <h3>Order Summary</h3>
@@ -32,6 +35,7 @@
 
   <div class="section">
     <h3>Delivery Info</h3>
+
     <form id="orderForm">
       <input id="name" type="text" placeholder="Full name" required>
       <input id="email" type="email" placeholder="Email" required>
@@ -51,8 +55,14 @@
       </select>
 
       <button type="button" id="payBtn" class="btn">💳 Pay with Paystack</button>
-      <div class="instruction" id="instruction">⚠️ After paying, do not close this page. Please make sure you submit your form.</div>
-      <button type="submit" id="submitBtn" class="btn secondary" style="display:none;">Submit Order</button>
+
+      <div class="instruction" id="instruction">
+        ⚠️ After paying, do not close this page. Please submit your order.
+      </div>
+
+      <button type="submit" id="submitBtn" class="btn secondary" style="display:none;">
+        Submit Order
+      </button>
     </form>
 
     <div class="message" id="message"></div>
@@ -60,6 +70,7 @@
 </div>
 
 <script src="https://js.paystack.co/v1/inline.js"></script>
+
 <script>
 const PAYSTACK_PUBLIC_KEY = "pk_live_b43df11e368a73ac564defaf565f7a626069d107";
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec";
@@ -71,12 +82,17 @@ const submitBtn = document.getElementById("submitBtn");
 const instruction = document.getElementById("instruction");
 
 const cart = JSON.parse(localStorage.getItem("campusmartCart") || "[]");
-let total = 0;
 
-productSummary.innerHTML = cart.map(i => {
+let total = 0;
+productSummary.innerHTML = cart.map(i=>{
   total += i.price * i.quantity;
-  return `<div class="item"><div>${i.name} × ${i.quantity}</div><div>₦${(i.price*i.quantity).toLocaleString()}</div></div>`;
+  return `
+    <div class="item">
+      <div>${i.name} × ${i.quantity}</div>
+      <div>₦${(i.price*i.quantity).toLocaleString()}</div>
+    </div>`;
 }).join("");
+
 totalDisplay.textContent = "₦" + total.toLocaleString();
 
 /* PAYSTACK */
@@ -101,42 +117,47 @@ document.getElementById("payBtn").onclick = () => {
 };
 
 /* SUBMIT ORDER */
-document.getElementById("orderForm").onsubmit = async e => {
+document.getElementById("orderForm").addEventListener("submit", async e => {
   e.preventDefault();
 
   const payRef = sessionStorage.getItem("campusmart_pay_ref");
   if(!payRef) return alert("Please complete payment first.");
 
   const fd = new FormData();
-  fd.append("name", name.value);
-  fd.append("email", email.value);
-  fd.append("phone", phone.value);
-  fd.append("delivery", delivery.value);
-  fd.append("university", university.value);
+  fd.append("name", document.getElementById("name").value);
+  fd.append("email", document.getElementById("email").value);
+  fd.append("phone", document.getElementById("phone").value);
+  fd.append("delivery", document.getElementById("delivery").value);
+  fd.append("university", document.getElementById("university").value);
   fd.append("items", JSON.stringify(cart));
   fd.append("amount", total);
   fd.append("payment_reference", payRef);
 
+  messageEl.style.color = "#000";
   messageEl.textContent = "Submitting order...";
 
   try {
     const res = await fetch(APPS_SCRIPT_URL, { method: "POST", body: fd });
-    const json = await res.json();
-    if(json.status === "success"){
+    const data = await res.json();
+
+    console.log("Server response:", data);
+
+    if(data.status === "success"){
       messageEl.style.color = "green";
-      messageEl.textContent = "Order submitted successfully!";
+      messageEl.textContent = "✅ Order submitted successfully!";
       localStorage.removeItem("campusmartCart");
       sessionStorage.removeItem("campusmart_pay_ref");
-      setTimeout(()=>location.href="mart.html", 1500);
+      setTimeout(()=>location.href="mart.html",1500);
     } else {
       messageEl.style.color = "red";
-      messageEl.textContent = "Error: "+json.message;
+      messageEl.textContent = "❌ " + (data.message || "Submission failed");
     }
   } catch(err){
+    console.error(err);
     messageEl.style.color = "red";
-    messageEl.textContent = "Error: "+err.message;
+    messageEl.textContent = "⚠️ Network or server error";
   }
-};
+});
 </script>
 </body>
 </html>
