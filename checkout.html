@@ -19,7 +19,18 @@
     .btn{width:100%;padding:12px;background:#003cff;color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;margin-top:10px}
     .btn.secondary{background:#16a34a}
     .message{text-align:center;margin-top:12px;min-height:24px}
-    .instruction{display:none;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;padding:10px;border-radius:6px;margin-top:12px;font-size:14px;text-align:center;font-weight:600}
+    .instruction{
+      display:none;
+      background:#fff7ed;
+      color:#9a3412;
+      border:1px solid #fed7aa;
+      padding:10px;
+      border-radius:6px;
+      margin-top:12px;
+      font-size:14px;
+      text-align:center;
+      font-weight:600
+    }
   </style>
 </head>
 
@@ -54,12 +65,15 @@
         <option>University of Lagos</option>
       </select>
 
+      <!-- PAY BUTTON -->
       <button type="button" id="payBtn" class="btn">💳 Pay with Paystack</button>
 
+      <!-- INSTRUCTION -->
       <div class="instruction" id="instruction">
         ⚠️ After paying, do not close this page. Please submit your order.
       </div>
 
+      <!-- SUBMIT BUTTON -->
       <button type="submit" id="submitBtn" class="btn secondary" style="display:none;">
         Submit Order
       </button>
@@ -72,8 +86,10 @@
 <script src="https://js.paystack.co/v1/inline.js"></script>
 
 <script>
+/* ================= CONFIG ================= */
 const PAYSTACK_PUBLIC_KEY = "pk_live_b43df11e368a73ac564defaf565f7a626069d107";
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec";
+/* ========================================= */
 
 const productSummary = document.getElementById("productSummary");
 const totalDisplay = document.getElementById("totalDisplay");
@@ -95,7 +111,7 @@ productSummary.innerHTML = cart.map(i=>{
 
 totalDisplay.textContent = "₦" + total.toLocaleString();
 
-/* PAYSTACK */
+/* ================= PAYSTACK ================= */
 document.getElementById("payBtn").onclick = () => {
   const email = document.getElementById("email").value.trim();
   if(!email) return alert("Enter your email first");
@@ -116,7 +132,7 @@ document.getElementById("payBtn").onclick = () => {
   }).openIframe();
 };
 
-/* SUBMIT ORDER */
+/* ================= SUBMIT ORDER ================= */
 document.getElementById("orderForm").addEventListener("submit", async e => {
   e.preventDefault();
 
@@ -137,9 +153,12 @@ document.getElementById("orderForm").addEventListener("submit", async e => {
   messageEl.textContent = "Submitting order...";
 
   try {
-    const res = await fetch(APPS_SCRIPT_URL, { method: "POST", body: fd });
-    const data = await res.json();
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      body: fd
+    });
 
+    const data = await res.json();
     console.log("Server response:", data);
 
     if(data.status === "success"){
