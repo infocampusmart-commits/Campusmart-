@@ -147,7 +147,7 @@
     e.preventDefault();
 
     const handler = PaystackPop.setup({
-      key: "pk_test_xxxxxxxxxxxxxxxxx", // 🔴 replace
+      key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107", // 🔴 replace
       email: email.value,
       amount: totalAmount * 100,
       currency: "NGN",
@@ -176,7 +176,7 @@
       status: "PAID"
     };
 
-    fetch("YOUR_APPS_SCRIPT_URL", {
+    fetch("https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec", {
       method: "POST",
       body: JSON.stringify(orderData)
     })
