@@ -2,22 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Campusmart Checkout</title>
-  <link rel="icon" type="image/x-icon" href="Blue 1.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f5f5f5;
       padding: 20px;
-      margin: 0;
     }
 
     .checkout-container {
       max-width: 500px;
-      margin: auto;
       background: #fff;
+      margin: auto;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
@@ -25,7 +23,7 @@
 
     h2 {
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .product-summary {
@@ -35,25 +33,33 @@
       margin-bottom: 20px;
     }
 
-    .product-summary p {
-      margin: 6px 0;
-      font-size: 14px;
+    .summary-item {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .summary-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 8px;
     }
 
     label {
       font-weight: bold;
-      margin-top: 10px;
       display: block;
+      margin-top: 10px;
     }
 
     input, select, button {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
-      margin-bottom: 15px;
-      border: 1px solid #ddd;
+      margin-bottom: 12px;
       border-radius: 8px;
-      font-size: 14px;
+      border: 1px solid #ddd;
     }
 
     button {
@@ -63,166 +69,127 @@
       cursor: pointer;
     }
 
-    button:hover {
-      background: #333;
-    }
-
     #loadingSpinner {
       display: none;
       text-align: center;
       margin-top: 15px;
-      font-size: 14px;
-      color: #555;
-    }
-
-    .spinner {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #000;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      margin: 0 auto 10px;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
 
-  <div class="checkout-container">
-    <h2>Checkout</h2>
+<div class="checkout-container">
+  <h2>Checkout</h2>
 
-    <!-- ORDER SUMMARY -->
-    <div id="checkoutProduct" class="product-summary"></div>
+  <!-- ORDER SUMMARY -->
+  <div id="checkoutProduct" class="product-summary"></div>
 
-    <!-- CHECKOUT FORM -->
-    <form id="checkoutForm">
-      <label>Full Name</label>
-      <input type="text" id="name" required>
+  <!-- FORM -->
+  <form id="checkoutForm">
+    <label>Full Name</label>
+    <input id="name" required>
 
-      <label>Email Address</label>
-      <input type="email" id="email" required>
+    <label>Email</label>
+    <input id="email" type="email" required>
 
-      <label>Phone Number</label>
-      <input type="text" id="phone" required>
+    <label>Phone</label>
+    <input id="phone" required>
 
-      <label>Location</label>
-      <select id="location" required>
-        <option value="">-- Select Location --</option>
-        <option value="Covenant University">Covenant University</option>
-        <option value="Crawford University">Crawford University</option>
-        <option value="Bells University">Bells University</option>
-      </select>
+    <label>Location</label>
+    <select id="location" required>
+      <option value="">Select location</option>
+      <option>Covenant University</option>
+      <option>Crawford University</option>
+      <option>Bells University</option>
+    </select>
 
-      <label>Hall / Hostel</label>
-      <input type="text" id="hall" required>
+    <label>Hall / Hostel</label>
+    <input id="hall" required>
 
-      <label>Room Number</label>
-      <input type="text" id="room" required>
+    <label>Room Number</label>
+    <input id="room" required>
 
-      <button type="submit">Pay with Paystack</button>
-    </form>
+    <button type="submit">Pay with Paystack</button>
+  </form>
 
-    <!-- LOADING -->
-    <div id="loadingSpinner">
-      <div class="spinner"></div>
-      Processing your order...
-    </div>
-  </div>
+  <div id="loadingSpinner">Processing order...</div>
+</div>
 
-  <!-- PAYSTACK -->
-  <script src="https://js.paystack.co/v1/inline.js"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
 
-  <script>
-    /* =========================
-       LOAD CART FROM mart.html
-    ========================== */
-    const cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
-    const checkoutProduct = document.getElementById("checkoutProduct");
-    let totalAmount = 0;
+<script>
+  const cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
+  const summaryBox = document.getElementById("checkoutProduct");
+  let totalAmount = 0;
 
-    if (cart.length === 0) {
-      checkoutProduct.innerHTML = "<p>Your cart is empty</p>";
-    } else {
-      checkoutProduct.innerHTML = cart.map(item => {
-        totalAmount += item.price * item.qty;
-        return `
-          <p><strong>${item.name}</strong> × ${item.qty} — ₦${item.price * item.qty}</p>
-        `;
-      }).join("") + `<hr><h3>Total: ₦${totalAmount}</h3>`;
-    }
+  if (cart.length === 0) {
+    summaryBox.innerHTML = "<p>Your cart is empty</p>";
+  } else {
+    summaryBox.innerHTML = cart.map(item => {
+      const itemTotal = item.price * item.quantity;
+      totalAmount += itemTotal;
 
-    /* =========================
-       PAYSTACK PAYMENT
-    ========================== */
-    document.getElementById("checkoutForm").addEventListener("submit", function(e) {
-      e.preventDefault();
+      return `
+        <div class="summary-item">
+          <img src="${item.img}">
+          <div>
+            <strong>${item.name}</strong><br>
+            ₦${item.price} × ${item.quantity}<br>
+            <b>₦${itemTotal}</b>
+          </div>
+        </div>
+      `;
+    }).join("") + `<hr><h3>Total: ₦${totalAmount}</h3>`;
+  }
 
-      if (cart.length === 0) {
-        alert("Cart is empty");
-        return;
-      }
+  document.getElementById("checkoutForm").addEventListener("submit", function(e) {
+    e.preventDefault();
 
-      const handler = PaystackPop.setup({
-        key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107", // 🔴 PUT YOUR PAYSTACK PUBLIC KEY
-        email: document.getElementById("email").value,
-        amount: totalAmount * 100,
-        currency: "NGN",
-        callback: function(response) {
-          submitOrder(response.reference);
-        },
-        onClose: function() {
-          alert("Payment cancelled");
-        }
-      });
-
-      handler.openIframe();
+    const handler = PaystackPop.setup({
+      key: "pk_test_xxxxxxxxxxxxxxxxx", // 🔴 replace
+      email: email.value,
+      amount: totalAmount * 100,
+      currency: "NGN",
+      callback: res => submitOrder(res.reference),
+      onClose: () => alert("Payment cancelled")
     });
 
-    /* =========================
-       SUBMIT ORDER TO GOOGLE SHEETS
-    ========================== */
-    function submitOrder(paymentRef) {
-      document.getElementById("loadingSpinner").style.display = "block";
+    handler.openIframe();
+  });
 
-      const orderData = {
-        name: document.getElementById("name").value,
-        email: document.getElementById("email").value,
-        phone: document.getElementById("phone").value,
-        location: document.getElementById("location").value,
-        hall: document.getElementById("hall").value,
-        room: document.getElementById("room").value,
-        cart: cart,
-        total: totalAmount,
-        paymentRef: paymentRef,
-        status: "PAID"
-      };
+  function submitOrder(paymentRef) {
+    document.getElementById("loadingSpinner").style.display = "block";
 
-      fetch("https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec", {
-        method: "POST",
-        body: JSON.stringify(orderData)
-      })
-      .then(res => res.json())
-      .then(resp => {
-        document.getElementById("loadingSpinner").style.display = "none";
-        if (resp.status === "success") {
-          localStorage.removeItem("campusmartCart");
-          window.location.href = "success.html";
-        } else {
-          alert("Order submission failed");
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        alert("Network error");
-        document.getElementById("loadingSpinner").style.display = "none";
-      });
-    }
-  </script>
+    const orderData = {
+      customer: {
+        name: name.value,
+        email: email.value,
+        phone: phone.value,
+        location: location.value,
+        hall: hall.value,
+        room: room.value
+      },
+      cart: cart,
+      total: totalAmount,
+      paymentRef: paymentRef,
+      status: "PAID"
+    };
+
+    fetch("YOUR_APPS_SCRIPT_URL", {
+      method: "POST",
+      body: JSON.stringify(orderData)
+    })
+    .then(r => r.json())
+    .then(res => {
+      if (res.status === "success") {
+        localStorage.removeItem("campusmartCart");
+        window.location.href = "success.html";
+      } else {
+        alert("Order failed");
+      }
+    });
+  }
+</script>
 
 </body>
 </html>
