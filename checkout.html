@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <title>Campusmart Checkout</title>
-  <link rel="icon" type="image/x-icon" href="Blue 1.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="Blue 1.png">
 
   <style>
     body {
@@ -12,48 +12,28 @@
       background: #f5f5f5;
       padding: 20px;
     }
-
     .checkout-container {
       max-width: 500px;
-      background: #fff;
       margin: auto;
+      background: #fff;
       padding: 20px;
       border-radius: 12px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
-    .product-summary {
-      background: #fafafa;
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-    }
-
+    h2 { text-align: center; }
     .summary-item {
       display: flex;
       gap: 10px;
-      align-items: center;
       margin-bottom: 10px;
+      align-items: center;
     }
-
     .summary-item img {
       width: 60px;
       height: 60px;
       object-fit: cover;
       border-radius: 8px;
     }
-
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 10px;
-    }
-
+    label { font-weight: bold; margin-top: 10px; display: block; }
     input, select, button {
       width: 100%;
       padding: 10px;
@@ -62,34 +42,24 @@
       border-radius: 8px;
       border: 1px solid #ddd;
     }
-
     button {
       background: #000;
       color: #fff;
-      border: none;
       cursor: pointer;
+      border: none;
     }
-
-    button:hover {
-      background: #333;
-    }
-
-    #loadingSpinner {
-      display: none;
-      text-align: center;
-      margin-top: 15px;
-      font-size: 14px;
-      color: #555;
-    }
+    button:hover { background: #333; }
+    #loadingSpinner { display:none; text-align:center; margin-top:15px; }
   </style>
 </head>
+
 <body>
 
 <div class="checkout-container">
   <h2>Checkout</h2>
 
   <!-- ORDER SUMMARY -->
-  <div id="checkoutProduct" class="product-summary"></div>
+  <div id="checkoutProduct"></div>
 
   <!-- FORM -->
   <form id="checkoutForm">
@@ -119,15 +89,12 @@
     <button type="submit">Pay with Paystack</button>
   </form>
 
-  <div id="loadingSpinner">
-    <div class="spinner">Processing order...</div>
-  </div>
+  <div id="loadingSpinner">Processing order...</div>
 </div>
 
 <script src="https://js.paystack.co/v1/inline.js"></script>
 
 <script>
-  // Load cart from localStorage
   const cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
   const summaryBox = document.getElementById("checkoutProduct");
   let totalAmount = 0;
@@ -143,7 +110,7 @@
         <div class="summary-item">
           <img src="${item.img}">
           <div>
-            <strong>${item.name}</strong><br>
+            <b>${item.name}</b><br>
             ₦${item.price} × ${item.quantity}<br>
             <b>₦${itemTotal}</b>
           </div>
@@ -152,33 +119,26 @@
     }).join("") + `<hr><h3>Total: ₦${totalAmount}</h3>`;
   }
 
-  // Handle Paystack payment
   document.getElementById("checkoutForm").addEventListener("submit", function(e){
     e.preventDefault();
-
-    if(cart.length === 0){
-      alert("Cart is empty!");
-      return;
-    }
+    if(cart.length === 0) return alert("Cart is empty");
 
     const handler = PaystackPop.setup({
-      key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107", // 🔴 Replace with your Paystack public key
+      key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107",
       email: email.value,
       amount: totalAmount * 100,
       currency: "NGN",
-      callback: function(response){
-        submitOrder(response.reference);
+      callback: function(){
+        submitOrder();
       },
       onClose: function(){
         alert("Payment cancelled");
       }
     });
-
     handler.openIframe();
   });
 
-  // Submit order to Apps Script
-  function submitOrder(paymentRef){
+  function submitOrder(){
     document.getElementById("loadingSpinner").style.display = "block";
 
     const orderData = {
@@ -194,10 +154,8 @@
         name: i.name,
         price: i.price,
         quantity: i.quantity
-      })), // no img
-      total: totalAmount,
-      paymentRef: paymentRef,
-      status: "PAID"
+      })),
+      total: totalAmount
     };
 
     fetch("https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec", {
@@ -211,13 +169,12 @@
         localStorage.removeItem("campusmartCart");
         window.location.href = "success.html";
       } else {
-        alert("Order failed: " + (res.message || ""));
+        alert("Order failed: " + res.message);
       }
     })
-    .catch(err => {
-      console.error(err);
+    .catch(() => {
       document.getElementById("loadingSpinner").style.display = "none";
-      alert("Network error. Try again.");
+      alert("Network error");
     });
   }
 </script>
