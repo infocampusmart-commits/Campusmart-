@@ -1,288 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<link rel="icon" type="image/x-icon" href="Blue 1.png">
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>CampusMart — Sales Dashboard</title>
+<meta charset="UTF-8">
+<title>Campusmart Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
 <style>
-  :root{--accent:#007bff;--muted:#666}
-  body{font-family:Inter,Arial,Helvetica,sans-serif;margin:0;background:#f2f6fb;color:#222}
-  .wrap{max-width:1100px;margin:28px auto;padding:18px}
-  .card{background:#fff;border-radius:10px;padding:18px;box-shadow:0 6px 18px rgba(20,30,50,0.06)}
-  h1{margin:0 0 6px;color:var(--accent)}
-  p.lead{margin:0 0 14px;color:var(--muted)}
-  .login-row{display:flex;gap:8px;align-items:center}
-  input[type=password]{flex:1;padding:10px;border-radius:8px;border:1px solid #d6dbe6}
-  button.btn{padding:10px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer}
-  .controls{display:flex;gap:12px;margin:12px 0;flex-wrap:wrap}
-  .search{flex:1;min-width:180px;padding:10px;border-radius:8px;border:1px solid #ddd}
-  select.filter{padding:10px;border-radius:8px;border:1px solid #ddd}
-  table{width:100%;border-collapse:collapse;margin-top:10px}
-  th,td{padding:10px;border-bottom:1px solid #eee;text-align:left;vertical-align:middle}
-  th{background:#f7fbff;color:#333;position:sticky;top:0}
-  img.thumb{height:60px;border-radius:6px;object-fit:cover}
-  .small{font-size:13px;color:var(--muted)}
-  .center{text-align:center}
-  @media (max-width:900px){
-    th:nth-child(1), td:nth-child(1){display:none}
-    .thumb{height:44px}
-  }
+  body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
+  h2 { text-align: center; }
+  .order { background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+  .order h3 { margin: 0 0 5px 0; }
+  .order p { margin: 2px 0; }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="card" id="loginCard">
-    <h1>Sales Dashboard — Admin</h1>
-    <p class="lead">Enter admin password to view orders</p>
-    <div class="login-row">
-      <input id="adminPassword" type="password" placeholder="Admin password" />
-      <button id="loginBtn" class="btn">Unlock</button>
-    </div>
-    <p id="loginMsg" class="small"></p>
-  </div>
 
-  <div class="card" id="dashboardCard" style="display:none;margin-top:18px">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-      <div>
-        <h1>Orders</h1>
-        <p class="small">Live list from Google Sheet</p>
-      </div>
-
-      <div>
-        <button id="logoutBtn" class="btn" style="background:#444">Logout</button>
-      </div>
-    </div>
-
-    <div class="controls">
-      <input id="searchInput" class="search" placeholder="Search by name, email, items or reference..." />
-      <select id="univFilter" class="filter">
-        <option value="">All Universities</option>
-      </select>
-      <select id="statusFilter" class="filter">
-        <option value="">All Status</option>
-        <option value="Pending">Pending</option>
-        <option value="Approved">Approved</option>
-        <option value="Completed">Completed</option>
-      </select>
-      <div style="min-width:160px">
-        <span class="small">Orders: <strong id="count">0</strong></span>
-      </div>
-    </div>
-
-    <div style="overflow:auto">
-      <table id="ordersTable">
-        <thead>
-          <tr>
-            <th class="small">TS</th>
-            <th>Name / Email</th>
-            <th>Phone</th>
-            <th>University</th>
-            <th>Items</th>
-            <th>Amount</th>
-            <th>Payment Ref</th>
-            <th>Receipt</th>
-            <th class="small">Status</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-</div>
+<h2>Campusmart Orders Admin</h2>
+<div id="orders"></div>
 
 <script>
-/* ---------- CONFIG ---------- */
-const WEB_APP_BASE = "https://script.google.com/macros/s/AKfycbzEMwalUx5t2PBylVzziIFW72skdUJH-5w4YeiXUYY8fF-tKR_2yF2ZjJKcL_JJM0Lg/exec"; 
-const GET_ORDERS = WEB_APP_BASE + "?action=getOrders";
-const UPDATE_STATUS_URL = WEB_APP_BASE + "?action=updateStatus";
+  // --- 1️⃣ Replace with your Firebase config ---
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "PROJECT_ID.firebaseapp.com",
+    projectId: "PROJECT_ID",
+    storageBucket: "PROJECT_ID.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "APP_ID"
+  };
 
-const ADMIN_PASSWORD = "campusmartstore2025"; 
-/* ---------------------------- */
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const auth = firebase.auth();
 
-const loginCard = document.getElementById('loginCard');
-const dashboardCard = document.getElementById('dashboardCard');
-const loginBtn = document.getElementById('loginBtn');
-const logoutBtn = document.getElementById('logoutBtn');
-const adminPasswordInput = document.getElementById('adminPassword');
-const loginMsg = document.getElementById('loginMsg');
+  // --- 2️⃣ Admin login ---
+  const adminEmail = "admin@campusmart.com";       // your admin email
+  const adminPassword = "Campusmart123!";          // your admin password
 
-const ordersTableBody = document.querySelector('#ordersTable tbody');
-const countEl = document.getElementById('count');
-const searchInput = document.getElementById('searchInput');
-const univFilter = document.getElementById('univFilter');
-const statusFilter = document.getElementById('statusFilter');
+  auth.signInWithEmailAndPassword(adminEmail, adminPassword)
+    .then(() => {
+      console.log("Admin logged in successfully");
 
-let orders = [];
+      // --- 3️⃣ Listen for orders ---
+      db.collection("orders")
+        .orderBy("date", "desc")
+        .onSnapshot(snapshot => {
+          const ordersDiv = document.getElementById("orders");
+          ordersDiv.innerHTML = "";
 
-/* ---------- LOGIN ---------- */
-loginBtn.addEventListener('click', () => {
-  if (adminPasswordInput.value === ADMIN_PASSWORD) {
-    localStorage.setItem('sales_admin_auth','1');
-    showDashboard();
-  } else {
-    loginMsg.textContent = 'Incorrect password';
-    loginMsg.style.color = 'crimson';
-  }
-});
+          snapshot.forEach(doc => {
+            const o = doc.data();
+            let itemsHtml = "";
+            o.cart.forEach(i => {
+              itemsHtml += `<p>${i.name} × ${i.quantity} — ₦${i.price * i.quantity}</p>`;
+            });
 
-logoutBtn.addEventListener('click', () => {
-  localStorage.removeItem('sales_admin_auth');
-  location.reload();
-});
-
-function showDashboard(){
-  loginCard.style.display = 'none';
-  dashboardCard.style.display = 'block';
-  fetchOrders();
-}
-
-if (localStorage.getItem('sales_admin_auth')) showDashboard();
-
-/* ---------- FETCH ORDERS ---------- */
-async function fetchOrders(){
-  try {
-    ordersTableBody.innerHTML = '<tr><td colspan="9" class="center small">Loading...</td></tr>';
-    const res = await fetch(GET_ORDERS);
-    const data = await res.json();
-
-    orders = Array.isArray(data) ? data : [];
-
-    orders = orders.map(o => ({
-      timestamp: o.timestamp || o.time || '',
-      name: o.name || o.fullName || '',
-      email: o.email || '',
-      phone: o.phone || '',
-      university: o.university || '',
-      items: o.items || '',
-      amount: o.amount || '',
-      paymentReference: o.paymentReference || '',
-      receiptUrl: o.receiptUrl || '',
-      status: o.status || 'Pending'
-    }));
-
-    renderOrders();
-    populateFilters();
-  } catch (err) {
-    ordersTableBody.innerHTML = `<tr><td colspan="9" class="center small">Error: ${err.message}</td></tr>`;
-  }
-}
-
-/* ---------- RENDER ---------- */
-function renderOrders(){
-  const text = searchInput.value.toLowerCase().trim();
-  const univ = univFilter.value;
-  const status = statusFilter.value;
-
-  const filtered = orders.filter(o => {
-    if (univ && o.university.toLowerCase() !== univ.toLowerCase()) return false;
-    if (status && o.status.toLowerCase() !== status.toLowerCase()) return false;
-
-    return (
-      (o.name + o.email + o.items + o.paymentReference)
-      .toLowerCase()
-      .includes(text)
-    );
-  });
-
-  ordersTableBody.innerHTML = '';
-
-  filtered.reverse().forEach(o => {
-    const ts = o.timestamp ? new Date(o.timestamp).toLocaleString() : '';
-    const receipt = o.receiptUrl 
-      ? `<a href="${o.receiptUrl}" target="_blank"><img class="thumb" src="${o.receiptUrl}"></a>` 
-      : '—';
-
-    ordersTableBody.innerHTML += `
-      <tr>
-        <td class="small">${ts}</td>
-        <td><strong>${escapeHtml(o.name)}</strong><div class="small">${escapeHtml(o.email)}</div></td>
-        <td>${escapeHtml(o.phone)}</td>
-        <td>${escapeHtml(o.university)}</td>
-        <td class="small">${escapeHtml(o.items)}</td>
-        <td>₦${escapeHtml(o.amount)}</td>
-        <td class="small">${escapeHtml(o.paymentReference)}</td>
-        <td>${receipt}</td>
-        <td class="small">
-          <select class="statusSelect" data-ref="${o.paymentReference}">
-            <option ${o.status==="Pending"?"selected":""}>Pending</option>
-            <option ${o.status==="Approved"?"selected":""}>Approved</option>
-            <option ${o.status==="Completed"?"selected":""}>Completed</option>
-          </select>
-        </td>
-      </tr>
-    `;
-  });
-
-  countEl.textContent = filtered.length;
-
-  document.querySelectorAll(".statusSelect").forEach(sel => {
-    sel.addEventListener("change", updateStatus);
-  });
-}
-
-/* ---------- UPDATE STATUS ---------- */
-async function updateStatus(e){
-  const newStatus = e.target.value;
-  const ref = e.target.dataset.ref;
-
-  try {
-    await fetch(`${UPDATE_STATUS_URL}&reference=${ref}&status=${newStatus}`);
-    alert("Status updated successfully!");
-  } catch (err) {
-    alert("Failed to update status: " + err.message);
-  }
-}
-
-/* ---------- FILTERS ---------- */
-searchInput.addEventListener('input', renderOrders);
-univFilter.addEventListener('change', renderOrders);
-statusFilter.addEventListener('change', renderOrders);
-
-function populateFilters(){
-  const univs = new Set(orders.map(o => o.university).filter(Boolean));
-  univFilter.innerHTML = '<option value="">All Universities</option>';
-  Array.from(univs).sort().forEach(u => {
-    const opt = document.createElement('option');
-    opt.value = u;
-    opt.textContent = u;
-    univFilter.appendChild(opt);
-  });
-}
-
-/* ---------- EXPORT CSV ---------- */
-function exportCSV(){
-  let csv = "Timestamp,Name,Email,Phone,University,Items,Amount,Reference,Status\n";
-
-  orders.forEach(o => {
-    csv += `"${o.timestamp}","${o.name}","${o.email}","${o.phone}","${o.university}","${o.items}","${o.amount}","${o.paymentReference}","${o.status}"\n`;
-  });
-
-  const link = document.createElement("a");
-  link.href = "data:text/csv;charset=utf-8," + encodeURIComponent(csv);
-  link.download = "campusmart_orders.csv";
-  link.click();
-}
-
-/* ---------- EXPORT EXCEL (.xlsx via HTML table trick) ---------- */
-function exportExcel(){
-  const table = document.getElementById("ordersTable").outerHTML;
-  const file = new Blob([table], {type:"application/vnd.ms-excel"});
-  const url = URL.createObjectURL(file);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "campusmart_orders.xls";
-  a.click();
-}
-
-function escapeHtml(s){
-  return String(s).replace(/[&<>"']/g, m => ({
-    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-  })[m]);
-}
+            ordersDiv.innerHTML += `
+              <div class="order">
+                <h3>${o.customer.name}</h3>
+                <p>Email: ${o.customer.email}</p>
+                <p>Phone: ${o.customer.phone}</p>
+                <p>Location: ${o.customer.location}</p>
+                <p>Hall/Room: ${o.customer.hall} / ${o.customer.room}</p>
+                <h4>Items:</h4>
+                ${itemsHtml}
+                <p><b>Total: ₦${o.total}</b></p>
+                <p>Date: ${new Date(o.date.seconds*1000).toLocaleString()}</p>
+              </div>
+            `;
+          });
+        });
+    })
+    .catch(err => alert("Admin login failed: " + err.message));
 </script>
 
 </body>
 </html>
-
