@@ -1,188 +1,127 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Campusmart Checkout</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="icon" href="Blue 1.png">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
-    }
-    .checkout-container {
-      max-width: 500px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
-    h2 { text-align: center; }
-    .summary-item {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-      align-items: center;
-    }
-    .summary-item img {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 8px;
-    }
-    label { font-weight: bold; margin-top: 10px; display: block; }
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      margin-bottom: 12px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-    }
-    button {
-      background: #000;
-      color: #fff;
-      cursor: pointer;
-      border: none;
-    }
-    button:hover { background: #333; }
-    #loadingSpinner { display:none; text-align:center; margin-top:15px; }
-  </style>
+<meta charset="UTF-8">
+<title>Campusmart Checkout</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<style>
+  body { font-family: Arial; background:#f5f5f5; padding:20px; }
+  .checkout-container { max-width:500px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+  h2 { text-align:center; }
+  label { display:block; font-weight:bold; margin-top:10px; }
+  input, select, button { width:100%; padding:10px; margin:5px 0 12px; border-radius:8px; border:1px solid #ddd; }
+  button { background:blue; color:#fff; border:none; cursor:pointer; }
+  button:hover { background:#333; }
+  .summary-item { display:flex; gap:10px; margin-bottom:10px; align-items:center; }
+  .summary-item img { width:60px; height:60px; object-fit:cover; border-radius:8px; }
+  #loadingSpinner { display:none; text-align:center; margin-top:15px; }
+</style>
 </head>
-
 <body>
 
 <div class="checkout-container">
-  <h2>Checkout</h2>
+<h2>Checkout</h2>
+<div id="checkoutProduct"></div>
 
-  <!-- ORDER SUMMARY -->
-  <div id="checkoutProduct"></div>
+<form id="checkoutForm">
+<label>Full Name</label><input id="name" required>
+<label>Email</label><input id="email" type="email" required>
+<label>Phone</label><input id="phone" required>
+<label>Location</label>
+<select id="location" required>
+  <option value="">Select location</option>
+  <option>Covenant University</option>
+  <option>Crawford University</option>
+  <option>Bells University</option>
+</select>
+<label>Hall / Hostel</label><input id="hall" required>
+<label>Room Number</label><input id="room" required>
+<button type="submit">Pay with Paystack</button>
+</form>
 
-  <!-- FORM -->
-  <form id="checkoutForm">
-    <label>Full Name</label>
-    <input id="name" required>
-
-    <label>Email</label>
-    <input id="email" type="email" required>
-
-    <label>Phone</label>
-    <input id="phone" required>
-
-    <label>Location</label>
-    <select id="location" required>
-      <option value="">Select location</option>
-      <option>Covenant University</option>
-      <option>Crawford University</option>
-      <option>Bells University</option>
-    </select>
-
-    <label>Hall / Hostel</label>
-    <input id="hall" required>
-
-    <label>Room Number</label>
-    <input id="room" required>
-
-    <button type="submit">Pay with Paystack</button>
-  </form>
-
-  <div id="loadingSpinner">Processing order...</div>
+<div id="loadingSpinner">Processing order...</div>
 </div>
 
-<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "PROJECT_ID.firebaseapp.com",
+    projectId: "PROJECT_ID",
+    storageBucket: "PROJECT_ID.appspot.com",
+    messagingSenderId: "SENDER_ID",
+    appId: "APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
 
-
-  <script>
+  // Load cart
   const cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
   const summaryBox = document.getElementById("checkoutProduct");
   let totalAmount = 0;
 
-  if (cart.length === 0) {
-    summaryBox.innerHTML = "<p>Your cart is empty</p>";
-  } else {
-    summaryBox.innerHTML = cart.map(item => {
+  if(cart.length === 0) summaryBox.innerHTML="<p>Cart is empty</p>";
+  else {
+    summaryBox.innerHTML = cart.map(item=>{
       const itemTotal = item.price * item.quantity;
       totalAmount += itemTotal;
-      return `
-        <div class="summary-item">
-          <img src="${item.img}">
-          <div>
-            <b>${item.name}</b><br>
-            ₦${item.price} × ${item.quantity}<br>
-            <b>₦${itemTotal}</b>
-          </div>
-        </div>
-      `;
+      return `<div class="summary-item">
+                <img src="${item.img}">
+                <div><b>${item.name}</b><br>₦${item.price} × ${item.quantity}<br><b>₦${itemTotal}</b></div>
+              </div>`;
     }).join("") + `<hr><h3>Total: ₦${totalAmount}</h3>`;
   }
 
-  document.getElementById("checkoutForm").addEventListener("submit", function(e){
+  // Paystack & Firestore
+  document.getElementById("checkoutForm").addEventListener("submit", e=>{
     e.preventDefault();
-    if(cart.length === 0) return alert("Cart is empty");
+    if(cart.length===0) return alert("Cart is empty");
 
     const handler = PaystackPop.setup({
-      key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107",
+      key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107", // your public key
       email: email.value,
-      amount: totalAmount * 100,
+      amount: totalAmount*100,
       currency: "NGN",
-      callback: function(){
-        submitOrder();
+      callback: function(response){
+        saveOrder();
       },
-      onClose: function(){
-        alert("Payment cancelled");
-      }
+      onClose: function(){ alert("Payment cancelled"); }
     });
     handler.openIframe();
   });
 
-  function submitOrder(){
-    document.getElementById("loadingSpinner").style.display = "block";
+  function saveOrder(){
+    document.getElementById("loadingSpinner").style.display="block";
 
     const orderData = {
-      customer: {
-        name: name.value,
-        email: email.value,
-        phone: phone.value,
-        location: location.value,
-        hall: hall.value,
-        room: room.value
-      },
-      cart: cart.map(i => ({
-        name: i.name,
-        price: i.price,
-        quantity: i.quantity
+      name: name.value,
+      email: email.value,
+      phone: phone.value,
+      location: location.value,
+      hall: hall.value,
+      room: room.value,
+      cart: cart.map(i=>({
+        name:i.name, price:i.price, quantity:i.quantity, total:i.price*i.quantity
       })),
-      total: totalAmount
+      total: totalAmount,
+      date: firebase.firestore.FieldValue.serverTimestamp()
     };
 
-    fetch("https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(orderData)
-    })
-    .then(res => res.json())
-    .then(res => {
-      document.getElementById("loadingSpinner").style.display = "none";
-      if(res.status === "success"){
+    db.collection("orders").add(orderData)
+      .then(()=>{
+        document.getElementById("loadingSpinner").style.display="none";
         localStorage.removeItem("campusmartCart");
-        window.location.href = "success.html";
-      } else {
-        alert("Order failed: " + res.message);
-      }
-    })
-    .catch(() => {
-      document.getElementById("loadingSpinner").style.display = "none";
-      alert("Network error");
-    });
+        window.location.href="success.html";
+      })
+      .catch(err=>{
+        console.error(err);
+        document.getElementById("loadingSpinner").style.display="none";
+        alert("Network error. Try again.");
+      });
   }
 </script>
-
-
-
-   
-
 </body>
 </html>
