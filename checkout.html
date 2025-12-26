@@ -3,52 +3,47 @@
 <head>
 <meta charset="UTF-8">
 <title>Campusmart Checkout</title>
-  <link rel="icon" type="image/x-icon" href="Blue 1.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <link rel="icon" type="image/x-icon" href="Blue 1.png">
+
 <script src="https://js.paystack.co/v1/inline.js"></script>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 <style>
-  body { font-family: Arial; background:#f5f5f5; padding:20px; }
-  .checkout-container { max-width:500px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
-  h2 { text-align:center; }
-  label { display:block; font-weight:bold; margin-top:10px; }
-  input, select, button { width:100%; padding:10px; margin:5px 0 12px; border-radius:8px; border:1px solid #ddd; }
-  button { background:blue; color:#fff; border:none; cursor:pointer; }
-  button:hover { background:#0058cc; }
-  .summary-item { display:flex; gap:10px; margin-bottom:10px; align-items:center; }
-  .summary-item img { width:60px; height:60px; object-fit:cover; border-radius:8px; }
-  #loadingSpinner { display:none; text-align:center; margin-top:15px; }
+body{font-family:Arial;background:#f5f5f5;padding:20px}
+.box{max-width:500px;margin:auto;background:#fff;padding:20px;border-radius:12px}
+.summary{display:flex;gap:10px;margin-bottom:10px}
+.summary img{width:60px;height:60px;border-radius:8px;object-fit:cover}
+button{background:#000;color:#fff;padding:12px;border:none;border-radius:8px;width:100%}
+#loading{display:none;text-align:center;margin-top:10px}
 </style>
 </head>
+
 <body>
 
-<div class="checkout-container">
+<div class="box">
 <h2>Checkout</h2>
-<div id="checkoutProduct"></div>
 
-<form id="checkoutForm">
-<label>Full Name</label><input id="name" required>
-<label>Email</label><input id="email" type="email" required>
-<label>Phone</label><input id="phone" required>
-<label>Location</label>
-<select id="location" required>
-  <option value="">Select location</option>
-  <option>Covenant University</option>
-  <option>Crawford University</option>
-  <option>Bells University</option>
-</select>
-<label>Hall / Hostel</label><input id="hall" required>
-<label>Room Number</label><input id="room" required>
-<button type="submit">💳 Pay with Paystack</button>
-</form>
+<div id="summary"></div>
 
-<div id="loadingSpinner">Processing order...</div>
+<input id="name" placeholder="Full Name" required>
+<input id="email" placeholder="Email" required>
+<input id="phone" placeholder="Phone" required>
+<input id="location" placeholder="Location" required>
+<input id="hall" placeholder="Hall" required>
+<input id="room" placeholder="Room" required>
+
+<button onclick="pay()">Pay with Paystack</button>
+<div id="loading">Processing order...</div>
 </div>
 
 <script>
-  // Firebase config
-  const firebaseConfig = {
+/* 🔥 FIREBASE CONFIG */
+const firebaseConfig = {
     apiKey: "AIzaSyBoxC2fwlPKFMJsn2Pcg0BqxNVKwhbKBb4",
     authDomain: "campusmartcheckout.firebaseapp.com",
     projectId: "campusmartcheckout",
@@ -56,73 +51,80 @@
     messagingSenderId: "94289670706",
     appId: "1:94289670706:web:67bc116dcbba9af41d422b"
   };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
 
-  // Load cart
-  const cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
-  const summaryBox = document.getElementById("checkoutProduct");
-  let totalAmount = 0;
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-  if(cart.length === 0) summaryBox.innerHTML="<p>Cart is empty</p>";
-  else {
-    summaryBox.innerHTML = cart.map(item=>{
-      const itemTotal = item.price * item.quantity;
-      totalAmount += itemTotal;
-      return `<div class="summary-item">
-                <img src="${item.img}">
-                <div><b>${item.name}</b><br>₦${item.price} × ${item.quantity}<br><b>₦${itemTotal}</b></div>
-              </div>`;
-    }).join("") + `<hr><h3>Total: ₦${totalAmount}</h3>`;
-  }
+/* 🔥 VERY IMPORTANT */
+auth.signInAnonymously();
 
-  // Paystack & Firestore
-  document.getElementById("checkoutForm").addEventListener("submit", e=>{
-    e.preventDefault();
-    if(cart.length===0) return alert("Cart is empty");
+/* CART */
+const cart = JSON.parse(localStorage.getItem("campusmartCart")) || [];
+let total = 0;
 
-    const handler = PaystackPop.setup({
-      key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107", // your public key
-      email: email.value,
-      amount: totalAmount*100,
-      currency: "NGN",
-      callback: function(response){
-        saveOrder();
+const summary = document.getElementById("summary");
+cart.forEach(i=>{
+  const t = i.price * i.quantity;
+  total += t;
+  summary.innerHTML += `
+    <div class="summary">
+      <img src="${i.img}">
+      <div>
+        <b>${i.name}</b><br>
+        ₦${i.price} × ${i.quantity}<br>
+        <b>₦${t}</b>
+      </div>
+    </div>`;
+});
+summary.innerHTML += `<hr><b>Total: ₦${total}</b>`;
+
+/* PAYSTACK */
+function pay(){
+  PaystackPop.setup({
+    key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107",
+    email: email.value,
+    amount: total * 100,
+    currency: "NGN",
+    callback: submitOrder
+  }).openIframe();
+}
+
+/* SAVE ORDER */
+async function submitOrder(){
+  document.getElementById("loading").style.display = "block";
+
+  try{
+    await db.collection("orders").add({
+      customer:{
+        name:name.value,
+        email:email.value,
+        phone:phone.value,
+        location:location.value,
+        hall:hall.value,
+        room:room.value
       },
-      onClose: function(){ alert("Payment cancelled"); }
-    });
-    handler.openIframe();
-  });
-
-  function saveOrder(){
-    document.getElementById("loadingSpinner").style.display="block";
-
-    const orderData = {
-      name: name.value,
-      email: email.value,
-      phone: phone.value,
-      location: location.value,
-      hall: hall.value,
-      room: room.value,
-      cart: cart.map(i=>({
-        name:i.name, price:i.price, quantity:i.quantity, total:i.price*i.quantity
+      items: cart.map(i=>({
+        product:i.name,
+        unitPrice:i.price,
+        quantity:i.quantity,
+        itemTotal:i.price*i.quantity
       })),
-      total: totalAmount,
+      orderTotal: total,
       date: firebase.firestore.FieldValue.serverTimestamp()
-    };
+    });
 
-    db.collection("orders").add(orderData)
-      .then(()=>{
-        document.getElementById("loadingSpinner").style.display="none";
-        localStorage.removeItem("campusmartCart");
-        window.location.href="success.html";
-      })
-      .catch(err=>{
-        console.error(err);
-        document.getElementById("loadingSpinner").style.display="none";
-        alert("Network error. Try again.");
-      });
+    document.getElementById("loading").style.display = "none";
+    localStorage.removeItem("campusmartCart");
+    alert("Order successful!");
+    location.href="success.html";
+
+  }catch(err){
+    document.getElementById("loading").style.display = "none";
+    alert("Order failed: "+err.message);
+    console.error(err);
   }
+}
 </script>
 </body>
 </html>
