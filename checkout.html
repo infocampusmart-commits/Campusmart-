@@ -80,14 +80,14 @@ button:hover{background:#333}
 
 
 
-<button type="button" onclick="payWithPaystack()">Pay Now</button>
+<button type="button" onclick="payWithPaystack()">💳 Pay Now</button>
 </form>
 
 <div id="spinner">Processing order...</div>
 </div>
 
 <script>
-const product = JSON.parse(localStorage.getItem("zakuSelectedProduct"));
+const product = JSON.parse(localStorage.getItem("martSelectedProduct"));
 
 if(product){
   document.getElementById("checkoutProduct").innerHTML = `
@@ -110,7 +110,7 @@ function payWithPaystack(){
   }
 
   const handler = PaystackPop.setup({
-    key: "YOUR_PAYSTACK_PUBLIC_KEY",
+    key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107",
     email: document.getElementById("email").value,
     amount: (product ? product.price : 3000) * 100,
     currency: "NGN",
