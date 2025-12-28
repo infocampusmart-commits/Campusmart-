@@ -3,121 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CampusMart</title>
 <link rel="icon" href="Blue 1.png">
+<title>Mart</title>
 
 <style>
-/* ===== RESET ===== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap');
+
 *{
-  box-sizing:border-box;
   margin:0;
   padding:0;
-  font-family:Arial, sans-serif;
+  box-sizing:border-box;
+  font-family:'Poppins',sans-serif;
 }
 
-/* ===== BODY ===== */
 body{
-  background:#f5f5f5;
+  background:#f9f9f9;
+  color:#333;
 }
 
 /* ===== NAVBAR ===== */
 header{
-  background:#0b3c91;
-  color:#fff;
-  padding:15px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-}
-
-header h1{
-  font-size:20px;
-}
-
-header a{
+  padding:15px 20px;
+  background:blue;
   color:#fff;
-  text-decoration:none;
-  font-weight:bold;
+  position:sticky;
+  top:0;
+  z-index:100;
 }
 
-/* ===== FILTER BAR (BELOW NAV) ===== */
+.logo{
+  font-size:1.5rem;
+}
+
+.search-box input{
+  padding:8px 12px;
+  border-radius:6px;
+  border:none;
+  outline:none;
+  width:180px;
+}
+
+/* ===== FILTER BAR (FIXED FOR MOBILE) ===== */
 .filter-bar{
   background:#fff;
-  padding:10px;
+  padding:12px 15px;
   display:flex;
   gap:10px;
-  overflow-x:auto;
-  border-bottom:1px solid #ddd;
+  justify-content:center;
+  flex-wrap:wrap;
+  box-shadow:0 2px 5px rgba(0,0,0,0.08);
 }
 
-.filter-bar button{
-  padding:8px 14px;
-  border:none;
-  border-radius:20px;
-  background:#eee;
-  cursor:pointer;
-  white-space:nowrap;
-}
-
-.filter-bar button.active{
-  background:#0b3c91;
-  color:#fff;
+.filter-bar select{
+  padding:10px;
+  border-radius:6px;
+  border:1px solid #ddd;
+  outline:none;
+  min-width:160px;
 }
 
 /* ===== PRODUCTS ===== */
-.container{
+main{
+  padding:25px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+}
+
+.card{
+  background:#fff;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 4px 8px rgba(0,0,0,0.1);
+  transition:.2s;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+}
+
+.card img{
+  width:100%;
+  height:180px;
+  object-fit:contain;
+  padding:10px;
+}
+
+.card-content{
   padding:15px;
 }
 
-.products{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:15px;
+.card-content h3{
+  font-size:1.05rem;
+  margin-bottom:8px;
 }
 
-.product-card{
-  background:#fff;
-  border-radius:12px;
-  box-shadow:0 4px 10px rgba(0,0,0,.08);
-  padding:12px;
-  text-align:center;
-}
-
-.product-card img{
-  width:100%;
-  height:140px;
-  object-fit:cover;
-  border-radius:8px;
-}
-
-.product-card h3{
-  font-size:16px;
-  margin:8px 0;
-}
-
-.product-card p{
-  font-weight:bold;
+.card-content p{
   margin-bottom:10px;
 }
 
-.product-card button{
-  background:#0b3c91;
-  color:#fff;
+.card-content button{
+  padding:8px 14px;
   border:none;
-  padding:10px;
-  width:100%;
-  border-radius:8px;
+  border-radius:6px;
+  background:blue;
+  color:#fff;
   cursor:pointer;
+  width:100%;
 }
 
-.product-card button:hover{
-  background:#1455c0;
+.card-content button:hover{
+  background:#87CEEB;
+  color:#111;
 }
 
 /* ===== MOBILE ===== */
-@media(max-width:600px){
-  header h1{
-    font-size:17px;
+@media(max-width:480px){
+  .search-box input{
+    width:140px;
   }
 }
 </style>
@@ -127,83 +133,119 @@ header a{
 
 <!-- ===== NAVBAR ===== -->
 <header>
-  <h1>CampusMart</h1>
-  <a href="#">Cart</a>
+  <div class="logo">Mart</div>
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search...">
+  </div>
 </header>
 
-<!-- ===== FILTER BUTTONS (FIXED POSITION ISSUE) ===== -->
+<!-- ===== FILTERS ===== -->
 <div class="filter-bar">
-  <button class="active" onclick="filterProducts('all',this)">All</button>
-  <button onclick="filterProducts('food',this)">Food</button>
-  <button onclick="filterProducts('groceries',this)">Groceries</button>
-  <button onclick="filterProducts('fashion',this)">Fashion</button>
+  <select id="categoryFilter">
+    <option value="all">All Categories</option>
+    <option value="product">Product</option>
+    <option value="service">Service</option>
+  </select>
+
+  <select id="campusFilter">
+    <option value="all">All Campuses</option>
+    <option value="covenant">Covenant University</option>
+    <option value="bells">Bells University</option>
+    <option value="crawford">Crawford University</option>
+  </select>
 </div>
 
 <!-- ===== PRODUCTS ===== -->
-<div class="container">
-  <div class="products">
+<main>
 
-    <div class="product-card" data-category="food">
-      <img src="images/rice.jpg">
-      <h3>Ofada Rice</h3>
-      <p>₦3000</p>
-      <button onclick="goToCheckout('images/rice.jpg','Ofada Rice',3000)">
-        Buy Now
-      </button>
+  <div class="card"
+    data-name="Anime Tie 1"
+    data-price="100"
+    data-img="p1.png"
+    data-category="product"
+    data-campus="covenant">
+    <img src="U1.png">
+    <div class="card-content">
+      <h3>Anime Tie 1</h3>
+      <p>₦100</p>
+      <button>Buy Now</button>
     </div>
-
-    <div class="product-card" data-category="food">
-      <img src="images/noodles.jpg">
-      <h3>Indomie Carton</h3>
-      <p>₦4500</p>
-      <button onclick="goToCheckout('images/noodles.jpg','Indomie Carton',4500)">
-        Buy Now
-      </button>
-    </div>
-
-    <div class="product-card" data-category="groceries">
-      <img src="images/beans.jpg">
-      <h3>Painted Beans</h3>
-      <p>₦2800</p>
-      <button onclick="goToCheckout('images/beans.jpg','Painted Beans',2800)">
-        Buy Now
-      </button>
-    </div>
-
-    <div class="product-card" data-category="fashion">
-      <img src="images/tie.jpg">
-      <h3>Anime Tie</h3>
-      <p>₦5000</p>
-      <button onclick="goToCheckout('images/tie.jpg','Anime Tie',5000)">
-        Buy Now
-      </button>
-    </div>
-
   </div>
-</div>
+
+  <div class="card"
+    data-name="Anime Tie 2"
+    data-price="3850"
+    data-img="j2.png"
+    data-category="product"
+    data-campus="bells">
+    <img src="U2.png">
+    <div class="card-content">
+      <h3>Anime Tie 2</h3>
+      <p>₦3850</p>
+      <button>Buy Now</button>
+    </div>
+  </div>
+
+  <div class="card"
+    data-name="Custom Tie Service"
+    data-price="3850"
+    data-img="y.png"
+    data-category="service"
+    data-campus="crawford">
+    <img src="U14.png">
+    <div class="card-content">
+      <h3>Custom Tie Service</h3>
+      <p>₦3850</p>
+      <button>Buy Now</button>
+    </div>
+  </div>
+
+</main>
 
 <script>
-/* ===== FILTER FUNCTION ===== */
-function filterProducts(category, btn){
-  document.querySelectorAll('.filter-bar button')
-    .forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+const searchInput = document.getElementById("searchInput");
+const categoryFilter = document.getElementById("categoryFilter");
+const campusFilter = document.getElementById("campusFilter");
+const cards = document.querySelectorAll(".card");
 
-  document.querySelectorAll('.product-card').forEach(card=>{
-    if(category==="all" || card.dataset.category===category){
-      card.style.display="block";
-    }else{
-      card.style.display="none";
-    }
+function filterProducts(){
+  const search = searchInput.value.toLowerCase();
+  const category = categoryFilter.value;
+  const campus = campusFilter.value;
+
+  cards.forEach(card=>{
+    const matchSearch = card.innerText.toLowerCase().includes(search);
+    const matchCategory = category==="all" || card.dataset.category===category;
+    const matchCampus = campus==="all" || card.dataset.campus===campus;
+
+    card.style.display =
+      matchSearch && matchCategory && matchCampus ? "block":"none";
   });
 }
 
-/* ===== SEND PRODUCT TO CHECKOUT ===== */
-function goToCheckout(img, name, price){
-  const product = { img, name, price };
-  localStorage.setItem("zakuSelectedProduct", JSON.stringify(product));
-  window.location.href = "checkout.html";
-}
+searchInput.addEventListener("input", filterProducts);
+categoryFilter.addEventListener("change", filterProducts);
+campusFilter.addEventListener("change", filterProducts);
+
+/* ===== BUY NOW → CHECKOUT ===== */
+document.querySelectorAll(".card button").forEach(btn=>{
+  btn.addEventListener("click", e=>{
+    const card = e.target.closest(".card");
+
+    const product = {
+      name: card.dataset.name,
+      price: Number(card.dataset.price),
+      img: card.dataset.img
+    };
+
+    localStorage.setItem(
+      "zakuSelectedProduct",
+      JSON.stringify(product)
+    );
+
+    window.location.href = "checkout.html";
+  });
+});
 </script>
 
 </body>
