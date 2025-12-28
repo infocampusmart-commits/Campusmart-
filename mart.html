@@ -163,7 +163,7 @@ main{
     <img src="p1.png">
     <div class="card-content">
       <h3>Anime Tie 1</h3>
-      <p>₦3850</p>
+      <p>₦100</p>
       <button>Buy Now</button>
     </div>
   </div>
@@ -219,7 +219,7 @@ campusFilter.addEventListener("change",filterProducts);
 document.querySelectorAll(".card button").forEach(btn=>{
   btn.addEventListener("click",e=>{
     const card = e.target.closest(".card");
-    localStorage.setItem("zakuSelectedProduct",JSON.stringify({
+    localStorage.setItem("martSelectedProduct",JSON.stringify({
       name:card.dataset.name,
       price:card.dataset.price,
       img:card.dataset.img
@@ -231,5 +231,6 @@ document.querySelectorAll(".card button").forEach(btn=>{
 
 </body>
 </html>
+
 
 
