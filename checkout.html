@@ -152,7 +152,7 @@ function submitOrder(paystackRef){
     paystackRef: paystackRef
   };
 
-  fetch("PASTE_YOUR_DEPLOYED_GAS_URL_HERE", { // Replace with your latest Apps Script URL
+  fetch("https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec", { // Replace with your latest Apps Script URL
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(orderData)
