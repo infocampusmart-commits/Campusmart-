@@ -116,7 +116,7 @@ main{
 }
 
 .card-content button:hover{
-  background:#ffcc00;
+  background:#87CEEB;
   color:#111;
 }
 
@@ -219,7 +219,7 @@ campusFilter.addEventListener("change",filterProducts);
 document.querySelectorAll(".card button").forEach(btn=>{
   btn.addEventListener("click",e=>{
     const card = e.target.closest(".card");
-    localStorage.setItem("martSelectedProduct",JSON.stringify({
+    localStorage.setItem("zakuSelectedProduct",JSON.stringify({
       name:card.dataset.name,
       price:card.dataset.price,
       img:card.dataset.img
@@ -231,6 +231,7 @@ document.querySelectorAll(".card button").forEach(btn=>{
 
 </body>
 </html>
+
 
 
 
