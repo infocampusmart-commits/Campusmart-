@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checkout</title>
-  <link rel="icon" href="Blue 1.png">
+<link rel="icon" href="Blue 1.png">
 
+<!-- Paystack Inline -->
 <script src="https://js.paystack.co/v1/inline.js"></script>
 
 <style>
@@ -45,7 +46,7 @@ button{
   cursor:pointer;
 }
 button:hover{background:#87CEEB}
-#spinner{text-align:center;display:none}
+#spinner{text-align:center;display:none;margin-top:10px}
 </style>
 </head>
 
@@ -54,8 +55,10 @@ button:hover{background:#87CEEB}
 <div class="checkout-container">
 <h2>Checkout</h2>
 
+<!-- Product summary -->
 <div id="checkoutProduct" class="product-summary"></div>
 
+<!-- Checkout Form -->
 <form id="checkoutForm">
 
 <label>Full Name</label>
@@ -67,9 +70,9 @@ button:hover{background:#87CEEB}
 <label>Location</label>
 <select id="location" required>
 <option value="">-- Select --</option>
-<option>Covenant University</option>
-<option>Bells University</option>
-<option>Crawford University</option>
+<option value="Covenant University">Covenant University</option>
+<option value="Bells University">Bells University</option>
+<option value="Crawford University">Crawford University</option>
 </select>
 
 <label>Hall / Hostel</label>
@@ -81,26 +84,32 @@ button:hover{background:#87CEEB}
 <label>Phone</label>
 <input type="tel" id="phone" required>
 
+<!-- Pay Button -->
 <button type="button" onclick="payWithPaystack()">💳 Pay Now</button>
+
 </form>
 
 <div id="spinner">Processing order...</div>
 </div>
 
 <script>
+// Get product from mart page
 const product = JSON.parse(localStorage.getItem("zakuSelectedProduct"));
 
+// If no product selected, redirect to mart
 if(!product){
   alert("No product selected");
   window.location.href = "mart.html";
 }
 
+// Display product
 document.getElementById("checkoutProduct").innerHTML = `
   <img src="${product.img}">
   <h3>${product.name}</h3>
   <p><strong>₦${product.price}</strong></p>
 `;
 
+// Paystack payment
 function payWithPaystack(){
   const form = document.getElementById("checkoutForm");
   if(!form.checkValidity()){
@@ -109,13 +118,13 @@ function payWithPaystack(){
   }
 
   const handler = PaystackPop.setup({
-    key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107",
-    email: email.value,
-    amount: product.price * 100,
+    key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107", // Replace with your live key
+    email: document.getElementById("email").value,
+    amount: Number(product.price) * 100,
     currency: "NGN",
 
-    callback: function(){
-      submitOrder();
+    callback: function(response){
+      submitOrder(response.reference);
     },
 
     onClose: function(){
@@ -126,35 +135,43 @@ function payWithPaystack(){
   handler.openIframe();
 }
 
-function submitOrder(){
-  document.getElementById("spinner").style.display="block";
+// Submit order to Apps Script
+function submitOrder(paystackRef){
+  document.getElementById("spinner").style.display = "block";
 
   const orderData = {
-    name: name.value,
-    email: email.value,
-    location: location.value,
-    hall: hall.value,
-    room: room.value,
-    phone: phone.value,
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    phone: document.getElementById("phone").value,
+    location: document.getElementById("location").value,
+    hall: document.getElementById("hall").value,
+    room: document.getElementById("room").value,
     productName: product.name,
-    productPrice: product.price
+    productPrice: product.price,
+    total: product.price,
+    paystackRef: paystackRef
   };
 
-  fetch("https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec",{
-    method:"POST",
-    body:JSON.stringify(orderData)
+  fetch("PASTE_YOUR_DEPLOYED_GAS_URL_HERE", { // Replace with your latest Apps Script URL
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(orderData)
   })
-  .then(res=>res.json())
-  .then(resp=>{
-    if(resp.status==="success"){
+  .then(res => res.json())
+  .then(resp => {
+    document.getElementById("spinner").style.display = "none";
+    if(resp.status === "success"){
       localStorage.removeItem("zakuSelectedProduct");
-      window.location.href="success.html";
-    }else{
-      alert("Order failed");
+      alert("✅ Order placed successfully!");
+      window.location.href = "success.html";
+    } else {
+      alert("❌ Order failed: " + (resp.message || "Unknown error"));
     }
   })
-  .catch(()=>{
-    alert("Network error");
+  .catch(err => {
+    document.getElementById("spinner").style.display = "none";
+    console.error("Fetch error:", err);
+    alert("❌ Network error. Try again.");
   });
 }
 </script>
