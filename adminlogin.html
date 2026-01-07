@@ -60,7 +60,7 @@ function login(){
   .then(data => {
     if(data.success){
       sessionStorage.setItem("adminAuth", "true");
-      window.location.href = "admin.html";
+      window.location.href = "adminsales.html";
     } else {
       msg.innerText = "Invalid login";
     }
@@ -70,5 +70,6 @@ function login(){
 
 </body>
 </html>
+
 
 
