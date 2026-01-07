@@ -1,87 +1,115 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>Campusmart Admin</title>
-  <link rel="icon" type="image/x-icon" href="Blue 1.png">
+<title>Admin Dashboard | Campusmart</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
 <style>
-  body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }
-  h2 { text-align: center; }
-  .order { background: #fff; padding: 15px; margin-bottom: 15px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-  .order h3 { margin: 0 0 5px 0; }
-  .order p { margin: 2px 0; }
+body{font-family:Arial;background:#f4f6f8;padding:20px}
+h2{text-align:center}
+.top{
+  display:flex;
+  gap:10px;
+  margin-bottom:15px;
+}
+input{padding:8px;width:100%}
+button{
+  background:#0aa84f;
+  color:white;
+  border:none;
+  padding:8px 12px;
+  cursor:pointer;
+}
+table{
+  width:100%;
+  background:white;
+  border-collapse:collapse;
+}
+th,td{
+  border:1px solid #ddd;
+  padding:10px;
+  font-size:14px;
+}
+th{background:#0aa84f;color:white}
+a{color:blue}
 </style>
 </head>
+
 <body>
 
-<h2>Campusmart Orders Admin</h2>
-<div id="orders"></div>
+<script>
+if(sessionStorage.getItem("adminAuth") !== "true"){
+  window.location.href = "admin-login.html";
+}
+</script>
+
+<h2>🛒 Campusmart Orders</h2>
+
+<div class="top">
+  <input id="search" placeholder="Search orders...">
+  <button onclick="logout()">Logout</button>
+</div>
+
+<table>
+<thead>
+<tr>
+<th>Date</th>
+<th>Name</th>
+<th>Email</th>
+<th>Phone</th>
+<th>Location</th>
+<th>Product</th>
+<th>Price</th>
+<th>Receipt</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
 
 <script>
-  // --- 1️⃣ Replace with your Firebase config ---
-  const firebaseConfig = {
-    apiKey: "AIzaSyBoxC2fwlPKFMJsn2Pcg0BqxNVKwhbKBb4",
-    authDomain: "campusmartcheckout.firebaseapp.com",
-    projectId: "campusmartcheckout",
-    storageBucket: "campusmartcheckout.firebasestorage.app",
-    messagingSenderId: "94289670706",
-    appId: "1:94289670706:web:67bc116dcbba9af41d422b"
-  };
+const API_URL = "PASTE_APPS_SCRIPT_EXEC_URL_HERE";
+let orders = [];
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const auth = firebase.auth();
+fetch(API_URL)
+  .then(r => r.json())
+  .then(data => {
+    orders = data.reverse();
+    render(orders);
+  });
 
-  // --- 2️⃣ Admin login ---
-  const adminEmail = "help.campusmart@gmail.com";       // your admin email
-  const adminPassword = "Campusmartstore@2025";          // your admin password
+function render(list){
+  tbody.innerHTML = "";
+  list.forEach(o => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${o.Timestamp || ""}</td>
+        <td>${o.Name || ""}</td>
+        <td>${o.Email || ""}</td>
+        <td>${o.Phone || ""}</td>
+        <td>${o.Location || ""}</td>
+        <td>${o.Product || ""}</td>
+        <td>₦${o.Price || ""}</td>
+        <td><a href="${o.Receipt}" target="_blank">View</a></td>
+      </tr>
+    `;
+  });
+}
 
-  auth.signInWithEmailAndPassword(adminEmail, adminPassword)
-    .then(() => {
-      console.log("Admin logged in successfully");
+search.addEventListener("input", e => {
+  const q = e.target.value.toLowerCase();
+  render(
+    orders.filter(o =>
+      Object.values(o).join(" ").toLowerCase().includes(q)
+    )
+  );
+});
 
-      // --- 3️⃣ Listen for orders ---
-      db.collection("orders")
-        .orderBy("date", "desc")
-        .onSnapshot(snapshot => {
-          const ordersDiv = document.getElementById("orders");
-          ordersDiv.innerHTML = "";
-
-          snapshot.forEach(doc => {
-            const o = doc.data();
-            let itemsHtml = "";
-            o.cart.forEach(i => {
-              itemsHtml += `<p>${i.name} × ${i.quantity} — ₦${i.price * i.quantity}</p>`;
-            });
-
-            ordersDiv.innerHTML += `
-              <div class="order">
-                <h3>${o.customer.name}</h3>
-                <p>Email: ${o.customer.email}</p>
-                <p>Phone: ${o.customer.phone}</p>
-                <p>Location: ${o.customer.location}</p>
-                <p>Hall/Room: ${o.customer.hall} / ${o.customer.room}</p>
-                <h4>Items:</h4>
-                ${itemsHtml}
-                <p><b>Total: ₦${o.total}</b></p>
-                <p>Date: ${new Date(o.date.seconds*1000).toLocaleString()}</p>
-              </div>
-            `;
-          });
-        });
-    })
-    .catch(err => alert("Admin login failed: " + err.message));
+function logout(){
+  sessionStorage.removeItem("adminAuth");
+  location.href="admin-login.html";
+}
 </script>
 
 </body>
 </html>
-
-
-
