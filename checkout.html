@@ -6,9 +6,6 @@
 <title>Checkout</title>
 <link rel="icon" href="Blue 1.png">
 
-<!-- Paystack Inline -->
-<script src="https://js.paystack.co/v1/inline.js"></script>
-
 <style>
 body{
   font-family:Arial,sans-serif;
@@ -46,6 +43,12 @@ button{
   cursor:pointer;
 }
 button:hover{background:#87CEEB}
+.pay-link{
+  background:#0aa84f;
+}
+.pay-link:hover{
+  background:#0ccf65;
+}
 #spinner{text-align:center;display:none;margin-top:10px}
 </style>
 </head>
@@ -55,10 +58,8 @@ button:hover{background:#87CEEB}
 <div class="checkout-container">
 <h2>Checkout</h2>
 
-<!-- Product summary -->
 <div id="checkoutProduct" class="product-summary"></div>
 
-<!-- Checkout Form -->
 <form id="checkoutForm">
 
 <label>Full Name</label>
@@ -84,96 +85,115 @@ button:hover{background:#87CEEB}
 <label>Phone</label>
 <input type="tel" id="phone" required>
 
-<!-- Pay Button -->
-<button type="button" onclick="payWithPaystack()">💳 Pay Now</button>
+<!-- PAYMENT LINK -->
+<label>Make Payment</label>
+<a href="https://paystack.com/pay/YOUR_PAYMENT_LINK" target="_blank">
+  <button type="button" class="pay-link">💳 Pay Now</button>
+</a>
 
+<!-- RECEIPT -->
+<label>Upload Payment Receipt</label>
+<input type="file" id="receipt" accept="image/*,application/pdf" required>
+
+<button type="submit">📦 Submit Order</button>
 </form>
 
 <div id="spinner">Processing order...</div>
 </div>
 
 <script>
-// Get product from mart page
+// =====================
+// PRODUCT LOAD
+// =====================
 const product = JSON.parse(localStorage.getItem("zakuSelectedProduct"));
 
-// If no product selected, redirect to mart
 if(!product){
   alert("No product selected");
   window.location.href = "mart.html";
 }
 
-// Display product
 document.getElementById("checkoutProduct").innerHTML = `
   <img src="${product.img}">
   <h3>${product.name}</h3>
   <p><strong>₦${product.price}</strong></p>
 `;
 
-// Paystack payment
-function payWithPaystack(){
-  const form = document.getElementById("checkoutForm");
-  if(!form.checkValidity()){
-    alert("Please fill all required fields");
+// =====================
+// CLOUDINARY CONFIG
+// =====================
+const CLOUD_NAME = "dgyrt3rpj";
+const UPLOAD_PRESET = "campusmartstore";
+
+// =====================
+// FORM SUBMIT
+// =====================
+document.getElementById("checkoutForm").addEventListener("submit", async function(e){
+  e.preventDefault();
+
+  const receiptFile = document.getElementById("receipt").files[0];
+  if(!receiptFile){
+    alert("Please upload payment receipt");
     return;
   }
 
-  const handler = PaystackPop.setup({
-    key: "pk_live_b43df11e368a73ac564defaf565f7a626069d107", // Replace with your live key
-    email: document.getElementById("email").value,
-    amount: Number(product.price) * 100,
-    currency: "NGN",
-
-    callback: function(response){
-      submitOrder(response.reference);
-    },
-
-    onClose: function(){
-      alert("Payment cancelled");
-    }
-  });
-
-  handler.openIframe();
-}
-
-// Submit order to Apps Script
-function submitOrder(paystackRef){
   document.getElementById("spinner").style.display = "block";
 
-  const orderData = {
-    name: document.getElementById("name").value,
-    email: document.getElementById("email").value,
-    phone: document.getElementById("phone").value,
-    location: document.getElementById("location").value,
-    hall: document.getElementById("hall").value,
-    room: document.getElementById("room").value,
-    productName: product.name,
-    productPrice: product.price,
-    total: product.price,
-    paystackRef: paystackRef
-  };
+  try {
+    // 1️⃣ Upload receipt to Cloudinary
+    const cloudData = new FormData();
+    cloudData.append("file", receiptFile);
+    cloudData.append("upload_preset", UPLOAD_PRESET);
 
-  fetch("https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec", { // Replace with your latest Apps Script URL
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(orderData)
-  })
-  .then(res => res.json())
-  .then(resp => {
+    const cloudRes = await fetch(
+      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
+      { method: "POST", body: cloudData }
+    );
+
+    const cloudJson = await cloudRes.json();
+    if(!cloudJson.secure_url){
+      throw new Error("Cloudinary upload failed");
+    }
+
+    // 2️⃣ Send order to Google Sheets
+    const orderData = {
+      name: document.getElementById("name").value,
+      email: document.getElementById("email").value,
+      phone: document.getElementById("phone").value,
+      location: document.getElementById("location").value,
+      hall: document.getElementById("hall").value,
+      room: document.getElementById("room").value,
+      productName: product.name,
+      productPrice: product.price,
+      receiptUrl: cloudJson.secure_url
+    };
+
+    const sheetRes = await fetch(
+      "https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderData)
+      }
+    );
+
+    const sheetJson = await sheetRes.json();
+
     document.getElementById("spinner").style.display = "none";
-    if(resp.status === "success"){
+
+    if(sheetJson.status === "success"){
       localStorage.removeItem("zakuSelectedProduct");
-      alert("✅ Order placed successfully!");
+      alert("✅ Order submitted successfully!");
       window.location.href = "success.html";
     } else {
-      alert("❌ Order failed: " + (resp.message || "Unknown error"));
+      alert("❌ Failed to save order");
     }
-  })
-  .catch(err => {
+
+  } catch(err){
     document.getElementById("spinner").style.display = "none";
-    console.error("Fetch error:", err);
-    alert("❌ Network error. Try again.");
-  });
-}
+    console.error(err);
+    alert("❌ Error submitting order");
+  }
+});
 </script>
 
 </body>
