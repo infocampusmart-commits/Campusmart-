@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Admin Login | Campusmart</title>
+<style>
+body{
+  font-family:Arial;
+  background:#f4f6f8;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:100vh;
+}
+.box{
+  background:#fff;
+  padding:30px;
+  border-radius:12px;
+  width:320px;
+  box-shadow:0 10px 25px rgba(0,0,0,.1);
+}
+input,button{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+}
+button{
+  background:#0aa84f;
+  color:#fff;
+  border:none;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+  <h3>Admin Login</h3>
+  <input id="email" type="email" placeholder="Admin email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p id="msg" style="color:red"></p>
+</div>
+
+<script>
+const API_URL = "PASTE_APPS_SCRIPT_EXEC_URL_HERE";
+
+function login(){
+  fetch(API_URL, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body:JSON.stringify({
+      login: true,
+      email: email.value,
+      password: password.value
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if(data.success){
+      sessionStorage.setItem("adminAuth", "true");
+      window.location.href = "admin.html";
+    } else {
+      msg.innerText = "Invalid login";
+    }
+  });
+}
+</script>
+
+</body>
+</html>
