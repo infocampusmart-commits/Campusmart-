@@ -60,16 +60,20 @@ button:hover{background:#87CEEB}
 
 <div id="checkoutProduct" class="product-summary"></div>
 
-<form id="checkoutForm">
+<form
+  id="checkoutForm"
+  action="https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec"
+  method="POST"
+>
 
 <label>Full Name</label>
-<input type="text" id="name" required>
+<input type="text" name="name" id="name" required>
 
 <label>Email</label>
-<input type="email" id="email" required>
+<input type="email" name="email" id="email" required>
 
 <label>Location</label>
-<select id="location" required>
+<select name="location" id="location" required>
 <option value="">-- Select --</option>
 <option value="Covenant University">Covenant University</option>
 <option value="Bells University">Bells University</option>
@@ -77,13 +81,13 @@ button:hover{background:#87CEEB}
 </select>
 
 <label>Hall / Hostel</label>
-<input type="text" id="hall" required>
+<input type="text" name="hall" id="hall" required>
 
 <label>Room Number</label>
-<input type="text" id="room" required>
+<input type="text" name="room" id="room" required>
 
 <label>Phone</label>
-<input type="tel" id="phone" required>
+<input type="tel" name="phone" id="phone" required>
 
 <!-- PAYMENT LINK -->
 <label>Make Payment</label>
@@ -94,6 +98,11 @@ button:hover{background:#87CEEB}
 <!-- RECEIPT -->
 <label>Upload Payment Receipt</label>
 <input type="file" id="receipt" accept="image/*,application/pdf" required>
+
+<!-- HIDDEN FIELDS SENT TO APPS SCRIPT -->
+<input type="hidden" name="productName" id="productName">
+<input type="hidden" name="productPrice" id="productPrice">
+<input type="hidden" name="receiptUrl" id="receiptUrl">
 
 <button type="submit">📦 Submit Order</button>
 </form>
@@ -118,6 +127,9 @@ document.getElementById("checkoutProduct").innerHTML = `
   <p><strong>₦${product.price}</strong></p>
 `;
 
+document.getElementById("productName").value = product.name;
+document.getElementById("productPrice").value = product.price;
+
 // =====================
 // CLOUDINARY CONFIG
 // =====================
@@ -125,7 +137,7 @@ const CLOUD_NAME = "dgyrt3rpj";
 const UPLOAD_PRESET = "campusmartstore";
 
 // =====================
-// FORM SUBMIT
+// FORM SUBMIT HANDLER
 // =====================
 document.getElementById("checkoutForm").addEventListener("submit", async function(e){
   e.preventDefault();
@@ -139,59 +151,31 @@ document.getElementById("checkoutForm").addEventListener("submit", async functio
   document.getElementById("spinner").style.display = "block";
 
   try {
-    // 1️⃣ Upload receipt to Cloudinary
+    // Upload receipt to Cloudinary
     const cloudData = new FormData();
     cloudData.append("file", receiptFile);
     cloudData.append("upload_preset", UPLOAD_PRESET);
 
-    const cloudRes = await fetch(
+    const res = await fetch(
       `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/auto/upload`,
       { method: "POST", body: cloudData }
     );
 
-    const cloudJson = await cloudRes.json();
-    if(!cloudJson.secure_url){
-      throw new Error("Cloudinary upload failed");
+    const data = await res.json();
+
+    if(!data.secure_url){
+      throw new Error("Receipt upload failed");
     }
 
-    // 2️⃣ Send order to Google Sheets
-    const orderData = {
-      name: document.getElementById("name").value,
-      email: document.getElementById("email").value,
-      phone: document.getElementById("phone").value,
-      location: document.getElementById("location").value,
-      hall: document.getElementById("hall").value,
-      room: document.getElementById("room").value,
-      productName: product.name,
-      productPrice: product.price,
-      receiptUrl: cloudJson.secure_url
-    };
+    // Set receipt URL and submit form normally
+    document.getElementById("receiptUrl").value = data.secure_url;
 
-    const sheetRes = await fetch(
-      "https://script.google.com/macros/s/AKfycbyANVTtYWgdilqYE241CFlH69woGsaC-Whuq2lxepkp_mLKkuyjaEaKRO6i5B6ye_LHVA/exec",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderData)
-      }
-    );
+    this.submit(); // 🚀 NORMAL FORM POST (NO CORS)
 
-    const sheetJson = await sheetRes.json();
-
+  } catch (err) {
     document.getElementById("spinner").style.display = "none";
-
-    if(sheetJson.status === "success"){
-      localStorage.removeItem("zakuSelectedProduct");
-      alert("✅ Order submitted successfully!");
-      window.location.href = "success.html";
-    } else {
-      alert("❌ Failed to save order");
-    }
-
-  } catch(err){
-    document.getElementById("spinner").style.display = "none";
+    alert("❌ Failed to upload receipt");
     console.error(err);
-    alert("❌ Error submitting order");
   }
 });
 </script>
