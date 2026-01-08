@@ -1,119 +1,277 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Admin Dashboard | Campusmart</title>
-  <link rel="icon" href="Blue 1.png">
+<link rel="icon" href="Blue 1.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body{font-family:Arial;background:#f4f6f8;padding:20px}
-h2{text-align:center}
-.top{
+body{
+  margin:0;
+  font-family:Arial, sans-serif;
+  background:#f4f6f8;
+}
+header{
+  background:#0aa84f;
+  color:#fff;
+  padding:15px 20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+header h2{margin:0}
+header button{
+  background:#fff;
+  color:#0aa84f;
+  border:none;
+  padding:8px 14px;
+  border-radius:6px;
+  cursor:pointer;
+  font-weight:bold;
+}
+.container{
+  padding:20px;
+}
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:15px;
+  margin-bottom:20px;
+}
+.card{
+  background:#fff;
+  padding:15px;
+  border-radius:12px;
+  box-shadow:0 4px 10px rgba(0,0,0,.08);
+}
+.card h3{margin:0;font-size:14px;color:#666}
+.card p{margin:5px 0 0;font-size:22px;font-weight:bold}
+.controls{
   display:flex;
   gap:10px;
   margin-bottom:15px;
 }
-input{padding:8px;width:100%}
-button{
-  background:#0aa84f;
-  color:white;
-  border:none;
-  padding:8px 12px;
-  cursor:pointer;
+.controls input{
+  padding:10px;
+  width:100%;
+  border-radius:8px;
+  border:1px solid #ccc;
 }
 table{
   width:100%;
-  background:white;
   border-collapse:collapse;
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
 }
 th,td{
-  border:1px solid #ddd;
   padding:10px;
+  border-bottom:1px solid #eee;
   font-size:14px;
 }
-th{background:#0aa84f;color:white}
-a{color:blue}
+th{
+  background:#f0f0f0;
+  text-align:left;
+}
+tr:hover{background:#fafafa}
+a{
+  color:#0aa84f;
+  text-decoration:none;
+  font-weight:bold;
+}
+.loading{
+  text-align:center;
+  padding:30px;
+  font-size:16px;
+}
+
+/* LOGIN MODAL */
+#loginModal{
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.5);
+  display:flex; align-items:center; justify-content:center;
+}
+#loginBox{
+  background:#fff;
+  padding:30px;
+  border-radius:12px;
+  width:320px;
+  box-shadow:0 10px 25px rgba(0,0,0,.2);
+  text-align:center;
+}
+#loginBox input{
+  width:100%;
+  padding:10px;
+  margin:10px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+#loginBox button{
+  background:#0aa84f;
+  color:#fff;
+  border:none;
+  padding:10px;
+  width:100%;
+  cursor:pointer;
+  border-radius:8px;
+}
+#loginMsg{color:red;margin-top:5px;}
 </style>
 </head>
 
 <body>
 
-<script>
-if(sessionStorage.getItem("adminAuth") !== "true"){
-  window.location.href = "admin-login.html";
-}
-</script>
-
-<h2>🛒 Campusmart Orders</h2>
-
-<div class="top">
-  <input id="search" placeholder="Search orders...">
-  <button onclick="logout()">Logout</button>
+<!-- LOGIN MODAL -->
+<div id="loginModal">
+  <div id="loginBox">
+    <h3>Admin Login</h3>
+    <input id="loginEmail" type="email" placeholder="Admin email">
+    <input id="loginPassword" type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+    <p id="loginMsg"></p>
+  </div>
 </div>
 
-<table>
-<thead>
-<tr>
-<th>Date</th>
-<th>Name</th>
-<th>Email</th>
-<th>Phone</th>
-<th>Location</th>
-<th>Product</th>
-<th>Price</th>
-<th>Receipt</th>
-</tr>
-</thead>
-<tbody id="tbody"></tbody>
-</table>
+<header>
+  <h2>Campusmart Orders</h2>
+  <button onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+
+  <div class="stats">
+    <div class="card">
+      <h3>Total Orders</h3>
+      <p id="totalOrders">0</p>
+    </div>
+    <div class="card">
+      <h3>Total Revenue</h3>
+      <p id="totalRevenue">₦0</p>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input type="text" placeholder="Search by name, email or product..."
+           onkeyup="searchOrders(this.value)">
+  </div>
+
+  <div class="table-wrap">
+    <div id="loading" class="loading">Loading orders...</div>
+
+    <table id="orderTable" style="display:none">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Product</th>
+          <th>Price</th>
+          <th>Location</th>
+          <th>Receipt</th>
+        </tr>
+      </thead>
+      <tbody id="orders"></tbody>
+    </table>
+  </div>
+
+</div>
 
 <script>
+// ===== CONFIG =====
 const API_URL = "https://script.google.com/macros/s/AKfycbwWMLa6CRVdfb-0qWtwy2gvcEJMoyCILpgTE_bvIkWA8ra9xvmWpvhN8nqbtkw6YXTiSQ/exec";
-let orders = [];
+const ADMIN_EMAIL = "help.campusmart@gmail.com";
+const ADMIN_PASSWORD = "campusmart123";
 
-fetch(API_URL)
-  .then(r => r.json())
-  .then(data => {
-    orders = data.reverse();
-    render(orders);
-  });
+let allOrders = [];
 
-function render(list){
+// ===== LOGIN FUNCTION =====
+function login(){
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+  const msg = document.getElementById("loginMsg");
+
+  if(email === ADMIN_EMAIL && password === ADMIN_PASSWORD){
+    sessionStorage.setItem("adminAuth", "true");
+    document.getElementById("loginModal").style.display = "none";
+    loadOrders();
+  } else {
+    msg.innerText = "Invalid credentials";
+  }
+}
+
+// ===== AUTH CHECK =====
+if(sessionStorage.getItem("adminAuth") === "true"){
+  document.getElementById("loginModal").style.display = "none";
+  loadOrders();
+}
+
+// ===== LOGOUT =====
+function logout(){
+  sessionStorage.removeItem("adminAuth");
+  location.reload();
+}
+
+// ===== FETCH ORDERS =====
+function loadOrders(){
+  document.getElementById("loading").style.display = "block";
+  fetch(API_URL)
+    .then(res => res.json())
+    .then(data => {
+      allOrders = data.reverse(); // latest first
+      renderOrders(allOrders);
+      calculateStats(allOrders);
+      document.getElementById("loading").style.display = "none";
+      document.getElementById("orderTable").style.display = "table";
+    })
+    .catch(err => {
+      document.getElementById("loading").innerText = "Failed to load orders";
+      console.error(err);
+    });
+}
+
+// ===== RENDER TABLE =====
+function renderOrders(data){
+  const tbody = document.getElementById("orders");
   tbody.innerHTML = "";
-  list.forEach(o => {
+
+  data.forEach(o => {
     tbody.innerHTML += `
       <tr>
-        <td>${o.Timestamp || ""}</td>
-        <td>${o.Name || ""}</td>
-        <td>${o.Email || ""}</td>
-        <td>${o.Phone || ""}</td>
-        <td>${o.Location || ""}</td>
-        <td>${o.Product || ""}</td>
-        <td>₦${o.Price || ""}</td>
-        <td><a href="${o.Receipt}" target="_blank">View</a></td>
+        <td>${new Date(o.Timestamp).toLocaleString()}</td>
+        <td>${o.name}</td>
+        <td>${o.email}</td>
+        <td>${o.phone}</td>
+        <td>${o.productName}</td>
+        <td>₦${o.productPrice}</td>
+        <td>${o.location} - ${o.hall} (${o.room})</td>
+        <td><a href="${o.receiptUrl}" target="_blank">View</a></td>
       </tr>
     `;
   });
 }
 
-search.addEventListener("input", e => {
-  const q = e.target.value.toLowerCase();
-  render(
-    orders.filter(o =>
-      Object.values(o).join(" ").toLowerCase().includes(q)
-    )
+// ===== SEARCH =====
+function searchOrders(value){
+  value = value.toLowerCase();
+  const filtered = allOrders.filter(o =>
+    o.name.toLowerCase().includes(value) ||
+    o.email.toLowerCase().includes(value) ||
+    o.productName.toLowerCase().includes(value)
   );
-});
+  renderOrders(filtered);
+}
 
-function logout(){
-  sessionStorage.removeItem("adminAuth");
-  location.href="adminlogin.html";
+// ===== STATS =====
+function calculateStats(data){
+  document.getElementById("totalOrders").innerText = data.length;
+  const total = data.reduce((sum, o) => sum + Number(o.productPrice || 0), 0);
+  document.getElementById("totalRevenue").innerText = "₦" + total.toLocaleString();
 }
 </script>
 
 </body>
 </html>
-
-
-
