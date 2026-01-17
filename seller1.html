@@ -4,152 +4,228 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/x-icon" href="Blue 1.png">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Become a Seller - CampusmartStore</title>
+  <title>Sell on Campusmart | Vendor Program</title>
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap');
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Montserrat', sans-serif;
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Montserrat', sans-serif;
     }
 
-    body {
-      background: #f9f9f9;
-      color: #333;
+    body{
+      background:#f5f7fa;
+      color:#333;
     }
 
-    /* Header */
-    header {
-      background: #fff;
-      padding: 1rem;
-      text-align: center;
-      color: black;
+    header{
+      background:#ffffff;
+      padding:1.2rem;
+      text-align:center;
+      box-shadow:0 2px 8px rgba(0,0,0,.05);
     }
 
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.6rem;
-      flex-wrap: wrap;
+    header h1{
+      font-size:2rem;
+      color:#0000FF;
     }
 
-    header h1 {
-      color: black;
-      font-size: 2rem;
-      margin: 0;
-      white-space: nowrap;
+    main{
+      max-width:1000px;
+      margin:2rem auto;
+      padding:0 1rem;
     }
 
-    .logo {
-      width: 40px;
-      height: 40px;
-      animation: shake 1.5s infinite;
-      flex-shrink: 0;
+    /* TOP ACTION CARDS */
+    .action-cards{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(240px,1fr));
+      gap:1.2rem;
+      margin-bottom:2.5rem;
     }
 
-    /* Shake Animation */
-    @keyframes shake {
-      0% { transform: rotate(0deg); }
-      25% { transform: rotate(3deg); }
-      50% { transform: rotate(-3deg); }
-      75% { transform: rotate(3deg); }
-      100% { transform: rotate(0deg); }
+    .action-card{
+      background:#ffffff;
+      padding:1.8rem;
+      border-radius:14px;
+      box-shadow:0 10px 25px rgba(0,0,0,.08);
+      text-align:center;
+      transition:transform .25s ease, box-shadow .25s ease;
     }
 
-    /* Seller Section */
-    .seller-section {
-      background: white;
-      padding: 2rem;
-      margin: 2rem auto;
-      max-width: 800px;
-      border-radius: 10px;
-      text-align: center;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    .action-card:hover{
+      transform:translateY(-5px);
+      box-shadow:0 15px 30px rgba(0,0,0,.12);
     }
 
-    .seller-section h2 {
-      color: #0000FF;
-      margin-bottom: 1rem;
-      font-size: 1.6rem;
+    .action-card h3{
+      color:#0000FF;
+      margin-bottom:.6rem;
+      font-size:1.3rem;
     }
 
-    .seller-section p {
-      font-size: 1.1rem;
-      margin-bottom: 1rem;
-      color: #444;
+    .action-card p{
+      font-size:.95rem;
+      margin-bottom:1.2rem;
+      color:#555;
     }
 
-    .btn-seller {
-      display: inline-block;
-      background: #0000FF;
-      color: white;
-      padding: 0.8rem 1.5rem;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: bold;
-      transition: background 0.3s ease, transform 0.2s ease;
+    .btn{
+      display:inline-block;
+      background:#0000FF;
+      color:#fff;
+      padding:.7rem 1.4rem;
+      border-radius:8px;
+      text-decoration:none;
+      font-weight:600;
+      transition:background .3s ease, transform .2s ease;
     }
 
-    .btn-seller:hover {
-      background: #87CEEB;
-      transform: scale(1.05);
+    .btn:hover{
+      background:#87CEEB;
+      transform:scale(1.05);
     }
 
-    /* Footer */
-    footer {
-      text-align: center;
-      padding: 1rem;
-      background: #0000FF;
-      color: white;
-      font-size: 0.9rem;
-      margin-top: 2rem;
+    /* INFO SECTION */
+    .info-section{
+      margin-top:2rem;
     }
 
-    /* Responsive Adjustments */
-    @media (max-width: 600px) {
-      header h1 {
-        font-size: 1.5rem;
-      }
+    .info-section h2{
+      text-align:center;
+      color:#0000FF;
+      margin-bottom:1.8rem;
+      font-size:1.7rem;
+    }
 
-      .logo {
-        width: 35px;
-        height: 35px;
-      }
+    .info-cards{
+      display:grid;
+      grid-template-columns:repeat(auto-fit, minmax(260px,1fr));
+      gap:1.5rem;
+    }
 
-      .seller-section {
-        padding: 1.5rem 1rem;
-        margin: 1rem;
-      }
+    .info-card{
+      background:#ffffff;
+      padding:1.6rem;
+      border-radius:14px;
+      box-shadow:0 6px 18px rgba(0,0,0,.08);
+    }
 
-      .seller-section p {
-        font-size: 1rem;
-      }
+    .info-card h4{
+      color:#0000FF;
+      margin-bottom:.6rem;
+      font-size:1.15rem;
+    }
+
+    .info-card p{
+      font-size:.95rem;
+      color:#555;
+      line-height:1.6;
+    }
+
+    footer{
+      margin-top:3rem;
+      background:#0000FF;
+      color:#fff;
+      text-align:center;
+      padding:1rem;
+      font-size:.9rem;
+    }
+
+    @media(max-width:600px){
+      header h1{font-size:1.6rem;}
     }
   </style>
 </head>
+
 <body>
 
-  <!-- Header -->
-  <header>
-    <div class="header-content">
+<header>
+  <h1>Sell on Campusmart</h1>
+</header>
 
-      <h1>CampusmartStore Sellers</h1>
+<main>
+
+  <!-- TOP ACTION CARDS -->
+  <section class="action-cards">
+
+    <div class="action-card">
+      <h3>Become a Vendor</h3>
+      <p>
+        Join Campusmart as a verified vendor and start selling to students
+        across campus.
+      </p>
+      <a href="https://forms.gle/XxzodqRNwLpLLmLo7" class="btn">
+        Register as Vendor
+      </a>
     </div>
-  </header>
 
-  <!-- Seller Section -->
-  <main>
-    <section class="seller-section">
-      <h2>Become a Seller on CampusmartStore</h2>
-      <p>Are you interested in selling your products to thousands of students on CampusmartStore? Join our community of trusted sellers today and grow your business!</p>
-      <p>Simply fill out our registration form to get started.</p>
-      <a href="https://forms.gle/XxzodqRNwLpLLmLo7" class="btn-seller">Register as a Seller</a>
-    </section>
-  </main>
+    <div class="action-card">
+      <h3>Add a Product</h3>
+      <p>
+        Already a vendor? Add new products and start receiving orders instantly.
+      </p>
+      <a href="https://forms.gle/XxzodqRNwLpLLmLo7" class="btn">
+        Add Product
+      </a>
+    </div>
 
-  
+  </section>
+
+  <!-- INFO SECTION -->
+  <section class="info-section">
+    <h2>How Selling on Campusmart Works</h2>
+
+    <div class="info-cards">
+
+      <div class="info-card">
+        <h4>1️⃣ Vendor Registration</h4>
+        <p>
+          To become a Campusmart vendor, you pay a one-time
+          <strong>₦1,000 registration fee</strong>.
+          This gives you a <strong>6-month vendor subscription</strong>
+          and access to sell on Campusmart.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h4>2️⃣ Product Listing Fee</h4>
+        <p>
+          Each product you want to add costs
+          <strong>₦200 per product</strong>.
+          This helps us manage quality listings and platform maintenance.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h4>3️⃣ Transaction Fees</h4>
+        <p>
+          Any applicable transaction fee will be
+          <strong>added to the product price</strong>,
+          so vendors don’t have to pay separately.
+        </p>
+      </div>
+
+      <div class="info-card">
+        <h4>4️⃣ Vendor Support & Updates</h4>
+        <p>
+          After registration, detailed information about Campusmart,
+          order handling, delivery process, and future updates
+          will be sent directly to your <strong>email address</strong>.
+        </p>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  © 2026 CampusmartStore · Empowering Student Businesses
+</footer>
+
 </body>
 </html>
