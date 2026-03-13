@@ -15,10 +15,20 @@
 
 /* ===== MART NEON GLOW ===== */
 .mart-glow{
-  color:#000; /* text color */
+  color:#00f;
   font-weight:700;
   position:relative;
+  text-decoration:none;
   animation: martGlow 1.6s infinite alternate;
+}
+
+.mart-glow::after {
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:8px;
+  border:2px solid rgba(0,0,255,0.5);
+  animation: martRing 1.6s infinite;
 }
 
 @keyframes martGlow{
@@ -39,6 +49,11 @@
   }
 }
 
+@keyframes martRing {
+  0% { opacity: 0; transform: scale(0.9);}
+  50% { opacity:1; }
+  100% { opacity:0; transform: scale(1.2);}
+}
 /* === PRELOADER STYLES === */
 #preloader {
   position: fixed;
@@ -290,3 +305,4 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
