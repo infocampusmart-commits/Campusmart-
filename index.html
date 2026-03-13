@@ -1,24 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/x-icon" href="Blue 1.png">
-    <link
-      href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
-    />
-    <link rel="stylesheet" href="food.css" />
-    <title>CampusmartStore</title>
-    
-  </head>
-  <body>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/x-icon" href="Blue 1.png">
 
-    <!-- === PRELOADER START === -->
+<link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet"/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"/>
+
+<link rel="stylesheet" href="food.css" />
+
+<title>CampusmartStore</title>
+
+<style>
+
+/* ===== MART GLOW EFFECT ===== */
+
+.mart-glow{
+  color:#0000FF;
+  font-weight:700;
+  animation: martGlow 1.5s infinite alternate;
+}
+
+@keyframes martGlow{
+  from{
+    text-shadow:
+      0 0 5px #0000FF,
+      0 0 10px #0000FF,
+      0 0 20px #0000FF;
+  }
+
+  to{
+    text-shadow:
+      0 0 10px #0000FF,
+      0 0 25px #0000FF,
+      0 0 40px #0000FF;
+  }
+}
+
+/* === PRELOADER STYLES === */
+
+#preloader {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 99999;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+#preloader.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.preloader {
+  display: flex;
+  gap: 6px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  color: #0000FF;
+  letter-spacing: 3px;
+  font-size: clamp(20px, 5vw, 50px);
+  text-transform: uppercase;
+}
+
+.preloader span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(18px);
+  animation: fadeUp 0.6s forwards, bounce 1s infinite ease-in-out alternate;
+}
+
+.preloader span:nth-child(1){animation-delay:0s,1s;}
+.preloader span:nth-child(2){animation-delay:0.1s,1.1s;}
+.preloader span:nth-child(3){animation-delay:0.2s,1.2s;}
+.preloader span:nth-child(4){animation-delay:0.3s,1.3s;}
+.preloader span:nth-child(5){animation-delay:0.4s,1.4s;}
+.preloader span:nth-child(6){animation-delay:0.5s,1.5s;}
+.preloader span:nth-child(7){animation-delay:0.6s,1.6s;}
+.preloader span:nth-child(8){animation-delay:0.7s,1.7s;}
+.preloader span:nth-child(9){animation-delay:0.8s,1.8s;}
+.preloader span:nth-child(10){animation-delay:0.9s,1.9s;}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce {
+  to {
+    transform: translateY(-8px);
+  }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- === PRELOADER START === -->
+
 <div id="preloader">
   <div class="preloader">
     <span>C</span><span>A</span><span>M</span><span>P</span><span>U</span>
@@ -26,159 +116,130 @@
   </div>
 </div>
 
-<style>
-  /* === PRELOADER STYLES === */
-  #preloader {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    background: #fff; /* white background */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 99999; /* stays on top of nav/content */
-    transition: opacity 0.6s ease, visibility 0.6s ease;
-  }
-  #preloader.hidden {
-    opacity: 0;
-    visibility: hidden;
-  }
-
-  .preloader {
-    display: flex;
-    gap: 6px;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 800;
-    color: #0000FF; /* text color */
-    letter-spacing: 3px;
-    font-size: clamp(20px, 5vw, 50px);
-    text-transform: uppercase;
-  }
-
-  .preloader span {
-    display: inline-block;
-    opacity: 0;
-    transform: translateY(18px);
-    animation: fadeUp 0.6s forwards, bounce 1s infinite ease-in-out alternate;
-  }
-
-  /* Staggered fade-in */
-  .preloader span:nth-child(1){animation-delay:0s, 1s;}
-  .preloader span:nth-child(2){animation-delay:0.1s, 1.1s;}
-  .preloader span:nth-child(3){animation-delay:0.2s, 1.2s;}
-  .preloader span:nth-child(4){animation-delay:0.3s, 1.3s;}
-  .preloader span:nth-child(5){animation-delay:0.4s, 1.4s;}
-  .preloader span:nth-child(6){animation-delay:0.5s, 1.5s;}
-  .preloader span:nth-child(7){animation-delay:0.6s, 1.6s;}
-  .preloader span:nth-child(8){animation-delay:0.7s, 1.7s;}
-  .preloader span:nth-child(9){animation-delay:0.8s, 1.8s;}
-  .preloader span:nth-child(10){animation-delay:0.9s, 1.9s;}
-
-  @keyframes fadeUp {
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes bounce {
-    to {
-      transform: translateY(-8px);
-    }
-  }
-</style>
-
 <script>
-  // === PRELOADER SCRIPT ===
-  window.addEventListener("load", () => {
-    const preloader = document.getElementById("preloader");
-    setTimeout(() => {
-      preloader.classList.add("hidden");
-    }, 2500); // hides after animations play
-  });
+
+window.addEventListener("load", () => {
+  const preloader = document.getElementById("preloader");
+
+  setTimeout(() => {
+    preloader.classList.add("hidden");
+  },2500);
+
+});
+
 </script>
+
 <!-- === PRELOADER END === -->
 
-    
-    <nav>
-      <div class="nav__header">
-        <div class="nav__logo">
-           <div class="logo">
-            <img src="Blue 1.png" alt="Logo" class="shake-logo" />
-            <h3>CampusmartStore</h3>
-         </div>
-        </div>
+<nav>
 
-        <div class="nav__menu__btn" id="menu-btn">
-          <i class="ri-menu-3-line"></i>
-        </div>
-      </div>
-      <ul class="nav__links" id="nav-links">
-        <li><a href="#home">Home</a></li>
-        <li><a href="info.html">Mart</a></li>
-        <li><a href="mailto:help.campusmart@gmail.com">Contact</a></li>
-      </ul>
-    </nav>
+<div class="nav__header">
 
-    <header id="header">
-      <div class="header__image">
-        <img src="p2">
-      </div>
-      <div class="header__content">
-        <h1>The Pulse Of Student Commerce & Connection!</h1>
-      </div>
-    </header>
+<div class="nav__logo">
 
-    <section class="service">
-      <div class="section__container service__container" id="service">
-        <h2 class="section__header">How It Works</h2>
-        
-      </div>
-    </section>
+<div class="logo">
+<img src="Blue 1.png" alt="Logo" class="shake-logo" />
+<h3>CampusmartStore</h3>
+</div>
 
-    <section class="experience">
-      <div class="experience__image">
-        <img src="P3">
-      </div>
-      <div class="experience__content">
-        <h2 class="section__header">Your Campus, <br /> Your Marketplace!</h2>
-        <p>
-           The ultimate student marketplace designed exclusively for Covenant University students! Don’t just watch be part of the movement, from graphic design to tutoring, discover and showcase student talents.Need a designer, tutor, or photographer? Hire student pros & support your peers!
-        </p>
-        <div class="experience__btn">
-          <button class="btn" onclick="window.location.href='seller1.html '">Join Us</button>
+</div>
 
-        </div>
-      </div>
-      
-    </section>
+<div class="nav__menu__btn" id="menu-btn">
+<i class="ri-menu-3-line"></i>
+</div>
 
-    <section class="experience">
-      <div class="experience__image">
-        <img src="p4">
-      </div>
-      <div class="experience__content">
-        <h2 class="section__header">Epic Events, <br />  Exclusive Deals!</h2>
-        <p>
-           From fashion to gadgets, get the best student-to-student deals. Get quality goods from fellow students at unbeatable prices!From thrilling competitions to flash sales, there’s always something exciting happening. Flash sales, competitions, and exclusive student-only discounts!
-        </p>
-        <div class="experience__btn">
-          <button class="btn" onclick="window.location.href='info.html'">Mart Now</button>
+</div>
 
-        </div>
-      </div>
-      
-    </section>
+<ul class="nav__links" id="nav-links">
 
-   
+<li><a href="#home">Home</a></li>
 
-    <section class="subscribe" id="contact">
-      <h2 class="section__header">Follow<br />Our Instagram</h2>
-     
-    </section>
+<li><a href="info.html" class="mart-glow">Mart</a></li>
 
-    <script>
+<li><a href="mailto:help.campusmart@gmail.com">Contact</a></li>
+
+</ul>
+
+</nav>
+
+<header id="header">
+
+<div class="header__image">
+<img src="p2">
+</div>
+
+<div class="header__content">
+<h1>The Pulse Of Student Commerce & Connection!</h1>
+</div>
+
+</header>
+
+<section class="service">
+
+<div class="section__container service__container" id="service">
+
+<h2 class="section__header">How It Works</h2>
+
+</div>
+
+</section>
+
+<section class="experience">
+
+<div class="experience__image">
+<img src="P3">
+</div>
+
+<div class="experience__content">
+
+<h2 class="section__header">Your Campus,<br>Your Marketplace!</h2>
+
+<p>
+The ultimate student marketplace designed exclusively for Covenant University students!
+Don’t just watch be part of the movement, from graphic design to tutoring,
+discover and showcase student talents.Need a designer, tutor, or photographer?
+Hire student pros & support your peers!
+</p>
+
+<div class="experience__btn">
+<button class="btn" onclick="window.location.href='seller1.html'">Join Us</button>
+</div>
+
+</div>
+
+</section>
+
+<section class="experience">
+
+<div class="experience__image">
+<img src="p4">
+</div>
+
+<div class="experience__content">
+
+<h2 class="section__header">Epic Events,<br>Exclusive Deals!</h2>
+
+<p>
+From fashion to gadgets, get the best student-to-student deals.
+Get quality goods from fellow students at unbeatable prices!
+Flash sales, competitions, and exclusive student-only discounts!
+</p>
+
+<div class="experience__btn">
+<button class="btn" onclick="window.location.href='info.html'">Mart Now</button>
+</div>
+
+</div>
+
+</section>
+
+<section class="subscribe" id="contact">
+
+<h2 class="section__header">Follow<br>Our Instagram</h2>
+
+</section>
+
+<script>
   atOptions = {
     'key' : '38d1f636e6b7d351c384d71b03c14090',
     'format' : 'iframe',
@@ -187,100 +248,142 @@
     'params' : {}
   };
 </script>
+
 <script src="https://www.highperformanceformat.com/38d1f636e6b7d351c384d71b03c14090/invoke.js"></script>
 
-    <footer>
-      <div class="section__container footer__container">
-        <div class="footer__col">
-          <div class="footer__logo">
-            <a href="#">CampusmartStore</a>
-          </div>
-          <p>
-            This isn’t just another marketplace—it’s a movement. Join CampusmartStore today and turn your campus connections into success! 
-          </p>
-          <ul class="footer__socials">
-            
-            <li>
-              <a href="https://www.instagram.com/campusmartstore_/?utm_source=ig_web_button_share_sheet"><i class="ri-instagram-fill"></i></a>
-            </li>
-          </ul>
-        </div>
-        <div class="footer__col">
-          <h4>OUR COMPANY</h4>
-          <ul class="footer__links">
-            <li><a href="octalearn.com.ng">Partners</a></li>
-            <li><a href="#">Our Services</a></li>
-            <li><a href="https://www.instagram.com/campusmartstore_/?utm_source=ig_web_button_share_sheet">Instagram</a></li>
-            <li><a href="mailto:help.campusmart@gmail.com">Email</a></li>
-          </ul>
-        </div>
+<footer>
 
-         <div class="footer__col">
-          <h4>More</h4>
-          <ul class="footer__links">
-            <li><a href="about.html">About Us</a></li>
-            <li><a href="terms.html">Terms & Conditions</a></li>
-            <li><a href="privacy.html">Privacy Policy</a></li>
-          </ul>
-        </div>
-        
-        <div class="footer__col">
-          <h4>LOCATION</h4>
-          <div class="footer__property__detail">
-            <img src="Blue 1.png" alt="footer" />
-            <div>
-              <h5>Covenant University</h5>
-              <p>km 10 idiroko rd, ota 112104, ogun state</p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="footer__bar">
-        Copyright © 2025 CampusmartStore. All rights reserved.
-      </div>
-    </footer>
+<div class="section__container footer__container">
 
-    <script src="https://unpkg.com/scrollreveal"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="food.js"></script>
+<div class="footer__col">
 
+<div class="footer__logo">
+<a href="#">CampusmartStore</a>
+</div>
 
-    
+<p>
+This isn’t just another marketplace—it’s a movement.
+Join CampusmartStore today and turn your campus connections into success!
+</p>
 
+<ul class="footer__socials">
+
+<li>
+<a href="https://www.instagram.com/campusmartstore_/">
+<i class="ri-instagram-fill"></i>
+</a>
+</li>
+
+</ul>
+
+</div>
+
+<div class="footer__col">
+
+<h4>OUR COMPANY</h4>
+
+<ul class="footer__links">
+
+<li><a href="octalearn.com.ng">Partners</a></li>
+<li><a href="#">Our Services</a></li>
+<li><a href="https://www.instagram.com/campusmartstore_/">Instagram</a></li>
+<li><a href="mailto:help.campusmart@gmail.com">Email</a></li>
+
+</ul>
+
+</div>
+
+<div class="footer__col">
+
+<h4>More</h4>
+
+<ul class="footer__links">
+
+<li><a href="about.html">About Us</a></li>
+<li><a href="terms.html">Terms & Conditions</a></li>
+<li><a href="privacy.html">Privacy Policy</a></li>
+
+</ul>
+
+</div>
+
+<div class="footer__col">
+
+<h4>LOCATION</h4>
+
+<div class="footer__property__detail">
+
+<img src="Blue 1.png" alt="footer" />
+
+<div>
+<h5>Covenant University</h5>
+<p>km 10 idiroko rd, ota 112104, ogun state</p>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="footer__bar">
+Copyright © 2025 CampusmartStore. All rights reserved.
+</div>
+
+</footer>
+
+<script src="https://unpkg.com/scrollreveal"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script src="food.js"></script>
 
 <script>
-  (function () {
-    const menuBtn  = document.getElementById('menu-btn');
-    const navLinks = document.getElementById('nav-links');
-    if (!menuBtn || !navLinks) return;
 
-    menuBtn.setAttribute('aria-label', 'Toggle menu');
-    menuBtn.setAttribute('aria-controls', 'nav-links');
-    menuBtn.setAttribute('aria-expanded', 'false');
+(function () {
 
-    function closeMenu() {
-      navLinks.classList.remove('open');
-      menuBtn.setAttribute('aria-expanded', 'false');
-    }
+const menuBtn  = document.getElementById('menu-btn');
+const navLinks = document.getElementById('nav-links');
 
-    menuBtn.addEventListener('click', function (e) {
-      e.stopPropagation();
-      const willOpen = !navLinks.classList.contains('open');
-      navLinks.classList.toggle('open', willOpen);
-      menuBtn.setAttribute('aria-expanded', String(willOpen));
-    });
+if (!menuBtn || !navLinks) return;
 
-    document.addEventListener('click', function (e) {
-      if (!navLinks.contains(e.target) && !menuBtn.contains(e.target)) closeMenu();
-    });
+menuBtn.setAttribute('aria-label','Toggle menu');
+menuBtn.setAttribute('aria-controls','nav-links');
+menuBtn.setAttribute('aria-expanded','false');
 
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeMenu();
-    });
-  })();
+function closeMenu(){
+navLinks.classList.remove('open');
+menuBtn.setAttribute('aria-expanded','false');
+}
+
+menuBtn.addEventListener('click',function(e){
+
+e.stopPropagation();
+
+const willOpen = !navLinks.classList.contains('open');
+
+navLinks.classList.toggle('open',willOpen);
+
+menuBtn.setAttribute('aria-expanded',String(willOpen));
+
+});
+
+document.addEventListener('click',function(e){
+
+if(!navLinks.contains(e.target) && !menuBtn.contains(e.target))
+closeMenu();
+
+});
+
+document.addEventListener('keydown',function(e){
+
+if(e.key === 'Escape') closeMenu();
+
+});
+
+})();
+
 </script>
 
-  </body>
+</body>
 </html>
-
-
