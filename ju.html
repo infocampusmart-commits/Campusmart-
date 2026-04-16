@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusMart Price Calculator</title>
+<link rel="icon" type="image/x-icon" href="Blue 1.png">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 15px;
+      width: 350px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      border: none;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: blue;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #87CEEB;
+    }
+
+    .result {
+      margin-top: 20px;
+      background: #334155;
+      padding: 15px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h2>CampusMart Calculator</h2>
+
+  <input type="number" id="price" placeholder="Enter Product Price (₦)">
+
+  <button onclick="calculate()">Calculate Final Price</button>
+
+  <div class="result" id="result" style="display:none;"></div>
+</div>
+
+<script>
+function calculate() {
+  let price = parseFloat(document.getElementById("price").value);
+
+  if (!price || price <= 0) {
+    alert("Enter a valid price");
+    return;
+  }
+
+  // CampusMart 3%
+  let commission = price * 0.03;
+
+  let subtotal = price + commission;
+
+  // Paystack Fee (1.5% + 100)
+  let paystack = (subtotal * 0.015) + 100;
+
+  let finalPrice = subtotal + paystack;
+
+  document.getElementById("result").style.display = "block";
+  document.getElementById("result").innerHTML = `
+    <p><strong>Original Price:</strong> ₦${price.toFixed(2)}</p>
+    <p><strong>CampusMart 3%:</strong> ₦${commission.toFixed(2)}</p>
+    <p><strong>Paystack Fee:</strong> ₦${paystack.toFixed(2)}</p>
+    <hr>
+    <p><strong>Final Price:</strong> ₦${finalPrice.toFixed(2)}</p>
+  `;
+}
+</script>
+
+</body>
+</html>
